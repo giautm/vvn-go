@@ -19,6 +19,26 @@ const (
 	Api_keyScopes = "api_key.Scopes"
 )
 
+// Defines values for FaceAntiSpoofStatusFakeCode.
+const (
+	FaceAntiSpoofStatusFakeCodeFAKE FaceAntiSpoofStatusFakeCode = "FAKE"
+	FaceAntiSpoofStatusFakeCodeREAL FaceAntiSpoofStatusFakeCode = "REAL"
+)
+
+// Defines values for FaceAntiSpoofStatusFakeType.
+const (
+	NA           FaceAntiSpoofStatusFakeType = "N/A"
+	RANDOMPOSE   FaceAntiSpoofStatusFakeType = "RANDOM_POSE"
+	SCREEN       FaceAntiSpoofStatusFakeType = "SCREEN"
+	STRAIGHTPOSE FaceAntiSpoofStatusFakeType = "STRAIGHT_POSE"
+)
+
+// Defines values for FaceAntiSpoofStatusStatus.
+const (
+	FaceAntiSpoofStatusStatusFAKE FaceAntiSpoofStatusStatus = "FAKE"
+	FaceAntiSpoofStatusStatusREAL FaceAntiSpoofStatusStatus = "REAL"
+)
+
 // Defines values for OCRResultDocument.
 const (
 	ARMYID           OCRResultDocument = "ARMY ID"
@@ -32,27 +52,310 @@ const (
 	POLICEID         OCRResultDocument = "POLICE ID"
 )
 
+// Defines values for OCRResultIdCheck.
+const (
+	BW    OCRResultIdCheck = "BW"
+	CONER OCRResultIdCheck = "CONER"
+	FAKE  OCRResultIdCheck = "FAKE"
+	PUNCH OCRResultIdCheck = "PUNCH"
+	REAL  OCRResultIdCheck = "REAL"
+)
+
+// Defines values for OCRResultResultCode.
+const (
+	N200 OCRResultResultCode = 200
+	N201 OCRResultResultCode = 201
+	N401 OCRResultResultCode = 401
+	N402 OCRResultResultCode = 402
+	N500 OCRResultResultCode = 500
+	N501 OCRResultResultCode = 501
+)
+
+// Defines values for VerificationResultVerifyResult.
+const (
+	N0 VerificationResultVerifyResult = 0
+	N1 VerificationResultVerifyResult = 1
+	N2 VerificationResultVerifyResult = 2
+)
+
+// Defines values for VerificationResultWearingMask.
+const (
+	NO  VerificationResultWearingMask = "NO"
+	YES VerificationResultWearingMask = "YES"
+)
+
+// FaceAntiSpoofStatus defines model for FaceAntiSpoofStatus.
+type FaceAntiSpoofStatus struct {
+	FakeCode *FaceAntiSpoofStatusFakeCode `json:"fake_code,omitempty"`
+
+	// Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]
+	FakeScore *float32 `json:"fake_score,omitempty"`
+
+	// Trả về loại lỗi giả mạo
+	FakeType *FaceAntiSpoofStatusFakeType `json:"fake_type,omitempty"`
+
+	// Trả về khi check_3_random_pose==1. Score matching giữa ảnh live với 3 ảnh đưa vào kiểm tra
+	LivenessCompareScores *string                    `json:"liveness_compare_scores,omitempty"`
+	Status                *FaceAntiSpoofStatusStatus `json:"status,omitempty"`
+}
+
+// FaceAntiSpoofStatusFakeCode defines model for FaceAntiSpoofStatus.FakeCode.
+type FaceAntiSpoofStatusFakeCode string
+
+// Trả về loại lỗi giả mạo
+type FaceAntiSpoofStatusFakeType string
+
+// FaceAntiSpoofStatusStatus defines model for FaceAntiSpoofStatus.Status.
+type FaceAntiSpoofStatusStatus string
+
+// OCRInput defines model for OCRInput.
+type OCRInput struct {
+	// Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMND..) yêu cầu request_id của mặt trước và hay không
+	IDFullThreshold *float32 `json:"id_full_thr,omitempty"`
+	Image           string   `json:"image"`
+	RequestID       string   `json:"request_id"`
+}
+
 // OCRResult defines model for OCRResult.
 type OCRResult struct {
+	// Địa chỉ thường trú
+	Address *string `json:"address,omitempty"`
+
+	// Độ tin tưởng trường địa chỉ thường trú (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	AddressConfidence *string `json:"addressconf,omitempty"`
+
+	// Ngày sinh
+	Birthday *string `json:"birthday,omitempty"`
+
+	// Độ tin tưởng trường ngày tháng năm sinh (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	BirthdayConfidence *string `json:"birthdayconf,omitempty"`
+
+	// Loại BLX
+	Class *string `json:"class,omitempty"`
+
+	// Quốc gia
+	Country *string `json:"country,omitempty"`
+
+	// Quận/Huyện
+	District *string `json:"district,omitempty"`
+
 	// Thông tin mô tả các loại giấy tờ
 	Document *OCRResultDocument `json:"document,omitempty"`
-	Id       *string            `json:"id,omitempty"`
-	Name     *string            `json:"name,omitempty"`
+
+	// Dân tộc
+	Ethnicity *string `json:"ethnicity,omitempty"`
+
+	// Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn)
+	Expiry *string `json:"expiry,omitempty"`
+
+	// Độ tin tưởng của trường hết hạn (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	ExpiryConfidence *string `json:"expiryconf,omitempty"`
+
+	// Nguyên quán
+	Hometown *string `json:"hometown,omitempty"`
+
+	// Độ tin tưởng trường nguyên quán (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	HometownConfidence *string `json:"hometownconf,omitempty"`
+	ID                 *string `json:"id,omitempty"`
+
+	// Kết quả kiểm tra văn bản
+	IDCheck *OCRResultIdCheck `json:"id_check,omitempty"`
+
+	// Check xem giấy tờ có full về mặt THÔNG TIN hay không. Note: trường hợp số ID bị che (dẫn tới score < id_full_thr (mặc định 0.8) --> not full). Giấy tờ có thể không đầy đủ về mặt hình ảnh(ví dụ không có hình ảnh khuôn mặt), nhưng nếu vẫn đầy đủ thông tin -- > id_full =1
+	IDFull *string `json:"id_full,omitempty"`
+
+	// ID logic
+	IDLogic *string `json:"id_logic,omitempty"`
+
+	// ID logic message
+	IDLogicMessage *string `json:"id_logic_message,omitempty"`
+	IDType         *string `json:"id_type,omitempty"`
+
+	// Độ tin tưởng của trường ID (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	IDConfidence *string `json:"idconf,omitempty"`
+
+	// Nơi cấp
+	IssueBy *string `json:"issue_by,omitempty"`
+
+	// Độ tin tưởng của trường nơi cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	IssueByConfidence *string `json:"issue_by_conf,omitempty"`
+
+	// Ngày cấp
+	IssueDate *string `json:"issue_date,omitempty"`
+
+	// Độ tin tưởng của trường ngày cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	IssueDateConfidence *string `json:"issue_date_conf,omitempty"`
+
+	// Tên khách hàng trên giấy tờ
+	Name *string `json:"name,omitempty"`
+
+	// Độ tin tưởng trường họ tên (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	NameConfidence *string `json:"nameconf,omitempty"`
+
+	// Quốc gia
+	National *string `json:"national,omitempty"`
+
+	// Chỉ có ý nghĩa với passport. Số CMT của Vietnam
+	OptinalData *string `json:"optinal_data,omitempty"`
+
+	// Loại Passport (công vụ/thường - PK/P)
+	PassportType *string `json:"passport_type,omitempty"`
+	Precinct     *string `json:"precinct,omitempty"`
+
+	// Tỉnh/TP
+	Province *string `json:"province,omitempty"`
+
+	// Tôn giáo
+	Religion *string `json:"religion,omitempty"`
+
+	// Độ tin tưởng của trường tôn giáo (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	ReligionConfidence *string `json:"religionconf,omitempty"`
+
+	// Mã kết quả
+	ResultCode *OCRResultResultCode `json:"result_code,omitempty"`
+
+	// container id
+	ServerName *string `json:"server_name,omitempty"`
+
+	// server version
+	ServerVersion *string `json:"server_ver,omitempty"`
+
+	// Giới tính
+	Sex *string `json:"sex,omitempty"`
+
+	// Độ tin tưởng trường giới tính (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+	SexConfidence *string `json:"sexconf,omitempty"`
 }
 
 // Thông tin mô tả các loại giấy tờ
 type OCRResultDocument string
 
-// Ocr defines model for Ocr.
-type Ocr struct {
-	// Chú ý: Với cùng 1 loại giấy tờ có 2 mặt (ví dụ: Căn cước Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMN
-	IDFullThr *float32 `json:"id_full_thr,omitempty"`
-	Image     string   `json:"image"`
-	RequestID string   `json:"request_id"`
+// Kết quả kiểm tra văn bản
+type OCRResultIdCheck string
+
+// Mã kết quả
+type OCRResultResultCode int
+
+// VerificationBaseInput defines model for VerificationBaseInput.
+type VerificationBaseInput struct {
+	// Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không
+	Check3RandomPose *int `json:"check_3_random_pose,omitempty"`
+
+	// Kiểm tra các ảnh khuôn mặt có fake hay không
+	Check3StraightPose *int `json:"check_3_straight_pose,omitempty"`
+
+	// Giá trị dùng để check xem khuôn mặt live có phải fake
+	FakeThreshold *float32 `json:"fake_threshold,omitempty"`
+
+	// Threshold để kiểm tra xem có đeo khẩu trang hay không
+	MaskThreshold *float32 `json:"mask_threshold,omitempty"`
+
+	// Trả về face feature vector hay không
+	ReturnFeature *int `json:"return_feature,omitempty"`
+
+	// độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 < độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >= sim_threshold_level2 ==> cùng 1 người
+	SimThresholdLevel1 *float32 `json:"sim_threshold_level1,omitempty"`
+
+	// độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 < độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >= sim_threshold_level2 ==> cùng 1 người
+	SimThresholdLevel2 *float32 `json:"sim_threshold_level2,omitempty"`
 }
 
-// NewOcrRecognitionJSONRequestBody defines body for NewOcrRecognition for application/json ContentType.
-type NewOcrRecognitionJSONRequestBody = Ocr
+// VerificationMessage defines model for VerificationMessage.
+type VerificationMessage struct {
+	// API version
+	APIVersion *string `json:"api_version,omitempty"`
+
+	// Mã lỗi
+	ErrorCode *string `json:"error_code,omitempty"`
+
+	// Mô tả lỗi
+	ErrorMessage *string `json:"error_message,omitempty"`
+}
+
+// VerificationResult defines model for VerificationResult.
+type VerificationResult struct {
+	FaceAntiSpoofStatus *FaceAntiSpoofStatus `json:"face_anti_spoof_status,omitempty"`
+
+	// Feature vector của khuôn mặt ở ảnh thẻ
+	FeatureVectorFaceCard *[]float32 `json:"feature_vector_face_card,omitempty"`
+
+	// Feature vector của khuôn mặt ở ảnh chụp chân dung
+	FeatureVectorFaceLive *[]float32           `json:"feature_vector_face_live,omitempty"`
+	Message               *VerificationMessage `json:"message,omitempty"`
+
+	// Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1]
+	Sim *float32 `json:"sim,omitempty"`
+
+	// Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms)
+	VerificationTime *int `json:"verification_time,omitempty"`
+
+	// 0: không xác thực, 1: xác thực
+	VerifyResult *VerificationResultVerifyResult `json:"verify_result,omitempty"`
+
+	// Kết quả xác thực dạng text
+	VerifyResultText *string                        `json:"verify_result_text,omitempty"`
+	WearingMask      *VerificationResultWearingMask `json:"wearing_mask,omitempty"`
+
+	// Điểm score khi nhận dạng khẩu trang, điểm càng cao thì độ tin tưởng đeo khẩu trang càng lớn score trong khoảng [0-1]
+	WearingMaskScore *float32 `json:"wearing_mask_score,omitempty"`
+}
+
+// 0: không xác thực, 1: xác thực
+type VerificationResultVerifyResult int
+
+// VerificationResultWearingMask defines model for VerificationResult.WearingMask.
+type VerificationResultWearingMask string
+
+// OCRRequest defines model for OCRRequest.
+type OCRRequest = OCRInput
+
+// VerificationRequest defines model for VerificationRequest.
+type VerificationRequest struct {
+	// Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không
+	Check3RandomPose *int `json:"check_3_random_pose,omitempty"`
+
+	// Kiểm tra các ảnh khuôn mặt có fake hay không
+	Check3StraightPose *int `json:"check_3_straight_pose,omitempty"`
+
+	// Giá trị dùng để check xem khuôn mặt live có phải fake
+	FakeThreshold *float32 `json:"fake_threshold,omitempty"`
+
+	// Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
+	ImageCard string `json:"image_card"`
+
+	// Ảnh chụp khuôn mặt
+	ImageLive string `json:"image_live"`
+
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+	ImageLive1 *string `json:"image_live1,omitempty"`
+
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+	ImageLive2 *string `json:"image_live2,omitempty"`
+
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+	ImageLive3 *string `json:"image_live3,omitempty"`
+
+	// Threshold để kiểm tra xem có đeo khẩu trang hay không
+	MaskThreshold *float32 `json:"mask_threshold,omitempty"`
+
+	// Request ID
+	RequestID string `json:"request_id"`
+
+	// Trả về face feature vector hay không
+	ReturnFeature *int `json:"return_feature,omitempty"`
+
+	// độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 < độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >= sim_threshold_level2 ==> cùng 1 người
+	SimThresholdLevel1 *float32 `json:"sim_threshold_level1,omitempty"`
+
+	// độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 < độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >= sim_threshold_level2 ==> cùng 1 người
+	SimThresholdLevel2 *float32 `json:"sim_threshold_level2,omitempty"`
+}
+
+// NewFaceIDVerificationJSONRequestBody defines body for NewFaceIDVerification for application/json ContentType.
+type NewFaceIDVerificationJSONRequestBody VerificationRequest
+
+// NewOCRRecognitionJSONRequestBody defines body for NewOCRRecognition for application/json ContentType.
+type NewOCRRecognitionJSONRequestBody = OCRRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -127,14 +430,19 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// NewOcrRecognition request with any body
-	NewOcrRecognitionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// NewFaceIDVerification request with any body
+	NewFaceIDVerificationWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	NewOcrRecognition(ctx context.Context, body NewOcrRecognitionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	NewFaceIDVerification(ctx context.Context, body NewFaceIDVerificationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// NewOCRRecognition request with any body
+	NewOCRRecognitionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	NewOCRRecognition(ctx context.Context, body NewOCRRecognitionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) NewOcrRecognitionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewNewOcrRecognitionRequestWithBody(c.Server, contentType, body)
+func (c *Client) NewFaceIDVerificationWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNewFaceIDVerificationRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -145,8 +453,8 @@ func (c *Client) NewOcrRecognitionWithBody(ctx context.Context, contentType stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) NewOcrRecognition(ctx context.Context, body NewOcrRecognitionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewNewOcrRecognitionRequest(c.Server, body)
+func (c *Client) NewFaceIDVerification(ctx context.Context, body NewFaceIDVerificationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNewFaceIDVerificationRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -157,19 +465,83 @@ func (c *Client) NewOcrRecognition(ctx context.Context, body NewOcrRecognitionJS
 	return c.Client.Do(req)
 }
 
-// NewNewOcrRecognitionRequest calls the generic NewOcrRecognition builder with application/json body
-func NewNewOcrRecognitionRequest(server string, body NewOcrRecognitionJSONRequestBody) (*http.Request, error) {
+func (c *Client) NewOCRRecognitionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNewOCRRecognitionRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) NewOCRRecognition(ctx context.Context, body NewOCRRecognitionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewNewOCRRecognitionRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// NewNewFaceIDVerificationRequest calls the generic NewFaceIDVerification builder with application/json body
+func NewNewFaceIDVerificationRequest(server string, body NewFaceIDVerificationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewNewOcrRecognitionRequestWithBody(server, "application/json", bodyReader)
+	return NewNewFaceIDVerificationRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewNewOcrRecognitionRequestWithBody generates requests for NewOcrRecognition with any type of body
-func NewNewOcrRecognitionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewNewFaceIDVerificationRequestWithBody generates requests for NewFaceIDVerification with any type of body
+func NewNewFaceIDVerificationRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/faceid/verification")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewNewOCRRecognitionRequest calls the generic NewOCRRecognition builder with application/json body
+func NewNewOCRRecognitionRequest(server string, body NewOCRRecognitionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewNewOCRRecognitionRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewNewOCRRecognitionRequestWithBody generates requests for NewOCRRecognition with any type of body
+func NewNewOCRRecognitionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -240,20 +612,25 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// NewOcrRecognition request with any body
-	NewOcrRecognitionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NewOcrRecognitionResponse, error)
+	// NewFaceIDVerification request with any body
+	NewFaceIDVerificationWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NewFaceIDVerificationResponse, error)
 
-	NewOcrRecognitionWithResponse(ctx context.Context, body NewOcrRecognitionJSONRequestBody, reqEditors ...RequestEditorFn) (*NewOcrRecognitionResponse, error)
+	NewFaceIDVerificationWithResponse(ctx context.Context, body NewFaceIDVerificationJSONRequestBody, reqEditors ...RequestEditorFn) (*NewFaceIDVerificationResponse, error)
+
+	// NewOCRRecognition request with any body
+	NewOCRRecognitionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NewOCRRecognitionResponse, error)
+
+	NewOCRRecognitionWithResponse(ctx context.Context, body NewOCRRecognitionJSONRequestBody, reqEditors ...RequestEditorFn) (*NewOCRRecognitionResponse, error)
 }
 
-type NewOcrRecognitionResponse struct {
+type NewFaceIDVerificationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *OCRResult
+	JSON200      *VerificationResult
 }
 
 // Status returns HTTPResponse.Status
-func (r NewOcrRecognitionResponse) Status() string {
+func (r NewFaceIDVerificationResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -261,39 +638,104 @@ func (r NewOcrRecognitionResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r NewOcrRecognitionResponse) StatusCode() int {
+func (r NewFaceIDVerificationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// NewOcrRecognitionWithBodyWithResponse request with arbitrary body returning *NewOcrRecognitionResponse
-func (c *ClientWithResponses) NewOcrRecognitionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NewOcrRecognitionResponse, error) {
-	rsp, err := c.NewOcrRecognitionWithBody(ctx, contentType, body, reqEditors...)
+type NewOCRRecognitionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OCRResult
+}
+
+// Status returns HTTPResponse.Status
+func (r NewOCRRecognitionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r NewOCRRecognitionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// NewFaceIDVerificationWithBodyWithResponse request with arbitrary body returning *NewFaceIDVerificationResponse
+func (c *ClientWithResponses) NewFaceIDVerificationWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NewFaceIDVerificationResponse, error) {
+	rsp, err := c.NewFaceIDVerificationWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseNewOcrRecognitionResponse(rsp)
+	return ParseNewFaceIDVerificationResponse(rsp)
 }
 
-func (c *ClientWithResponses) NewOcrRecognitionWithResponse(ctx context.Context, body NewOcrRecognitionJSONRequestBody, reqEditors ...RequestEditorFn) (*NewOcrRecognitionResponse, error) {
-	rsp, err := c.NewOcrRecognition(ctx, body, reqEditors...)
+func (c *ClientWithResponses) NewFaceIDVerificationWithResponse(ctx context.Context, body NewFaceIDVerificationJSONRequestBody, reqEditors ...RequestEditorFn) (*NewFaceIDVerificationResponse, error) {
+	rsp, err := c.NewFaceIDVerification(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseNewOcrRecognitionResponse(rsp)
+	return ParseNewFaceIDVerificationResponse(rsp)
 }
 
-// ParseNewOcrRecognitionResponse parses an HTTP response from a NewOcrRecognitionWithResponse call
-func ParseNewOcrRecognitionResponse(rsp *http.Response) (*NewOcrRecognitionResponse, error) {
+// NewOCRRecognitionWithBodyWithResponse request with arbitrary body returning *NewOCRRecognitionResponse
+func (c *ClientWithResponses) NewOCRRecognitionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NewOCRRecognitionResponse, error) {
+	rsp, err := c.NewOCRRecognitionWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNewOCRRecognitionResponse(rsp)
+}
+
+func (c *ClientWithResponses) NewOCRRecognitionWithResponse(ctx context.Context, body NewOCRRecognitionJSONRequestBody, reqEditors ...RequestEditorFn) (*NewOCRRecognitionResponse, error) {
+	rsp, err := c.NewOCRRecognition(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseNewOCRRecognitionResponse(rsp)
+}
+
+// ParseNewFaceIDVerificationResponse parses an HTTP response from a NewFaceIDVerificationWithResponse call
+func ParseNewFaceIDVerificationResponse(rsp *http.Response) (*NewFaceIDVerificationResponse, error) {
 	bodyBytes, err := ioutil.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &NewOcrRecognitionResponse{
+	response := &NewFaceIDVerificationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest VerificationResult
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseNewOCRRecognitionResponse parses an HTTP response from a NewOCRRecognitionWithResponse call
+func ParseNewOCRRecognitionResponse(rsp *http.Response) (*NewOCRRecognitionResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &NewOCRRecognitionResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

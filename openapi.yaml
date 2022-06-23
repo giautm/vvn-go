@@ -13,14 +13,14 @@ tags:
 paths:
   /ocr/recognition:
     post:
+      operationId: newOCRRecognition
+      summary: 'Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như: Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...'
       tags:
         - ocr
-      summary: 'Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như: Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...'
-      operationId: newOcrRecognition
       security:
         - api_key: []
       requestBody:
-        $ref: '#/components/requestBodies/Ocr'
+        $ref: '#/components/requestBodies/OCRRequest'
       responses:
         '401':
           description: Unauthorized request.
@@ -30,9 +30,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OCRResult'
+  /faceid/verification:
+    post:
+      operationId: newFaceIDVerification
+      tags:
+        - faceid
+      security:
+        - api_key: []
+      requestBody:
+        $ref: '#/components/requestBodies/VerificationRequest'
+      responses:
+        '401':
+          description: Unauthorized request.
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResult'
 components:
   schemas:
-    Ocr:
+    VerificationBaseInput:
+      type: object
+      properties:
+        check_3_random_pose:
+          x-go-name: Check3RandomPose
+          type: integer
+          description: Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không
+        check_3_straight_pose:
+          x-go-name: Check3StraightPose
+          type: integer
+          description: Kiểm tra các ảnh khuôn mặt có fake hay không
+        return_feature:
+          type: integer
+          description: Trả về face feature vector hay không
+        mask_threshold:
+          type: number
+          description: Threshold để kiểm tra xem có đeo khẩu trang hay không
+        fake_threshold:
+          type: number
+          description: Giá trị dùng để check xem khuôn mặt live có phải fake
+        sim_threshold_level1:
+          type: number
+          default: 0.60
+          description: 'độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 < độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >= sim_threshold_level2 ==> cùng 1 người'
+        sim_threshold_level2:
+          type: number
+          default: 0.75
+          description: 'độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 < độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >= sim_threshold_level2 ==> cùng 1 người'
+    OCRInput:
       type: object
       required:
         - image
@@ -45,11 +91,11 @@ components:
           x-go-name: Image
           type: string
         id_full_thr:
-          x-go-name: IDFullThr
+          x-go-name: IDFullThreshold
           type: number
           format: float
           default: 0.8
-          description: 'Chú ý: Với cùng 1 loại giấy tờ có 2 mặt (ví dụ: Căn cước Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMN'
+          description: 'Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMND..) yêu cầu request_id của mặt trước và hay không'
     OCRResult:
       type: object
       properties:
@@ -66,26 +112,296 @@ components:
             - 'CHIP ID'
             - 'POLICE ID'
             - 'ARMY ID'
-        id:
+        result_code:
+          type: integer
+          description: Mã kết quả
+          enum:
+            - 200 # OK
+            - 500 # Internal error
+            - 501 # Not active server
+            - 401 # Sai api-key
+            - 402 # ID blur or covered
+            - 201 # Wrong passport format
+        server_name:
           type: string
+          description: container id
+        server_ver:
+          x-go-name: ServerVersion
+          type: string
+          description: server version
+        id_check:
+          x-go-name: IDCheck
+          type: string
+          description: Kết quả kiểm tra văn bản
+          enum:
+            - BW # Photocopy đen trắng
+            - CONER
+            - FAKE # giả mạo
+            - PUNCH # Đục lỗ
+            - REAL # giấy tờ thực
+        id_full:
+          x-go-name: IDFull
+          type: string
+          description: 'Check xem giấy tờ có full về mặt THÔNG TIN hay không. Note: trường hợp số ID bị che (dẫn tới score < id_full_thr (mặc định 0.8) --> not full). Giấy tờ có thể không đầy đủ về mặt hình ảnh(ví dụ không có hình ảnh khuôn mặt), nhưng nếu vẫn đầy đủ thông tin -- > id_full =1'
+        id_logic:
+          x-go-name: IDLogic
+          type: string
+          description: ID logic
+        id_logic_message:
+          x-go-name: IDLogicMessage
+          type: string
+          description: ID logic message
+        id_type:
+          x-go-name: IDType
+          type: string
+
+        # Data with confidence value
+        id:
+          x-go-name: ID
+          type: string
+        idconf:
+          x-go-name: IDConfidence
+          type: string
+          description: 'Độ tin tưởng của trường ID (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
         name:
           type: string
-    ApiResponse:
+          description: Tên khách hàng trên giấy tờ
+        nameconf:
+          x-go-name: NameConfidence
+          type: string
+          description: 'Độ tin tưởng trường họ tên (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+        birthday:
+          type: string
+          description: Ngày sinh
+        birthdayconf:
+          x-go-name: BirthdayConfidence
+          type: string
+          description: 'Độ tin tưởng trường ngày tháng năm sinh (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+        sex:
+          type: string
+          description: Giới tính
+        sexconf:
+          x-go-name: SexConfidence
+          type: string
+          description: 'Độ tin tưởng trường giới tính (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+        hometown:
+          type: string
+          description: Nguyên quán
+        hometownconf:
+          x-go-name: HometownConfidence
+          type: string
+          description: 'Độ tin tưởng trường nguyên quán (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+        address:
+          type: string
+          description: Địa chỉ thường trú
+        addressconf:
+          x-go-name: AddressConfidence
+          type: string
+          description: 'Độ tin tưởng trường địa chỉ thường trú (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+        expiry:
+          type: string
+          description: Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn)
+        expiryconf:
+          x-go-name: ExpiryConfidence
+          type: string
+          description: 'Độ tin tưởng của trường hết hạn (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+        religion:
+          type: string
+          description: Tôn giáo
+        religionconf:
+          x-go-name: ReligionConfidence
+          type: string
+          description: 'Độ tin tưởng của trường tôn giáo (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+        issue_date:
+          type: string
+          description: Ngày cấp
+        issue_date_conf:
+          x-go-name: IssueDateConfidence
+          type: string
+          description: 'Độ tin tưởng của trường ngày cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+        issue_by:
+          type: string
+          description: Nơi cấp
+        issue_by_conf:
+          x-go-name: IssueByConfidence
+          type: string
+          description: 'Độ tin tưởng của trường nơi cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+
+        country:
+          type: string
+          description: Quốc gia
+        national:
+          type: string
+          description: Quốc gia
+        class:
+          type: string
+          description: Loại BLX
+        optinal_data:
+          type: string
+          description: Chỉ có ý nghĩa với passport. Số CMT của Vietnam
+        passport_type:
+          type: string
+          description: Loại Passport (công vụ/thường - PK/P)
+        province:
+          type: string
+          description: Tỉnh/TP
+        district:
+          type: string
+          description: Quận/Huyện
+        precinct:
+          type: string
+        ethnicity:
+          type: string
+          description: Dân tộc
+    FaceAntiSpoofStatus:
       type: object
       properties:
-        code:
+        status:
+          type: string
+          enum:
+            - FAKE
+            - REAL
+        fake_code:
+          type: string
+          enum:
+            - FAKE
+            - REAL
+        fake_score:
+          type: number
+          description: Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]
+        fake_type:
+          type: string
+          description: Trả về loại lỗi giả mạo
+          enum:
+            - N/A # ảnh selfie là ảnh thật
+            - SCREEN # ảnh chụp lại từ màn hình
+            - RANDOM_POSE # ảnh giả mạo do kiểm tra với 3 ảnh chụp quay các hướng
+            - STRAIGHT_POSE # ảnh giả mạo do kiểm tra 3 ảnh chụp thẳng liên tiếp
+        liveness_compare_scores:
+          type: string
+          description: Trả về khi check_3_random_pose==1. Score matching giữa ảnh live với 3 ảnh đưa vào kiểm tra
+    VerificationMessage:
+      type: object
+      properties:
+        api_version:
+          x-go-name: APIVersion
+          type: string
+          description: API version
+        error_code:
+          type: string
+          description: Mã lỗi
+        error_message:
+          type: string
+          description: Mô tả lỗi
+    VerificationResult:
+      type: object
+      properties:
+        verify_result:
           type: integer
-          format: int32
-        type:
+          description: '0: không xác thực, 1: xác thực'
+          enum: [0, 1, 2]
+        verify_result_text:
           type: string
+          description: Kết quả xác thực dạng text
+        sim:
+          type: number
+          description: Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1]
+        verification_time:
+          type: integer
+          description: Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms)
+        wearing_mask:
+          type: string
+          enum:
+            - 'YES'
+            - 'NO'
+        feature_vector_face_card:
+          type: array
+          items:
+            type: number
+          description: Feature vector của khuôn mặt ở ảnh thẻ
+        feature_vector_face_live:
+          type: array
+          items:
+            type: number
+          description: Feature vector của khuôn mặt ở ảnh chụp chân dung
+        wearing_mask_score:
+          type: number
+          description: Điểm score khi nhận dạng khẩu trang, điểm càng cao thì độ tin tưởng đeo khẩu trang càng lớn score trong khoảng [0-1]
+        face_anti_spoof_status:
+          $ref: '#/components/schemas/FaceAntiSpoofStatus'
         message:
-          type: string
+          $ref: '#/components/schemas/VerificationMessage'
   requestBodies:
-    Ocr:
+    OCRRequest:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Ocr'
+            $ref: '#/components/schemas/OCRInput'
+    VerificationRequest:
+      content:
+        application/json:
+          schema:
+            $allOf:
+            - $ref: '#/components/schemas/VerificationBaseInput'
+            - type: object
+              required:
+                - request_id
+                - image_card
+                - image_live
+              properties:
+                request_id:
+                  x-go-name: RequestID
+                  type: string
+                  description: Request ID
+                image_card:
+                  type: string
+                  description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
+                image_live:
+                  type: string
+                  description: Ảnh chụp khuôn mặt
+                image_live1:
+                  type: string
+                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+                image_live2:
+                  type: string
+                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+                image_live3:
+                  type: string
+                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        multipart/form-data:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/VerificationBaseInput'
+            - type: object
+              required:
+                - request_id
+                - image_card
+                - image_live
+              properties:
+                request_id:
+                  x-go-name: RequestID
+                  type: string
+                  description: Request ID
+                image_card:
+                  type: string
+                  description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
+                  format: binary
+                image_live:
+                  type: string
+                  description: Ảnh chụp khuôn mặt
+                  format: binary
+                image_live1:
+                  type: string
+                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+                  format: binary
+                image_live2:
+                  type: string
+                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+                  format: binary
+                image_live3:
+                  type: string
+                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+                  format: binary
   securitySchemes:
     api_key:
       type: apiKey
