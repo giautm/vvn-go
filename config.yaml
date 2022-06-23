@@ -1,0 +1,6 @@
+package: vvn
+output:
+  vvn.gen.go
+generate:
+  client: true
+  models: true

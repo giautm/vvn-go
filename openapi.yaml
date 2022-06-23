@@ -1,0 +1,94 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  title: VVN AI API
+  contact:
+    email: hello@giautm.dev
+servers:
+  - description: Production API - v3.2
+    url: 'https://api.cloudekyc.com/v3.2'
+tags:
+  - name: ocr
+    description: OCR APIs
+paths:
+  /ocr/recognition:
+    post:
+      tags:
+        - ocr
+      summary: 'Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như: Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...'
+      operationId: newOcrRecognition
+      security:
+        - api_key: []
+      requestBody:
+        $ref: '#/components/requestBodies/Ocr'
+      responses:
+        '401':
+          description: Unauthorized request.
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCRResult'
+components:
+  schemas:
+    Ocr:
+      type: object
+      required:
+        - image
+        - request_id
+      properties:
+        request_id:
+          x-go-name: RequestID
+          type: string
+        image:
+          x-go-name: Image
+          type: string
+        id_full_thr:
+          x-go-name: IDFullThr
+          type: number
+          format: float
+          default: 0.8
+          description: 'Chú ý: Với cùng 1 loại giấy tờ có 2 mặt (ví dụ: Căn cước Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMN'
+    OCRResult:
+      type: object
+      properties:
+        document:
+          type: string
+          description: Thông tin mô tả các loại giấy tờ
+          enum:
+            - CCCD
+            - 'NEW ID'
+            - 'OLD ID'
+            - PASSPORT
+            - 'DRIVER LICENSE OLD'
+            - 'DRIVER LICENSE PET'
+            - 'CHIP ID'
+            - 'POLICE ID'
+            - 'ARMY ID'
+        id:
+          type: string
+        name:
+          type: string
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  requestBodies:
+    Ocr:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Ocr'
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: key
+      in: header
+
