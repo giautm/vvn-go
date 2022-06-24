@@ -90,6 +90,7 @@ components:
         image:
           x-go-name: Image
           type: string
+          format: binary
         id_full_thr:
           x-go-name: IDFullThreshold
           type: number
@@ -334,14 +335,14 @@ components:
   requestBodies:
     OCRRequest:
       content:
-        application/json:
+        multipart/form-data:
           schema:
             $ref: '#/components/schemas/OCRInput'
     VerificationRequest:
       content:
         application/json:
           schema:
-            $allOf:
+            allOf:
             - $ref: '#/components/schemas/VerificationBaseInput'
             - type: object
               required:
@@ -407,4 +408,3 @@ components:
       type: apiKey
       name: key
       in: header
-
