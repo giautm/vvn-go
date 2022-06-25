@@ -8,7 +8,7 @@ import (
 
 const (
 	// ServerProduction is the base URL for the production server.
-	ServerProduction = "https://api.cloudekyc.com/v3.2"
+	ServerProduction = "https://api.cloudekyc.com"
 )
 
 // StaticKey is a static API key.

@@ -38,7 +38,7 @@ func encodeNewFaceIDVerificationResponse(response NewFaceIDVerificationRes, w ht
 		return nil
 
 	default:
-		return errors.Errorf("/faceid/verification"+`: unexpected response type: %T`, response)
+		return errors.Errorf("/v3.2/faceid/verification"+`: unexpected response type: %T`, response)
 	}
 }
 func encodeNewOCRRecognitionResponse(response NewOCRRecognitionRes, w http.ResponseWriter, span trace.Span) error {
@@ -68,6 +68,6 @@ func encodeNewOCRRecognitionResponse(response NewOCRRecognitionRes, w http.Respo
 		return nil
 
 	default:
-		return errors.Errorf("/ocr/recognition"+`: unexpected response type: %T`, response)
+		return errors.Errorf("/v3.2/ocr/recognition"+`: unexpected response type: %T`, response)
 	}
 }

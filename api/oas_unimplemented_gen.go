@@ -15,7 +15,10 @@ type UnimplementedHandler struct{}
 
 // NewFaceIDVerification implements newFaceIDVerification operation.
 //
-// POST /faceid/verification
+// Face verification is the task of comparing a candidate face to another, and verifying whether it
+// is a match. It is a one-to-one mapping: you have to check if this person is the correct one.
+//
+// POST /v3.2/faceid/verification
 func (UnimplementedHandler) NewFaceIDVerification(ctx context.Context, req NewFaceIDVerificationReq) (r NewFaceIDVerificationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -25,7 +28,7 @@ func (UnimplementedHandler) NewFaceIDVerification(ctx context.Context, req NewFa
 // Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như:
 // Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...
 //
-// POST /ocr/recognition
+// POST /v3.2/ocr/recognition
 func (UnimplementedHandler) NewOCRRecognition(ctx context.Context, req OCRInputForm) (r NewOCRRecognitionRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

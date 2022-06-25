@@ -14,14 +14,17 @@ import (
 type Handler interface {
 	// NewFaceIDVerification implements newFaceIDVerification operation.
 	//
-	// POST /faceid/verification
+	// Face verification is the task of comparing a candidate face to another, and verifying whether it
+	// is a match. It is a one-to-one mapping: you have to check if this person is the correct one.
+	//
+	// POST /v3.2/faceid/verification
 	NewFaceIDVerification(ctx context.Context, req NewFaceIDVerificationReq) (NewFaceIDVerificationRes, error)
 	// NewOCRRecognition implements newOCRRecognition operation.
 	//
 	// Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như:
 	// Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...
 	//
-	// POST /ocr/recognition
+	// POST /v3.2/ocr/recognition
 	NewOCRRecognition(ctx context.Context, req OCRInputForm) (NewOCRRecognitionRes, error)
 }
 

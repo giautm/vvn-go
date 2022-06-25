@@ -53,7 +53,10 @@ func NewClient(serverURL string, sec SecuritySource, opts ...Option) (*Client, e
 
 // NewFaceIDVerification invokes newFaceIDVerification operation.
 //
-// POST /faceid/verification
+// Face verification is the task of comparing a candidate face to another, and verifying whether it
+// is a match. It is a one-to-one mapping: you have to check if this person is the correct one.
+//
+// POST /v3.2/faceid/verification
 func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVerificationReq) (res NewFaceIDVerificationRes, err error) {
 	switch request := request.(type) {
 	case *VerificationInput:
@@ -121,7 +124,7 @@ func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVer
 	}
 
 	u := uri.Clone(c.serverURL)
-	u.Path += "/faceid/verification"
+	u.Path += "/v3.2/faceid/verification"
 
 	body, err := reqBody()
 	if err != nil {
@@ -157,7 +160,7 @@ func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVer
 // Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như:
 // Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...
 //
-// POST /ocr/recognition
+// POST /v3.2/ocr/recognition
 func (c *Client) NewOCRRecognition(ctx context.Context, request OCRInputForm) (res NewOCRRecognitionRes, err error) {
 	if err := func() error {
 		if err := request.Validate(); err != nil {
@@ -199,7 +202,7 @@ func (c *Client) NewOCRRecognition(ctx context.Context, request OCRInputForm) (r
 	contentType = ct
 
 	u := uri.Clone(c.serverURL)
-	u.Path += "/ocr/recognition"
+	u.Path += "/v3.2/ocr/recognition"
 
 	body, err := reqBody()
 	if err != nil {

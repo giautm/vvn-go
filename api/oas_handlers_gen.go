@@ -17,7 +17,7 @@ import (
 
 // HandleNewFaceIDVerificationRequest handles newFaceIDVerification operation.
 //
-// POST /faceid/verification
+// POST /v3.2/faceid/verification
 func (s *Server) handleNewFaceIDVerificationRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
 	otelAttrs := []attribute.KeyValue{
@@ -73,7 +73,7 @@ func (s *Server) handleNewFaceIDVerificationRequest(args [0]string, w http.Respo
 
 // HandleNewOCRRecognitionRequest handles newOCRRecognition operation.
 //
-// POST /ocr/recognition
+// POST /v3.2/ocr/recognition
 func (s *Server) handleNewOCRRecognitionRequest(args [0]string, w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
 	otelAttrs := []attribute.KeyValue{

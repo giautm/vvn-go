@@ -1,23 +1,46 @@
 openapi: 3.0.0
 info:
-  version: "1.0.0"
-  title: VVN AI API
+  description: |
+    # INTRODUCTION
+    Most countries have well-established Know Your Customer (KYC) rules that specify identification, due diligence and risk assessment procedures for analyzing clients. However, many of these regulations are more appropriate for yesterday’s consumer.
+    Today's digital savvy, mobile-first consumer expects to consume content and transact in real-time, therefore, requiring them to visit a retail store or branch to prove their identity in person will result in cart abandonment or loss of transaction to another merchant that can satisfy their expectations.
+    New KYC guidelines and regulations are required to keep pace with the reality of digital transactions. While modifying laws to make them more applicable is possible, many countries have established eKYC (electronic Know Your Customer) regulations for the digital and mobile realities of today.
+
+    # EKYC V3.2
+    API include [Face Verification](), [Face Recognition](), [Face Register](), [Face Delete](), [Ocr Recognition]().A facial recognition system is a technology capable of identifying or verifying a person from a digital image or a video frame from a video source.
+    Verification is the foundation of Authentication.
+    The process is built out to increase the level of scrutiny applied to obtain the credential.
+    For instance, Authentication requires the user to provide information only known to that individual, like the answer to a predetermined question or details around recent transactions.
+    [Face Recognition]() the process computer software performs to make a positive identification of a face in a photo or video image against a pre-existing database of faces.
+
+    # AUTHENTICATION
+    Ekyc offers one forms of authentication:
+      - API Key
+  version: 3.x.x
+  title: EKYC DOCUMENT API
   contact:
+    name: Contact support
     email: contact@vvn.vn
+    url: https://vvn.vn/
+  license:
+    name: EKYC 3.0
+    url: https://demo.cloudekyc.com/
 servers:
-  - description: Production API - v3.2
-    url: 'https://api.cloudekyc.com/v3.2'
+  - description: Entrypoint
+    url: https://api.cloudekyc.com
 tags:
-  - name: faceid
-    description: FaceID APIs
-  - name: ocr
-    description: OCR APIs
+  - name: v3.2
+    description: API V3.2
 paths:
-  /faceid/verification:
+  /v3.2/faceid/verification:
     post:
       operationId: newFaceIDVerification
+      summary: FACE VERIFICATION
+      description: >
+        Face verification is the task of comparing a candidate face to another, and verifying whether it is a match.
+        It is a one-to-one mapping: you have to check if this person is the correct one
       tags:
-        - faceid
+        - v3.2
       security:
         - api_key: []
       requestBody:
@@ -35,14 +58,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GatewayError'
-  /ocr/recognition:
+  /v3.2/ocr/recognition:
     post:
       operationId: newOCRRecognition
-      summary: >
+      summary: OCR RECOGNITION
+      description: >
         Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như:
         Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...
       tags:
-        - ocr
+        - v3.2
       security:
         - api_key: []
       requestBody:

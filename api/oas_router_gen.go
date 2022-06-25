@@ -25,8 +25,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/"
-			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+		case '/': // Prefix: "/v3.2/"
+			if l := len("/v3.2/"); len(elem) >= l && elem[0:l] == "/v3.2/" {
 				elem = elem[l:]
 			} else {
 				break
@@ -103,8 +103,8 @@ func (s *Server) FindRoute(method, path string) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/"
-			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+		case '/': // Prefix: "/v3.2/"
+			if l := len("/v3.2/"); len(elem) >= l && elem[0:l] == "/v3.2/" {
 				elem = elem[l:]
 			} else {
 				break
