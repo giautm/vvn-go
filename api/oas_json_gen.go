@@ -2043,6 +2043,38 @@ func (s VerificationResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.FaceCardAngle.Set {
+			e.FieldStart("face_card_angle")
+			s.FaceCardAngle.Encode(e)
+		}
+	}
+	{
+		if s.FaceLiveAngle.Set {
+			e.FieldStart("face_live_angle")
+			s.FaceLiveAngle.Encode(e)
+		}
+	}
+	{
+		if s.FaceLocCard != nil {
+			e.FieldStart("face_loc_card")
+			e.ArrStart()
+			for _, elem := range s.FaceLocCard {
+				e.Int(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.FaceLocLive != nil {
+			e.FieldStart("face_loc_live")
+			e.ArrStart()
+			for _, elem := range s.FaceLocLive {
+				e.Int(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		if s.FeatureVectorFaceCard != nil {
 			e.FieldStart("feature_vector_face_card")
 			e.ArrStart()
@@ -2110,18 +2142,22 @@ func (s VerificationResult) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfVerificationResult = [11]string{
+var jsonFieldsNameOfVerificationResult = [15]string{
 	0:  "face_anti_spoof_status",
-	1:  "feature_vector_face_card",
-	2:  "feature_vector_face_live",
-	3:  "message",
-	4:  "request_id",
-	5:  "sim",
-	6:  "verification_time",
-	7:  "verify_result",
-	8:  "verify_result_text",
-	9:  "wearing_mask",
-	10: "wearing_mask_score",
+	1:  "face_card_angle",
+	2:  "face_live_angle",
+	3:  "face_loc_card",
+	4:  "face_loc_live",
+	5:  "feature_vector_face_card",
+	6:  "feature_vector_face_live",
+	7:  "message",
+	8:  "request_id",
+	9:  "sim",
+	10: "verification_time",
+	11: "verify_result",
+	12: "verify_result_text",
+	13: "wearing_mask",
+	14: "wearing_mask_score",
 }
 
 // Decode decodes VerificationResult from json.
@@ -2142,6 +2178,64 @@ func (s *VerificationResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"face_anti_spoof_status\"")
+			}
+		case "face_card_angle":
+			if err := func() error {
+				s.FaceCardAngle.Reset()
+				if err := s.FaceCardAngle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_card_angle\"")
+			}
+		case "face_live_angle":
+			if err := func() error {
+				s.FaceLiveAngle.Reset()
+				if err := s.FaceLiveAngle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_live_angle\"")
+			}
+		case "face_loc_card":
+			if err := func() error {
+				s.FaceLocCard = make([]int, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem int
+					v, err := d.Int()
+					elem = int(v)
+					if err != nil {
+						return err
+					}
+					s.FaceLocCard = append(s.FaceLocCard, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_loc_card\"")
+			}
+		case "face_loc_live":
+			if err := func() error {
+				s.FaceLocLive = make([]int, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem int
+					v, err := d.Int()
+					elem = int(v)
+					if err != nil {
+						return err
+					}
+					s.FaceLocLive = append(s.FaceLocLive, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_loc_live\"")
 			}
 		case "feature_vector_face_card":
 			if err := func() error {
@@ -2182,7 +2276,7 @@ func (s *VerificationResult) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"feature_vector_face_live\"")
 			}
 		case "message":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				if err := s.Message.Decode(d); err != nil {
 					return err
@@ -2192,7 +2286,7 @@ func (s *VerificationResult) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "request_id":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
 				s.RequestID = string(v)
@@ -2273,8 +2367,8 @@ func (s *VerificationResult) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b00011000,
-		0b00000000,
+		0b10000000,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

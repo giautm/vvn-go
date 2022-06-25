@@ -522,6 +522,30 @@ components:
           description: Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1]
           minimum: 0
           maximum: 1
+        face_loc_card:
+          type: array
+          description: >
+            Vị trí của khuôn mặt detect được trong ảnh card id.
+            Format: [left, top, right, bottom]
+          items:
+            type: integer
+          minItems: 4
+          maxItems: 4
+        face_card_angle:
+          type: integer
+          description: Góc nghiêng của khuôn mặt ở ảnh card id.
+        face_loc_live:
+          description: >
+            Vị trí của khuôn mặt detect được trong ảnh chụp chân dung.
+            Format: [left, top, right, bottom]
+          type: array
+          items:
+            type: integer
+          minItems: 4
+          maxItems: 4
+        face_live_angle:
+          type: integer
+          description: Góc nghiêng của khuôn mặt ở ảnh chụp chân dung.
         feature_vector_face_card:
           type: array
           items:

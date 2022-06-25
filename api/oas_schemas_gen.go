@@ -1015,6 +1015,16 @@ type VerificationMessage struct {
 // Ref: #/components/schemas/VerificationResult
 type VerificationResult struct {
 	FaceAntiSpoofStatus OptFaceAntiSpoofStatus "json:\"face_anti_spoof_status\""
+	// Góc nghiêng của khuôn mặt ở ảnh card id.
+	FaceCardAngle OptInt "json:\"face_card_angle\""
+	// Góc nghiêng của khuôn mặt ở ảnh chụp chân dung.
+	FaceLiveAngle OptInt "json:\"face_live_angle\""
+	// Vị trí của khuôn mặt detect được trong ảnh card id. Format: [left, top, right,
+	// bottom].
+	FaceLocCard []int "json:\"face_loc_card\""
+	// Vị trí của khuôn mặt detect được trong ảnh chụp chân dung. Format: [left, top,
+	// right, bottom].
+	FaceLocLive []int "json:\"face_loc_live\""
 	// Feature vector của khuôn mặt ở ảnh thẻ.
 	FeatureVectorFaceCard []float64 "json:\"feature_vector_face_card\""
 	// Feature vector của khuôn mặt ở ảnh chụp chân dung.

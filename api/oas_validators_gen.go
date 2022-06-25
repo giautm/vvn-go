@@ -572,6 +572,38 @@ func (s VerificationResult) Validate() error {
 	}
 	if err := func() error {
 		if err := (validate.Array{
+			MinLength:    4,
+			MinLengthSet: true,
+			MaxLength:    4,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.FaceLocCard)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "face_loc_card",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := (validate.Array{
+			MinLength:    4,
+			MinLengthSet: true,
+			MaxLength:    4,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.FaceLocLive)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "face_loc_live",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := (validate.Array{
 			MinLength:    512,
 			MinLengthSet: true,
 			MaxLength:    512,
