@@ -85,6 +85,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/GatewayError'
 components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: key
+      in: header
   schemas:
     GatewayError:
       type: object
@@ -536,8 +541,3 @@ components:
         multipart/form-data:
           schema:
             $ref: '#/components/schemas/VerificationInput'
-  securitySchemes:
-    api_key:
-      type: apiKey
-      name: key
-      in: header
