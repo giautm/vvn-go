@@ -425,11 +425,15 @@ components:
           type: array
           items:
             type: number
+          minItems: 512
+          maxItems: 512
           description: Feature vector của khuôn mặt ở ảnh thẻ
         feature_vector_face_live:
           type: array
           items:
             type: number
+          minItems: 512
+          maxItems: 512
           description: Feature vector của khuôn mặt ở ảnh chụp chân dung
         wearing_mask_score:
           type: number

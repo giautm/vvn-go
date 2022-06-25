@@ -472,6 +472,14 @@ func (s VerificationResult) Validate() error {
 		})
 	}
 	if err := func() error {
+		if err := (validate.Array{
+			MinLength:    512,
+			MinLengthSet: true,
+			MaxLength:    512,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.FeatureVectorFaceCard)); err != nil {
+			return errors.Wrap(err, "array")
+		}
 		var failures []validate.FieldError
 		for i, elem := range s.FeatureVectorFaceCard {
 			if err := func() error {
@@ -497,6 +505,14 @@ func (s VerificationResult) Validate() error {
 		})
 	}
 	if err := func() error {
+		if err := (validate.Array{
+			MinLength:    512,
+			MinLengthSet: true,
+			MaxLength:    512,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.FeatureVectorFaceLive)); err != nil {
+			return errors.Wrap(err, "array")
+		}
 		var failures []validate.FieldError
 		for i, elem := range s.FeatureVectorFaceLive {
 			if err := func() error {
