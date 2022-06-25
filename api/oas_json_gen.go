@@ -268,6 +268,69 @@ func (s *FaceAntiSpoofStatusStatus) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s GatewayError) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s GatewayError) encodeFields(e *jx.Encoder) {
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGatewayError = [1]string{
+	0: "message",
+}
+
+// Decode decodes GatewayError from json.
+func (s *GatewayError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GatewayError to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GatewayError")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GatewayError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GatewayError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s OCRResult) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)

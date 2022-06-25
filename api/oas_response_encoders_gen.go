@@ -25,9 +25,16 @@ func encodeNewFaceIDVerificationResponse(response NewFaceIDVerificationRes, w ht
 		}
 		return nil
 
-	case *NewFaceIDVerificationUnauthorized:
+	case *GatewayError:
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+		e := jx.GetEncoder()
+
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
 		return nil
 
 	default:
@@ -48,9 +55,16 @@ func encodeNewOCRRecognitionResponse(response NewOCRRecognitionRes, w http.Respo
 		}
 		return nil
 
-	case *NewOCRRecognitionUnauthorized:
+	case *GatewayError:
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+		e := jx.GetEncoder()
+
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
 		return nil
 
 	default:

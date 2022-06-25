@@ -65,15 +65,15 @@ const (
 	FaceAntiSpoofStatusStatusREAL FaceAntiSpoofStatusStatus = "REAL"
 )
 
-// NewFaceIDVerificationUnauthorized is response for NewFaceIDVerification operation.
-type NewFaceIDVerificationUnauthorized struct{}
+// Thông báo lỗi trả về từ Gateway.
+// Ref: #/components/schemas/GatewayError
+type GatewayError struct {
+	// Thông điệp lỗi.
+	Message OptString "json:\"message\""
+}
 
-func (*NewFaceIDVerificationUnauthorized) newFaceIDVerificationRes() {}
-
-// NewOCRRecognitionUnauthorized is response for NewOCRRecognition operation.
-type NewOCRRecognitionUnauthorized struct{}
-
-func (*NewOCRRecognitionUnauthorized) newOCRRecognitionRes() {}
+func (*GatewayError) newFaceIDVerificationRes() {}
+func (*GatewayError) newOCRRecognitionRes()     {}
 
 // Ref: #/components/schemas/OCRInput
 type OCRInput struct {
@@ -996,12 +996,12 @@ type VerificationInput struct {
 	// Trả về face feature vector hay không.
 	ReturnFeature OptInt "json:\"return_feature\""
 	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
-	// độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >=
-	// sim_threshold_level2 ==> cùng 1 người.
+	// độ tương đồng < sim_threshold_level2 ==> có thể cùng 1 người độ tương đồng
+	// >= sim_threshold_level2 ==> cùng 1 người.
 	SimThresholdLevel1 OptFloat64 "json:\"sim_threshold_level1\""
 	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
-	// độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >=
-	// sim_threshold_level2 ==> cùng 1 người.
+	// độ tương đồng < sim_threshold_level2 ==> có thể cùng 1 người độ tương đồng
+	// >= sim_threshold_level2 ==> cùng 1 người.
 	SimThresholdLevel2 OptFloat64 "json:\"sim_threshold_level2\""
 }
 
@@ -1035,12 +1035,12 @@ type VerificationInputForm struct {
 	// Trả về face feature vector hay không.
 	ReturnFeature OptInt "json:\"return_feature\""
 	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
-	// độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >=
-	// sim_threshold_level2 ==> cùng 1 người.
+	// độ tương đồng < sim_threshold_level2 ==> có thể cùng 1 người độ tương đồng
+	// >= sim_threshold_level2 ==> cùng 1 người.
 	SimThresholdLevel1 OptFloat64 "json:\"sim_threshold_level1\""
 	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
-	// độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >=
-	// sim_threshold_level2 ==> cùng 1 người.
+	// độ tương đồng < sim_threshold_level2 ==> có thể cùng 1 người độ tương đồng
+	// >= sim_threshold_level2 ==> cùng 1 người.
 	SimThresholdLevel2 OptFloat64 "json:\"sim_threshold_level2\""
 }
 

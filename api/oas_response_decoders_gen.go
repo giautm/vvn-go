@@ -43,7 +43,31 @@ func decodeNewFaceIDVerificationResponse(resp *http.Response, span trace.Span) (
 			return res, validate.InvalidContentType(ct)
 		}
 	case 401:
-		return &NewFaceIDVerificationUnauthorized{}, nil
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+
+			d := jx.DecodeBytes(b)
+			var response GatewayError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	default:
 		return res, validate.UnexpectedStatusCode(resp.StatusCode)
 	}
@@ -77,7 +101,31 @@ func decodeNewOCRRecognitionResponse(resp *http.Response, span trace.Span) (res 
 			return res, validate.InvalidContentType(ct)
 		}
 	case 401:
-		return &NewOCRRecognitionUnauthorized{}, nil
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+
+			d := jx.DecodeBytes(b)
+			var response GatewayError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	default:
 		return res, validate.UnexpectedStatusCode(resp.StatusCode)
 	}

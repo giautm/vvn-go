@@ -3,35 +3,16 @@ info:
   version: "1.0.0"
   title: VVN AI API
   contact:
-    email: hello@giautm.dev
+    email: contact@vvn.vn
 servers:
   - description: Production API - v3.2
     url: 'https://api.cloudekyc.com/v3.2'
 tags:
-  - name: ocr
-    description: OCR APIs
   - name: faceid
     description: FaceID APIs
+  - name: ocr
+    description: OCR APIs
 paths:
-  /ocr/recognition:
-    post:
-      operationId: newOCRRecognition
-      summary: 'Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như: Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...'
-      tags:
-        - ocr
-      security:
-        - api_key: []
-      requestBody:
-        $ref: '#/components/requestBodies/OCRRequest'
-      responses:
-        '401':
-          description: Unauthorized request.
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OCRResult'
   /faceid/verification:
     post:
       operationId: newFaceIDVerification
@@ -42,72 +23,53 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/VerificationRequest'
       responses:
-        '401':
-          description: Unauthorized request.
         '200':
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerificationResult'
+        '401':
+          description: Unauthorized request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayError'
+  /ocr/recognition:
+    post:
+      operationId: newOCRRecognition
+      summary: >
+        Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như:
+        Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...
+      tags:
+        - ocr
+      security:
+        - api_key: []
+      requestBody:
+        $ref: '#/components/requestBodies/OCRRequest'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCRResult'
+        '401':
+          description: Unauthorized request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayError'
 components:
   schemas:
-    VerificationInput:
+    GatewayError:
       type: object
-      required:
-        - request_id
-        - image_card
-        - image_live
+      description: >
+        Thông báo lỗi trả về từ Gateway
       properties:
-        request_id:
-          x-go-name: RequestID
+        message:
           type: string
-          description: Request ID
-        image_card:
-          type: string
-          format: binary
-          description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
-        image_live:
-          type: string
-          format: binary
-          description: Ảnh chụp khuôn mặt
-        image_live1:
-          type: string
-          format: binary
-          description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-        image_live2:
-          type: string
-          format: binary
-          description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-        image_live3:
-          type: string
-          format: binary
-          description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-        check_3_random_pose:
-          x-go-name: Check3RandomPose
-          type: integer
-          description: Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không
-        check_3_straight_pose:
-          x-go-name: Check3StraightPose
-          type: integer
-          description: Kiểm tra các ảnh khuôn mặt có fake hay không
-        return_feature:
-          type: integer
-          description: Trả về face feature vector hay không
-        mask_threshold:
-          type: number
-          description: Threshold để kiểm tra xem có đeo khẩu trang hay không
-        fake_threshold:
-          type: number
-          description: Giá trị dùng để check xem khuôn mặt live có phải fake
-        sim_threshold_level1:
-          type: number
-          default: 0.60
-          description: 'độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 < độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >= sim_threshold_level2 ==> cùng 1 người'
-        sim_threshold_level2:
-          type: number
-          default: 0.75
-          description: 'độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 < độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >= sim_threshold_level2 ==> cùng 1 người'
+          description: Thông điệp lỗi
     OCRInput:
       type: object
       required:
@@ -126,7 +88,9 @@ components:
           type: number
           format: float
           default: 0.8
-          description: 'Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMND..) yêu cầu request_id của mặt trước và hay không'
+          description: >
+            Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMND..)
+            yêu cầu request_id của mặt trước và hay không
     OCRResult:
       type: object
       properties:
@@ -185,11 +149,11 @@ components:
               * `BW` - photocopy đen trắng
               * `REAL` - giấy tờ OK
           enum:
-            - BW # Photocopy đen trắng
+            - BW
             - CONER
-            - FAKE # giả mạo
-            - PUNCH # Đục lỗ
-            - REAL # giấy tờ thực
+            - FAKE
+            - PUNCH
+            - REAL
         id_full:
           x-go-name: IDFull
           type: integer
@@ -219,7 +183,6 @@ components:
               * `Not match year code` - Năm sinh trên giấy tờ và trong số ID không trùng khớp
               * `Expiry subtract birthday not good` - Ngày tháng năm sinh và ngày tháng hết hạn không hợp lệ (đối với CCCD; ngày hết hạn là khi công dân đủ 25, 40, 60 tuổi hoặc không có thời hạn)
               * `ID can be fake` - trường hợp có thể đang bị giả mạo về chữ "CĂN CƯỚC CÔNG DÂN/CHỨNG MINH NHÂN DÂN" đối với giấy tờ thẻ cứng
-
         id_type:
           x-go-name: IDType
           type: string
@@ -227,6 +190,7 @@ components:
             Phân biệt mặt trước/mặt sau:
               * `0` - mặt trước
               * `1` - mặt sau
+
         # Data with confidence value
         id:
           x-go-name: ID
@@ -245,67 +209,80 @@ components:
         nameconf:
           x-go-name: NameConfidence
           type: string
-          description: 'Độ tin tưởng trường họ tên (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng trường họ tên (là chuỗi string của 1 mảng các giá trị float từ 0-1)
         birthday:
           type: string
           description: Ngày sinh
         birthdayconf:
           x-go-name: BirthdayConfidence
           type: string
-          description: 'Độ tin tưởng trường ngày tháng năm sinh (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng trường ngày tháng năm sinh (là chuỗi string của 1 mảng các giá trị float từ 0-1)
         sex:
           type: string
           description: Giới tính
         sexconf:
           x-go-name: SexConfidence
           type: string
-          description: 'Độ tin tưởng trường giới tính (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng trường giới tính (là chuỗi string của 1 mảng các giá trị float từ 0-1)
         hometown:
           type: string
           description: Nguyên quán
         hometownconf:
           x-go-name: HometownConfidence
           type: string
-          description: 'Độ tin tưởng trường nguyên quán (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng trường nguyên quán (là chuỗi string của 1 mảng các giá trị float từ 0-1)
         address:
           type: string
           description: Địa chỉ thường trú
         addressconf:
           x-go-name: AddressConfidence
           type: string
-          description: 'Độ tin tưởng trường địa chỉ thường trú (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng trường địa chỉ thường trú (là chuỗi string của 1 mảng các giá trị float từ 0-1)
         expiry:
           type: string
           description: >
             Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn).
-            Chú ý: trường ngày hết hạn có dạng dd-mm-yyyy hoặc Không thời hạn --> nếu không phù hợp với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A
+            Chú ý: trường ngày hết hạn có dạng dd-mm-yyyy hoặc Không thời hạn
+            --> nếu không phù hợp với các dạng này(bị che, tẩy xóa)
+            --> giá trị nhận dạng là N/A
         expiryconf:
           x-go-name: ExpiryConfidence
           type: string
-          description: 'Độ tin tưởng của trường hết hạn (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng của trường hết hạn (là chuỗi string của 1 mảng các giá trị float từ 0-1)
         religion:
           type: string
           description: Tôn giáo
         religionconf:
           x-go-name: ReligionConfidence
           type: string
-          description: 'Độ tin tưởng của trường tôn giáo (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: 
+            Độ tin tưởng của trường tôn giáo (là chuỗi string của 1 mảng các giá trị float từ 0-1)
         issue_date:
           type: string
           description: >
             Ngày cấp
-            *Chú ý*: trường ngày cấp có dạng dd-mm-yyyy --> nếu không phù hợp với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A
+            *Chú ý*: trường ngày cấp có dạng dd-mm-yyyy
+            --> nếu không phù hợp với các dạng này(bị che, tẩy xóa)
+            --> giá trị nhận dạng là N/A
         issue_date_conf:
           x-go-name: IssueDateConfidence
           type: string
-          description: 'Độ tin tưởng của trường ngày cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng của trường ngày cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)
         issue_by:
           type: string
           description: Nơi cấp
         issue_by_conf:
           x-go-name: IssueByConfidence
           type: string
-          description: 'Độ tin tưởng của trường nơi cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng của trường nơi cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)
 
         country:
           type: string
@@ -318,7 +295,8 @@ components:
           description: Loại BLX
         optinal_data:
           type: string
-          description: Chỉ có ý nghĩa với passport. Số CMT của Vietnam
+          description: >
+            Chỉ có ý nghĩa với passport. Số CMT của Vietnam
         passport_type:
           type: string
           description: Loại Passport (công vụ/thường - PK/P)
@@ -336,7 +314,8 @@ components:
     FaceAntiSpoofStatus:
       type: object
       description: >
-        Thông tin đánh giá giả mạo khuôn mặt. Có thể kiểm tra thêm 3 random pose hoặc 3 ảnh thẳng mặt liên tiếp.
+        Thông tin đánh giá giả mạo khuôn mặt. Có thể kiểm tra thêm
+        3 random pose hoặc 3 ảnh thẳng mặt liên tiếp.
         ```
         {
           "fake_code": "REAL",
@@ -379,7 +358,9 @@ components:
             - STRAIGHT_POSE # ảnh giả mạo do kiểm tra 3 ảnh chụp thẳng liên tiếp
         liveness_compare_scores:
           type: string
-          description: Trả về khi check_3_random_pose==1. Score matching giữa ảnh live với 3 ảnh đưa vào kiểm tra
+          description: >
+            Trả về khi check_3_random_pose==1.
+            Score matching giữa ảnh live với 3 ảnh đưa vào kiểm tra
     VerificationMessage:
       type: object
       description: >
@@ -396,6 +377,77 @@ components:
         error_message:
           type: string
           description: Mô tả lỗi
+    VerificationInput:
+      type: object
+      required:
+        - request_id
+        - image_card
+        - image_live
+      properties:
+        request_id:
+          x-go-name: RequestID
+          type: string
+          description: Request ID
+        image_card:
+          type: string
+          format: binary
+          description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
+        image_live:
+          type: string
+          format: binary
+          description: Ảnh chụp khuôn mặt
+        image_live1:
+          type: string
+          format: binary
+          description: >
+            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        image_live2:
+          type: string
+          format: binary
+          description: >
+            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        image_live3:
+          type: string
+          format: binary
+          description: >
+            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        check_3_random_pose:
+          x-go-name: Check3RandomPose
+          type: integer
+          description: Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không
+        check_3_straight_pose:
+          x-go-name: Check3StraightPose
+          type: integer
+          description: Kiểm tra các ảnh khuôn mặt có fake hay không
+        return_feature:
+          type: integer
+          description: Trả về face feature vector hay không
+        mask_threshold:
+          type: number
+          description: Threshold để kiểm tra xem có đeo khẩu trang hay không
+        fake_threshold:
+          type: number
+          description: Giá trị dùng để check xem khuôn mặt live có phải fake
+        sim_threshold_level1:
+          type: number
+          default: 0.60
+          description: >
+            độ tương đồng <= sim_threshold_level1
+            => không cùng 1 người
+            sim_threshold_level1 < độ tương đồng < sim_threshold_level2
+            ==> có thể cùng 1 người
+            độ tương đồng >= sim_threshold_level2
+            ==> cùng 1 người
+        sim_threshold_level2:
+          type: number
+          default: 0.75
+          description: >
+            độ tương đồng <= sim_threshold_level1
+            => không cùng 1 người
+            sim_threshold_level1 < độ tương đồng < sim_threshold_level2
+            ==> có thể cùng 1 người
+            độ tương đồng >= sim_threshold_level2
+            ==> cùng 1 người
     VerificationResult:
       type: object
       properties:
@@ -437,7 +489,9 @@ components:
           description: Feature vector của khuôn mặt ở ảnh chụp chân dung
         wearing_mask_score:
           type: number
-          description: Điểm score khi nhận dạng khẩu trang, điểm càng cao thì độ tin tưởng đeo khẩu trang càng lớn score trong khoảng [0-1]
+          description: >
+            Điểm score khi nhận dạng khẩu trang, điểm càng cao thì
+            độ tin tưởng đeo khẩu trang càng lớn score trong khoảng [0-1]
         face_anti_spoof_status:
           $ref: '#/components/schemas/FaceAntiSpoofStatus'
         message:
