@@ -10,6 +10,8 @@ servers:
 tags:
   - name: ocr
     description: OCR APIs
+  - name: faceid
+    description: FaceID APIs
 paths:
   /ocr/recognition:
     post:
