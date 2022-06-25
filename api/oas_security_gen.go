@@ -9,19 +9,6 @@ import (
 	"github.com/go-faster/errors"
 )
 
-// SecurityHandler is handler for security parameters.
-type SecurityHandler interface {
-	// HandleAPIKey handles api_key security.
-	HandleAPIKey(ctx context.Context, operationID string, t APIKey) (context.Context, error)
-}
-
-func (s *Server) securityAPIKey(ctx context.Context, operationID string, req *http.Request) (context.Context, error) {
-	var t APIKey
-	value := req.Header.Get("key")
-	t.APIKey = value
-	return s.sec.HandleAPIKey(ctx, operationID, t)
-}
-
 // SecuritySource is provider of security values (tokens, passwords, etc.).
 type SecuritySource interface {
 	// APIKey provides api_key security value.
