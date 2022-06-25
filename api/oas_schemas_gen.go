@@ -114,7 +114,7 @@ type OCRResult struct {
 	// bị che (dẫn tới score < id_full_thr (mặc định 0.8) --> not full). Giấy tờ có thể
 	// không đầy đủ về mặt hình ảnh(ví dụ không có hình ảnh khuôn mặt), nhưng
 	// nếu vẫn đầy đủ thông tin -- > id_full =1.
-	IDFull OptString "json:\"id_full\""
+	IDFull OptInt "json:\"id_full\""
 	// ID logic.
 	IDLogic OptString "json:\"id_logic\""
 	// ID logic message.

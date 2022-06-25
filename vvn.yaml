@@ -165,7 +165,7 @@ components:
             - REAL # giấy tờ thực
         id_full:
           x-go-name: IDFull
-          type: string
+          type: integer
           description: 'Check xem giấy tờ có full về mặt THÔNG TIN hay không. Note: trường hợp số ID bị che (dẫn tới score < id_full_thr (mặc định 0.8) --> not full). Giấy tờ có thể không đầy đủ về mặt hình ảnh(ví dụ không có hình ảnh khuôn mặt), nhưng nếu vẫn đầy đủ thông tin -- > id_full =1'
         id_logic:
           x-go-name: IDLogic
