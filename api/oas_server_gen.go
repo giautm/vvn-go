@@ -15,7 +15,7 @@ type Handler interface {
 	// NewFaceIDVerification implements newFaceIDVerification operation.
 	//
 	// POST /faceid/verification
-	NewFaceIDVerification(ctx context.Context, req VerificationInput) (NewFaceIDVerificationRes, error)
+	NewFaceIDVerification(ctx context.Context, req NewFaceIDVerificationReq) (NewFaceIDVerificationRes, error)
 	// NewOCRRecognition implements newOCRRecognition operation.
 	//
 	// Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như:

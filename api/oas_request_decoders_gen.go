@@ -20,7 +20,7 @@ import (
 )
 
 func (s *Server) decodeNewFaceIDVerificationRequest(r *http.Request, span trace.Span) (
-	req VerificationInput,
+	req NewFaceIDVerificationReq,
 	close func() error,
 	rerr error,
 ) {
@@ -76,7 +76,445 @@ func (s *Server) decodeNewFaceIDVerificationRequest(r *http.Request, span trace.
 			return req, close, errors.Wrap(err, "validate")
 		}
 
-		return request, close, nil
+		return &request, close, nil
+	case "multipart/form-data":
+		var request VerificationInputForm
+
+		if r.ContentLength == 0 {
+			return req, close, validate.ErrBodyRequired
+		}
+		if err := r.ParseMultipartForm(s.cfg.MaxMultipartMemory); err != nil {
+			return req, close, errors.Wrap(err, "parse multipart form")
+		}
+		form := url.Values(r.MultipartForm.Value)
+
+		q := uri.NewQueryDecoder(form)
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "check_3_random_pose",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					var requestDotCheck3RandomPoseVal int
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToInt(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotCheck3RandomPoseVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					request.Check3RandomPose.SetTo(requestDotCheck3RandomPoseVal)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"check_3_random_pose\"")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "check_3_straight_pose",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					var requestDotCheck3StraightPoseVal int
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToInt(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotCheck3StraightPoseVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					request.Check3StraightPose.SetTo(requestDotCheck3StraightPoseVal)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"check_3_straight_pose\"")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "fake_threshold",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					var requestDotFakeThresholdVal float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotFakeThresholdVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					request.FakeThreshold.SetTo(requestDotFakeThresholdVal)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"fake_threshold\"")
+				}
+				if err := func() error {
+					if request.FakeThreshold.Set {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(request.FakeThreshold.Value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "mask_threshold",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					var requestDotMaskThresholdVal float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotMaskThresholdVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					request.MaskThreshold.SetTo(requestDotMaskThresholdVal)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"mask_threshold\"")
+				}
+				if err := func() error {
+					if request.MaskThreshold.Set {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(request.MaskThreshold.Value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "request_id",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					request.RequestID = c
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"request_id\"")
+				}
+			} else {
+				return req, close, errors.Wrap(err, "query")
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "return_feature",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					var requestDotReturnFeatureVal int
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToInt(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotReturnFeatureVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					request.ReturnFeature.SetTo(requestDotReturnFeatureVal)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"return_feature\"")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "sim_threshold_level1",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					var requestDotSimThresholdLevel1Val float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotSimThresholdLevel1Val = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					request.SimThresholdLevel1.SetTo(requestDotSimThresholdLevel1Val)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"sim_threshold_level1\"")
+				}
+				if err := func() error {
+					if request.SimThresholdLevel1.Set {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(request.SimThresholdLevel1.Value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			}
+		}
+		{
+			cfg := uri.QueryParameterDecodingConfig{
+				Name:    "sim_threshold_level2",
+				Style:   uri.QueryStyleForm,
+				Explode: true,
+			}
+
+			if err := q.HasParam(cfg); err == nil {
+				if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+					var requestDotSimThresholdLevel2Val float64
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToFloat64(val)
+						if err != nil {
+							return err
+						}
+
+						requestDotSimThresholdLevel2Val = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					request.SimThresholdLevel2.SetTo(requestDotSimThresholdLevel2Val)
+					return nil
+				}); err != nil {
+					return req, close, errors.Wrap(err, "decode \"sim_threshold_level2\"")
+				}
+				if err := func() error {
+					if request.SimThresholdLevel2.Set {
+						if err := func() error {
+							if err := (validate.Float{}).Validate(float64(request.SimThresholdLevel2.Value)); err != nil {
+								return errors.Wrap(err, "float")
+							}
+							return nil
+						}(); err != nil {
+							return err
+						}
+					}
+					return nil
+				}(); err != nil {
+					return req, close, errors.Wrap(err, "validate")
+				}
+			}
+		}
+		if err := func() error {
+			files, ok := r.MultipartForm.File["image_card"]
+			if !ok || len(files) < 1 {
+				return validate.ErrFieldRequired
+			}
+			fh := files[0]
+
+			f, err := fh.Open()
+			if err != nil {
+				return errors.Wrap(err, "open")
+			}
+			closers = append(closers, f)
+			request.ImageCard = ht.MultipartFile{
+				Name:   fh.Filename,
+				File:   f,
+				Header: fh.Header,
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "decode \"image_card\"")
+		}
+		if err := func() error {
+			files, ok := r.MultipartForm.File["image_live"]
+			if !ok || len(files) < 1 {
+				return validate.ErrFieldRequired
+			}
+			fh := files[0]
+
+			f, err := fh.Open()
+			if err != nil {
+				return errors.Wrap(err, "open")
+			}
+			closers = append(closers, f)
+			request.ImageLive = ht.MultipartFile{
+				Name:   fh.Filename,
+				File:   f,
+				Header: fh.Header,
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "decode \"image_live\"")
+		}
+		if err := func() error {
+			files, ok := r.MultipartForm.File["image_live1"]
+			if !ok || len(files) < 1 {
+				return nil
+			}
+			fh := files[0]
+
+			f, err := fh.Open()
+			if err != nil {
+				return errors.Wrap(err, "open")
+			}
+			closers = append(closers, f)
+			request.ImageLive1.SetTo(ht.MultipartFile{
+				Name:   fh.Filename,
+				File:   f,
+				Header: fh.Header,
+			})
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "decode \"image_live1\"")
+		}
+		if err := func() error {
+			files, ok := r.MultipartForm.File["image_live2"]
+			if !ok || len(files) < 1 {
+				return nil
+			}
+			fh := files[0]
+
+			f, err := fh.Open()
+			if err != nil {
+				return errors.Wrap(err, "open")
+			}
+			closers = append(closers, f)
+			request.ImageLive2.SetTo(ht.MultipartFile{
+				Name:   fh.Filename,
+				File:   f,
+				Header: fh.Header,
+			})
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "decode \"image_live2\"")
+		}
+		if err := func() error {
+			files, ok := r.MultipartForm.File["image_live3"]
+			if !ok || len(files) < 1 {
+				return nil
+			}
+			fh := files[0]
+
+			f, err := fh.Open()
+			if err != nil {
+				return errors.Wrap(err, "open")
+			}
+			closers = append(closers, f)
+			request.ImageLive3.SetTo(ht.MultipartFile{
+				Name:   fh.Filename,
+				File:   f,
+				Header: fh.Header,
+			})
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "decode \"image_live3\"")
+		}
+
+		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)
 	}

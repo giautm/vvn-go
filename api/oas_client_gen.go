@@ -54,14 +54,28 @@ func NewClient(serverURL string, sec SecuritySource, opts ...Option) (*Client, e
 // NewFaceIDVerification invokes newFaceIDVerification operation.
 //
 // POST /faceid/verification
-func (c *Client) NewFaceIDVerification(ctx context.Context, request VerificationInput) (res NewFaceIDVerificationRes, err error) {
-	if err := func() error {
-		if err := request.Validate(); err != nil {
-			return err
+func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVerificationReq) (res NewFaceIDVerificationRes, err error) {
+	switch request := request.(type) {
+	case *VerificationInput:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
 		}
-		return nil
-	}(); err != nil {
-		return res, errors.Wrap(err, "validate")
+	case *VerificationInputForm:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
+		}
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
 	}
 	startTime := time.Now()
 	otelAttrs := []attribute.KeyValue{
@@ -86,12 +100,25 @@ func (c *Client) NewFaceIDVerification(ctx context.Context, request Verification
 		contentType string
 		reqBody     func() (io.ReadCloser, error)
 	)
-	contentType = "application/json"
-	fn, err := encodeNewFaceIDVerificationRequestJSON(request, span)
-	if err != nil {
-		return res, err
+	switch req := request.(type) {
+	case *VerificationInput:
+		contentType = "application/json"
+		fn, err := encodeNewFaceIDVerificationRequestJSON(*req, span)
+		if err != nil {
+			return res, err
+		}
+		reqBody = fn
+	case *VerificationInputForm:
+		contentType = "multipart/form-data"
+		fn, ct, err := encodeNewFaceIDVerificationRequest(*req, span)
+		if err != nil {
+			return res, err
+		}
+		reqBody = fn
+		contentType = ct
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
 	}
-	reqBody = fn
 
 	u := uri.Clone(c.serverURL)
 	u.Path += "/faceid/verification"

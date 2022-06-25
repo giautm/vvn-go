@@ -372,6 +372,85 @@ func (s VerificationInput) Validate() error {
 	}
 	return nil
 }
+func (s VerificationInputForm) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.FakeThreshold.Set {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(s.FakeThreshold.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "fake_threshold",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.MaskThreshold.Set {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(s.MaskThreshold.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "mask_threshold",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.SimThresholdLevel1.Set {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(s.SimThresholdLevel1.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "sim_threshold_level1",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.SimThresholdLevel2.Set {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(s.SimThresholdLevel2.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "sim_threshold_level2",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
 func (s VerificationResult) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {

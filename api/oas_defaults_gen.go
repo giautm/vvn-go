@@ -29,3 +29,15 @@ func (s *VerificationInput) setDefaults() {
 		s.SimThresholdLevel2.SetTo(val)
 	}
 }
+
+// setDefaults set default value of fields.
+func (s *VerificationInputForm) setDefaults() {
+	{
+		val := float64(0.6)
+		s.SimThresholdLevel1.SetTo(val)
+	}
+	{
+		val := float64(0.75)
+		s.SimThresholdLevel2.SetTo(val)
+	}
+}

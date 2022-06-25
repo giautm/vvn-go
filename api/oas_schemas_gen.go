@@ -10,12 +10,26 @@ type APIKey struct {
 	APIKey string
 }
 
+// Thông tin đánh giá giả mạo khuôn mặt. Có thể kiểm tra thêm 3 random pose hoặc 3
+// ảnh thẳng mặt liên tiếp. ``` {
+// "fake_code": "REAL",
+// "fake_score": 0.0,
+// "status": "REAL",
+// "liveness_compare_scores": [float]
+// } ```.
 // Ref: #/components/schemas/FaceAntiSpoofStatus
 type FaceAntiSpoofStatus struct {
 	FakeCode OptFaceAntiSpoofStatusFakeCode "json:\"fake_code\""
-	// Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0].
+	// Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]:
+	// - 1.0: ảnh giả
+	// - 0.0: ảnh thật
+	// NOTE: By our experiments, threshold to judge an image is fake is fake_score > 0.63.
 	FakeScore OptFloat64 "json:\"fake_score\""
-	// Trả về loại lỗi giả mạo.
+	// Trả về loại lỗi giả mạo
+	// * `N/A` - ảnh selfie là ảnh thật
+	// * `SCREEN` - ảnh chụp lại từ màn hình
+	// * `RANDOM_POSE` - ảnh giả mạo do kiểm tra với 3 ảnh chụp quay các hướng
+	// * `STRAIGHT_POSE` - ảnh giả mạo do kiểm tra 3 ảnh chụp thẳng liên tiếp.
 	FakeType OptFaceAntiSpoofStatusFakeType "json:\"fake_type\""
 	// Trả về khi check_3_random_pose==1. Score matching giữa ảnh live với 3 ảnh đưa vào
 	// kiểm tra.
@@ -30,7 +44,11 @@ const (
 	FaceAntiSpoofStatusFakeCodeREAL FaceAntiSpoofStatusFakeCode = "REAL"
 )
 
-// Trả về loại lỗi giả mạo.
+// Trả về loại lỗi giả mạo
+// * `N/A` - ảnh selfie là ảnh thật
+// * `SCREEN` - ảnh chụp lại từ màn hình
+// * `RANDOM_POSE` - ảnh giả mạo do kiểm tra với 3 ảnh chụp quay các hướng
+// * `STRAIGHT_POSE` - ảnh giả mạo do kiểm tra 3 ảnh chụp thẳng liên tiếp.
 type FaceAntiSpoofStatusFakeType string
 
 const (
@@ -93,11 +111,24 @@ type OCRResult struct {
 	Country OptString "json:\"country\""
 	// Quận/Huyện.
 	District OptString "json:\"district\""
-	// Thông tin mô tả các loại giấy tờ.
+	// Thông tin mô tả các loại giấy tờ:
+	// * `CCCD` - (Căn cước công dân)
+	// * `NEW ID` - (CMT 12 số)
+	// * `OLD ID` - (CMT 9 số)
+	// * `PASSPORT`
+	// * `DRIVER LICENSE OLD`
+	// * `DRIVER LICENSE PET`
+	// * `CHIP ID`
+	// * `POLICE ID`
+	// * `ARMY ID`
+	// *Chú ý*: Không phân biệt được mặt sau của CMT 12 số và CCCD -> mặt sau của 2
+	// loại giấy tờ này hoàn toàn giống nhau về mặt hình ảnh và ý nghĩa.
 	Document OptOCRResultDocument "json:\"document\""
 	// Dân tộc.
 	Ethnicity OptString "json:\"ethnicity\""
-	// Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn).
+	// Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn). Chú ý: trường
+	// ngày hết hạn có dạng dd-mm-yyyy hoặc Không thời hạn --> nếu không phù hợp
+	// với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A.
 	Expiry OptString "json:\"expiry\""
 	// Độ tin tưởng của trường hết hạn (là chuỗi string của 1 mảng các giá trị
 	// float từ 0-1).
@@ -108,27 +139,52 @@ type OCRResult struct {
 	// float từ 0-1).
 	Hometownconf OptString "json:\"hometownconf\""
 	ID           OptString "json:\"id\""
-	// Kết quả kiểm tra văn bản.
+	// Kết quả kiểm tra văn bản:
+	// * `FAKE` - giả mạo
+	// * `CONER`
+	// * `REAL` - giấy tờ thực
+	// * `PUNCH` - Đục lỗ
+	// * `BW` - photocopy đen trắng
+	// * `REAL` - giấy tờ OK.
 	IDCheck OptOCRResultIDCheck "json:\"id_check\""
-	// Check xem giấy tờ có full về mặt THÔNG TIN hay không. Note: trường hợp số ID
-	// bị che (dẫn tới score < id_full_thr (mặc định 0.8) --> not full). Giấy tờ có thể
-	// không đầy đủ về mặt hình ảnh(ví dụ không có hình ảnh khuôn mặt), nhưng
-	// nếu vẫn đầy đủ thông tin -- > id_full =1.
+	// Check xem giấy tờ có full về mặt THÔNG TIN hay không
+	// * `1` - Full
+	// * `0` - Không full; bị chụp thiếu
+	// Note: trường hợp số ID bị che (dẫn tới score < id_full_thr (mặc định 0.8) -->
+	// not full) Giấy tờ có thể không đầy đủ về mặt hình ảnh(ví dụ không có
+	// hình ảnh khuôn mặt), nhưng nếu vẫn đầy đủ thông tin -- > id_full =1.
 	IDFull OptInt "json:\"id_full\""
-	// ID logic.
+	// ID logic:
+	// * `0` - check not OK
+	// * `1` - check OK.
 	IDLogic OptString "json:\"id_logic\""
-	// ID logic message.
+	// Nội dung kiểm tra logic:
+	// * `OK` - logic trên giấy tờ đúng theo quy định
+	// * `ID is expired` - giấy tờ đã hết hạn
+	// * `Not match province code` - sai mã tỉnh
+	// * `Not match sex code` - Giới tính trên giấy tờ và trong số ID không trùng khớp
+	// * `Not match year code` - Năm sinh trên giấy tờ và trong số ID không trùng khớp
+	// * `Expiry subtract birthday not good` - Ngày tháng năm sinh và ngày tháng hết hạn không
+	// hợp lệ (đối với CCCD; ngày hết hạn là khi công dân đủ 25, 40, 60 tuổi hoặc
+	// không có thời hạn)
+	// * `ID can be fake` - trường hợp có thể đang bị giả mạo về chữ "CĂN CƯỚC
+	// CÔNG DÂN/CHỨNG MINH NHÂN DÂN" đối với giấy tờ thẻ cứng.
 	IDLogicMessage OptString "json:\"id_logic_message\""
-	IDType         OptString "json:\"id_type\""
+	// Phân biệt mặt trước/mặt sau:
+	// * `0` - mặt trước
+	// * `1` - mặt sau.
+	IDType OptString "json:\"id_type\""
 	// Độ tin tưởng của trường ID (là chuỗi string của 1 mảng các giá trị float
-	// từ 0-1).
+	// từ 0-1)
+	// *Chú ý*: độ tin tưởng của ký tự bất kì < 0.8 --> cảnh báo đầu vào kém.
 	Idconf OptString "json:\"idconf\""
 	// Nơi cấp.
 	IssueBy OptString "json:\"issue_by\""
 	// Độ tin tưởng của trường nơi cấp (là chuỗi string của 1 mảng các giá trị
 	// float từ 0-1).
 	IssueByConf OptString "json:\"issue_by_conf\""
-	// Ngày cấp.
+	// Ngày cấp *Chú ý*: trường ngày cấp có dạng dd-mm-yyyy --> nếu không phù hợp
+	// với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A.
 	IssueDate OptString "json:\"issue_date\""
 	// Độ tin tưởng của trường ngày cấp (là chuỗi string của 1 mảng các giá trị
 	// float từ 0-1).
@@ -167,7 +223,18 @@ type OCRResult struct {
 
 func (*OCRResult) newOCRRecognitionRes() {}
 
-// Thông tin mô tả các loại giấy tờ.
+// Thông tin mô tả các loại giấy tờ:
+// * `CCCD` - (Căn cước công dân)
+// * `NEW ID` - (CMT 12 số)
+// * `OLD ID` - (CMT 9 số)
+// * `PASSPORT`
+// * `DRIVER LICENSE OLD`
+// * `DRIVER LICENSE PET`
+// * `CHIP ID`
+// * `POLICE ID`
+// * `ARMY ID`
+// *Chú ý*: Không phân biệt được mặt sau của CMT 12 số và CCCD -> mặt sau của 2
+// loại giấy tờ này hoàn toàn giống nhau về mặt hình ảnh và ý nghĩa.
 type OCRResultDocument string
 
 const (
@@ -182,7 +249,13 @@ const (
 	OCRResultDocumentARMYID           OCRResultDocument = "ARMY ID"
 )
 
-// Kết quả kiểm tra văn bản.
+// Kết quả kiểm tra văn bản:
+// * `FAKE` - giả mạo
+// * `CONER`
+// * `REAL` - giấy tờ thực
+// * `PUNCH` - Đục lỗ
+// * `BW` - photocopy đen trắng
+// * `REAL` - giấy tờ OK.
 type OCRResultIDCheck string
 
 const (
@@ -521,6 +594,52 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptMultipartFile returns new OptMultipartFile with value set to v.
+func NewOptMultipartFile(v ht.MultipartFile) OptMultipartFile {
+	return OptMultipartFile{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptMultipartFile is optional ht.MultipartFile.
+type OptMultipartFile struct {
+	Value ht.MultipartFile
+	Set   bool
+}
+
+// IsSet returns true if OptMultipartFile was set.
+func (o OptMultipartFile) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptMultipartFile) Reset() {
+	var v ht.MultipartFile
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptMultipartFile) SetTo(v ht.MultipartFile) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptMultipartFile) Get() (v ht.MultipartFile, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptMultipartFile) Or(d ht.MultipartFile) ht.MultipartFile {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -886,6 +1005,49 @@ type VerificationInput struct {
 	SimThresholdLevel2 OptFloat64 "json:\"sim_threshold_level2\""
 }
 
+func (*VerificationInput) newFaceIDVerificationReq() {}
+
+// Ref: #/components/schemas/VerificationInput
+type VerificationInputForm struct {
+	// Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không.
+	Check3RandomPose OptInt "json:\"check_3_random_pose\""
+	// Kiểm tra các ảnh khuôn mặt có fake hay không.
+	Check3StraightPose OptInt "json:\"check_3_straight_pose\""
+	// Giá trị dùng để check xem khuôn mặt live có phải fake.
+	FakeThreshold OptFloat64 "json:\"fake_threshold\""
+	// Ảnh card id (chứng minh thư, căn cước công dân) của người dùng.
+	ImageCard ht.MultipartFile "json:\"image_card\""
+	// Ảnh chụp khuôn mặt.
+	ImageLive ht.MultipartFile "json:\"image_live\""
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive1 OptMultipartFile "json:\"image_live1\""
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive2 OptMultipartFile "json:\"image_live2\""
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive3 OptMultipartFile "json:\"image_live3\""
+	// Threshold để kiểm tra xem có đeo khẩu trang hay không.
+	MaskThreshold OptFloat64 "json:\"mask_threshold\""
+	// Request ID.
+	RequestID string "json:\"request_id\""
+	// Trả về face feature vector hay không.
+	ReturnFeature OptInt "json:\"return_feature\""
+	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
+	// độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >=
+	// sim_threshold_level2 ==> cùng 1 người.
+	SimThresholdLevel1 OptFloat64 "json:\"sim_threshold_level1\""
+	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
+	// độ tương đồng < sim_threshold_level2 ==> có thể cù độ tương đồng >=
+	// sim_threshold_level2 ==> cùng 1 người.
+	SimThresholdLevel2 OptFloat64 "json:\"sim_threshold_level2\""
+}
+
+func (*VerificationInputForm) newFaceIDVerificationReq() {}
+
+// Thông tin thêm về kết quả trả về. Ví dụ: ```{"api_version": 1.0.4, "error_message":
+// "000", "error_code": "OK"}```.
 // Ref: #/components/schemas/VerificationMessage
 type VerificationMessage struct {
 	// API version.
@@ -908,7 +1070,10 @@ type VerificationResult struct {
 	Sim OptFloat64 "json:\"sim\""
 	// Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms).
 	VerificationTime OptInt "json:\"verification_time\""
-	// 0: không xác thực, 1: xác thực.
+	// Kết quả xác thực dạng số:
+	// * `0` - not same
+	// * `1` - may be same
+	// * `2` - same person.
 	VerifyResult OptVerificationResultVerifyResult "json:\"verify_result\""
 	// Kết quả xác thực dạng text.
 	VerifyResultText OptString                        "json:\"verify_result_text\""
@@ -920,7 +1085,10 @@ type VerificationResult struct {
 
 func (*VerificationResult) newFaceIDVerificationRes() {}
 
-// 0: không xác thực, 1: xác thực.
+// Kết quả xác thực dạng số:
+// * `0` - not same
+// * `1` - may be same
+// * `2` - same person.
 type VerificationResultVerifyResult int
 
 const (

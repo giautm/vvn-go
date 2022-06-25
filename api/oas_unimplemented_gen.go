@@ -16,7 +16,7 @@ type UnimplementedHandler struct{}
 // NewFaceIDVerification implements newFaceIDVerification operation.
 //
 // POST /faceid/verification
-func (UnimplementedHandler) NewFaceIDVerification(ctx context.Context, req VerificationInput) (r NewFaceIDVerificationRes, _ error) {
+func (UnimplementedHandler) NewFaceIDVerification(ctx context.Context, req NewFaceIDVerificationReq) (r NewFaceIDVerificationRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

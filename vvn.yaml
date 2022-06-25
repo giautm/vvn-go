@@ -63,18 +63,23 @@ components:
           description: Request ID
         image_card:
           type: string
+          format: binary
           description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
         image_live:
           type: string
+          format: binary
           description: Ảnh chụp khuôn mặt
         image_live1:
           type: string
+          format: binary
           description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
         image_live2:
           type: string
+          format: binary
           description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
         image_live3:
           type: string
+          format: binary
           description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
         check_3_random_pose:
           x-go-name: Check3RandomPose
@@ -125,17 +130,30 @@ components:
       properties:
         document:
           type: string
-          description: Thông tin mô tả các loại giấy tờ
+          description: >
+            Thông tin mô tả các loại giấy tờ:
+              * `CCCD` - (Căn cước công dân)
+              * `NEW ID` - (CMT 12 số)
+              * `OLD ID` - (CMT 9 số)
+              * `PASSPORT`
+              * `DRIVER LICENSE OLD`
+              * `DRIVER LICENSE PET`
+              * `CHIP ID`
+              * `POLICE ID`
+              * `ARMY ID`
+
+            *Chú ý*: Không phân biệt được mặt sau của CMT 12 số và CCCD
+            -> mặt sau của 2 loại giấy tờ này hoàn toàn giống nhau về mặt hình ảnh và ý nghĩa
           enum:
             - CCCD
-            - 'NEW ID'
-            - 'OLD ID'
+            - NEW ID
+            - OLD ID
             - PASSPORT
-            - 'DRIVER LICENSE OLD'
-            - 'DRIVER LICENSE PET'
-            - 'CHIP ID'
-            - 'POLICE ID'
-            - 'ARMY ID'
+            - DRIVER LICENSE OLD
+            - DRIVER LICENSE PET
+            - CHIP ID
+            - POLICE ID
+            - ARMY ID
         result_code:
           type: integer
           description: Mã kết quả
@@ -156,7 +174,14 @@ components:
         id_check:
           x-go-name: IDCheck
           type: string
-          description: Kết quả kiểm tra văn bản
+          description: >
+            Kết quả kiểm tra văn bản:
+              * `FAKE` - giả mạo
+              * `CONER`
+              * `REAL` - giấy tờ thực
+              * `PUNCH` - Đục lỗ
+              * `BW` - photocopy đen trắng
+              * `REAL` - giấy tờ OK
           enum:
             - BW # Photocopy đen trắng
             - CONER
@@ -166,19 +191,40 @@ components:
         id_full:
           x-go-name: IDFull
           type: integer
-          description: 'Check xem giấy tờ có full về mặt THÔNG TIN hay không. Note: trường hợp số ID bị che (dẫn tới score < id_full_thr (mặc định 0.8) --> not full). Giấy tờ có thể không đầy đủ về mặt hình ảnh(ví dụ không có hình ảnh khuôn mặt), nhưng nếu vẫn đầy đủ thông tin -- > id_full =1'
+          description: >
+            Check xem giấy tờ có full về mặt THÔNG TIN hay không
+              * `1` - Full
+              * `0` - Không full; bị chụp thiếu
+
+            Note: trường hợp số ID bị che (dẫn tới score < id_full_thr (mặc định 0.8) --> not full)
+            Giấy tờ có thể không đầy đủ về mặt hình ảnh(ví dụ không có hình ảnh khuôn mặt), nhưng nếu vẫn đầy đủ thông tin -- > id_full =1
         id_logic:
           x-go-name: IDLogic
           type: string
-          description: ID logic
+          description: >
+            ID logic:
+              * `0` - check not OK
+              * `1` - check OK
         id_logic_message:
           x-go-name: IDLogicMessage
           type: string
-          description: ID logic message
+          description: >
+            Nội dung kiểm tra logic:
+              * `OK` - logic trên giấy tờ đúng theo quy định
+              * `ID is expired` - giấy tờ đã hết hạn
+              * `Not match province code` - sai mã tỉnh
+              * `Not match sex code` - Giới tính trên giấy tờ và trong số ID không trùng khớp
+              * `Not match year code` - Năm sinh trên giấy tờ và trong số ID không trùng khớp
+              * `Expiry subtract birthday not good` - Ngày tháng năm sinh và ngày tháng hết hạn không hợp lệ (đối với CCCD; ngày hết hạn là khi công dân đủ 25, 40, 60 tuổi hoặc không có thời hạn)
+              * `ID can be fake` - trường hợp có thể đang bị giả mạo về chữ "CĂN CƯỚC CÔNG DÂN/CHỨNG MINH NHÂN DÂN" đối với giấy tờ thẻ cứng
+
         id_type:
           x-go-name: IDType
           type: string
-
+          description: >
+            Phân biệt mặt trước/mặt sau:
+              * `0` - mặt trước
+              * `1` - mặt sau
         # Data with confidence value
         id:
           x-go-name: ID
@@ -186,7 +232,11 @@ components:
         idconf:
           x-go-name: IDConfidence
           type: string
-          description: 'Độ tin tưởng của trường ID (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
+          description: >
+            Độ tin tưởng của trường ID (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+
+            *Chú ý*: độ tin tưởng của ký tự bất kì < 0.8
+            --> cảnh báo đầu vào kém
         name:
           type: string
           description: Tên khách hàng trên giấy tờ
@@ -224,7 +274,9 @@ components:
           description: 'Độ tin tưởng trường địa chỉ thường trú (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
         expiry:
           type: string
-          description: Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn)
+          description: >
+            Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn).
+            Chú ý: trường ngày hết hạn có dạng dd-mm-yyyy hoặc Không thời hạn --> nếu không phù hợp với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A
         expiryconf:
           x-go-name: ExpiryConfidence
           type: string
@@ -238,7 +290,9 @@ components:
           description: 'Độ tin tưởng của trường tôn giáo (là chuỗi string của 1 mảng các giá trị float từ 0-1)'
         issue_date:
           type: string
-          description: Ngày cấp
+          description: >
+            Ngày cấp
+            *Chú ý*: trường ngày cấp có dạng dd-mm-yyyy --> nếu không phù hợp với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A
         issue_date_conf:
           x-go-name: IssueDateConfidence
           type: string
@@ -279,6 +333,16 @@ components:
           description: Dân tộc
     FaceAntiSpoofStatus:
       type: object
+      description: >
+        Thông tin đánh giá giả mạo khuôn mặt. Có thể kiểm tra thêm 3 random pose hoặc 3 ảnh thẳng mặt liên tiếp.
+        ```
+        {
+          "fake_code": "REAL",
+          "fake_score": 0.0,
+          "status": "REAL",
+          "liveness_compare_scores": [float]
+        }
+        ```
       properties:
         status:
           type: string
@@ -292,10 +356,20 @@ components:
             - REAL
         fake_score:
           type: number
-          description: Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]
+          description: >
+            Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]:
+              - 1.0: ảnh giả
+              - 0.0: ảnh thật
+
+            NOTE: By our experiments, threshold to judge an image is fake is fake_score > 0.63
         fake_type:
           type: string
-          description: Trả về loại lỗi giả mạo
+          description: >
+            Trả về loại lỗi giả mạo
+              * `N/A` - ảnh selfie là ảnh thật
+              * `SCREEN` - ảnh chụp lại từ màn hình
+              * `RANDOM_POSE` - ảnh giả mạo do kiểm tra với 3 ảnh chụp quay các hướng
+              * `STRAIGHT_POSE` - ảnh giả mạo do kiểm tra 3 ảnh chụp thẳng liên tiếp
           enum:
             - N/A # ảnh selfie là ảnh thật
             - SCREEN # ảnh chụp lại từ màn hình
@@ -306,6 +380,9 @@ components:
           description: Trả về khi check_3_random_pose==1. Score matching giữa ảnh live với 3 ảnh đưa vào kiểm tra
     VerificationMessage:
       type: object
+      description: >
+        Thông tin thêm về kết quả trả về. Ví dụ:
+        ```{"api_version": 1.0.4, "error_message": "000", "error_code": "OK"}```
       properties:
         api_version:
           x-go-name: APIVersion
@@ -322,8 +399,12 @@ components:
       properties:
         verify_result:
           type: integer
-          description: '0: không xác thực, 1: xác thực'
           enum: [0, 1, 2]
+          description: >
+            Kết quả xác thực dạng số:
+             * `0` - not same
+             * `1` - may be same
+             * `2` - same person
         verify_result_text:
           type: string
           description: Kết quả xác thực dạng text
@@ -366,6 +447,9 @@ components:
       required: true
       content:
         application/json:
+          schema:
+            $ref: '#/components/schemas/VerificationInput'
+        multipart/form-data:
           schema:
             $ref: '#/components/schemas/VerificationInput'
   securitySchemes:
