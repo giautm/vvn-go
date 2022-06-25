@@ -33,7 +33,16 @@ func (s FaceAntiSpoofStatus) Validate() error {
 	if err := func() error {
 		if s.FakeScore.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.FakeScore.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.FakeScore.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -128,7 +137,16 @@ func (s OCRInput) Validate() error {
 	if err := func() error {
 		if s.IDFullThr.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.IDFullThr.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.IDFullThr.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -153,7 +171,16 @@ func (s OCRInputForm) Validate() error {
 	if err := func() error {
 		if s.IDFullThr.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.IDFullThr.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.IDFullThr.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -298,7 +325,16 @@ func (s VerificationInput) Validate() error {
 	if err := func() error {
 		if s.FakeThreshold.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.FakeThreshold.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.FakeThreshold.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -316,7 +352,16 @@ func (s VerificationInput) Validate() error {
 	if err := func() error {
 		if s.MaskThreshold.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.MaskThreshold.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.MaskThreshold.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -334,7 +379,16 @@ func (s VerificationInput) Validate() error {
 	if err := func() error {
 		if s.SimThresholdLevel1.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.SimThresholdLevel1.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.SimThresholdLevel1.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -352,7 +406,16 @@ func (s VerificationInput) Validate() error {
 	if err := func() error {
 		if s.SimThresholdLevel2.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.SimThresholdLevel2.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.SimThresholdLevel2.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -377,7 +440,16 @@ func (s VerificationInputForm) Validate() error {
 	if err := func() error {
 		if s.FakeThreshold.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.FakeThreshold.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.FakeThreshold.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -395,7 +467,16 @@ func (s VerificationInputForm) Validate() error {
 	if err := func() error {
 		if s.MaskThreshold.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.MaskThreshold.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.MaskThreshold.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -413,7 +494,16 @@ func (s VerificationInputForm) Validate() error {
 	if err := func() error {
 		if s.SimThresholdLevel1.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.SimThresholdLevel1.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.SimThresholdLevel1.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -431,7 +521,16 @@ func (s VerificationInputForm) Validate() error {
 	if err := func() error {
 		if s.SimThresholdLevel2.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.SimThresholdLevel2.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.SimThresholdLevel2.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -540,7 +639,16 @@ func (s VerificationResult) Validate() error {
 	if err := func() error {
 		if s.Sim.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.Sim.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.Sim.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -594,7 +702,16 @@ func (s VerificationResult) Validate() error {
 	if err := func() error {
 		if s.WearingMaskScore.Set {
 			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(s.WearingMaskScore.Value)); err != nil {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.WearingMaskScore.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil

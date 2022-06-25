@@ -118,6 +118,8 @@ components:
           x-go-name: IDFullThreshold
           type: number
           format: float
+          minimum: 0
+          maximum: 1
           default: 0.8
           description: >
             Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMND..)
@@ -368,6 +370,8 @@ components:
             - REAL
         fake_score:
           type: number
+          minimum: 0
+          maximum: 1
           description: >
             Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]:
               - 1.0: ảnh giả
@@ -458,12 +462,18 @@ components:
           description: Trả về face feature vector hay không
         mask_threshold:
           type: number
+          minimum: 0
+          maximum: 1
           description: Threshold để kiểm tra xem có đeo khẩu trang hay không
         fake_threshold:
           type: number
+          minimum: 0
+          maximum: 1
           description: Giá trị dùng để check xem khuôn mặt live có phải fake
         sim_threshold_level1:
           type: number
+          minimum: 0
+          maximum: 1
           default: 0.60
           description: >
             độ tương đồng <= sim_threshold_level1
@@ -474,6 +484,8 @@ components:
             ==> cùng 1 người
         sim_threshold_level2:
           type: number
+          minimum: 0
+          maximum: 1
           default: 0.75
           description: >
             độ tương đồng <= sim_threshold_level1
@@ -508,14 +520,8 @@ components:
         sim:
           type: number
           description: Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1]
-        verification_time:
-          type: integer
-          description: Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms)
-        wearing_mask:
-          type: string
-          enum:
-            - 'YES'
-            - 'NO'
+          minimum: 0
+          maximum: 1
         feature_vector_face_card:
           type: array
           items:
@@ -530,13 +536,23 @@ components:
           minItems: 512
           maxItems: 512
           description: Feature vector của khuôn mặt ở ảnh chụp chân dung
+        face_anti_spoof_status:
+          $ref: '#/components/schemas/FaceAntiSpoofStatus'
+        verification_time:
+          type: integer
+          description: Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms)
+        wearing_mask:
+          type: string
+          enum:
+            - 'YES'
+            - 'NO'
         wearing_mask_score:
           type: number
+          minimum: 0
+          maximum: 1
           description: >
             Điểm score khi nhận dạng khẩu trang, điểm càng cao thì
             độ tin tưởng đeo khẩu trang càng lớn score trong khoảng [0-1]
-        face_anti_spoof_status:
-          $ref: '#/components/schemas/FaceAntiSpoofStatus'
   requestBodies:
     OCRRequest:
       required: true
