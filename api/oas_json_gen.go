@@ -398,9 +398,27 @@ func (s OCRResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Characteristics.Set {
+			e.FieldStart("characteristics")
+			s.Characteristics.Encode(e)
+		}
+	}
+	{
+		if s.CharacteristicsConf.Set {
+			e.FieldStart("characteristics_conf")
+			s.CharacteristicsConf.Encode(e)
+		}
+	}
+	{
 		if s.Class.Set {
 			e.FieldStart("class")
 			s.Class.Encode(e)
+		}
+	}
+	{
+		if s.Copyright.Set {
+			e.FieldStart("copyright")
+			s.Copyright.Encode(e)
 		}
 	}
 	{
@@ -425,6 +443,12 @@ func (s OCRResult) encodeFields(e *jx.Encoder) {
 		if s.Ethnicity.Set {
 			e.FieldStart("ethnicity")
 			s.Ethnicity.Encode(e)
+		}
+	}
+	{
+		if s.Ethnicityconf.Set {
+			e.FieldStart("ethnicityconf")
+			s.Ethnicityconf.Encode(e)
 		}
 	}
 	{
@@ -542,6 +566,12 @@ func (s OCRResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.OptionalData.Set {
+			e.FieldStart("optional_data")
+			s.OptionalData.Encode(e)
+		}
+	}
+	{
 		if s.PassportType.Set {
 			e.FieldStart("passport_type")
 			s.PassportType.Encode(e)
@@ -601,47 +631,66 @@ func (s OCRResult) encodeFields(e *jx.Encoder) {
 			s.Sexconf.Encode(e)
 		}
 	}
+	{
+		if s.Street.Set {
+			e.FieldStart("street")
+			s.Street.Encode(e)
+		}
+	}
+	{
+		if s.StreetName.Set {
+			e.FieldStart("street_name")
+			s.StreetName.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfOCRResult = [38]string{
+var jsonFieldsNameOfOCRResult = [45]string{
 	0:  "address",
 	1:  "addressconf",
 	2:  "birthday",
 	3:  "birthdayconf",
-	4:  "class",
-	5:  "country",
-	6:  "district",
-	7:  "document",
-	8:  "ethnicity",
-	9:  "expiry",
-	10: "expiryconf",
-	11: "hometown",
-	12: "hometownconf",
-	13: "id",
-	14: "id_check",
-	15: "id_full",
-	16: "id_logic",
-	17: "id_logic_message",
-	18: "id_type",
-	19: "idconf",
-	20: "issue_by",
-	21: "issue_by_conf",
-	22: "issue_date",
-	23: "issue_date_conf",
-	24: "name",
-	25: "nameconf",
-	26: "national",
-	27: "optinal_data",
-	28: "passport_type",
-	29: "precinct",
-	30: "province",
-	31: "religion",
-	32: "religionconf",
-	33: "result_code",
-	34: "server_name",
-	35: "server_ver",
-	36: "sex",
-	37: "sexconf",
+	4:  "characteristics",
+	5:  "characteristics_conf",
+	6:  "class",
+	7:  "copyright",
+	8:  "country",
+	9:  "district",
+	10: "document",
+	11: "ethnicity",
+	12: "ethnicityconf",
+	13: "expiry",
+	14: "expiryconf",
+	15: "hometown",
+	16: "hometownconf",
+	17: "id",
+	18: "id_check",
+	19: "id_full",
+	20: "id_logic",
+	21: "id_logic_message",
+	22: "id_type",
+	23: "idconf",
+	24: "issue_by",
+	25: "issue_by_conf",
+	26: "issue_date",
+	27: "issue_date_conf",
+	28: "name",
+	29: "nameconf",
+	30: "national",
+	31: "optinal_data",
+	32: "optional_data",
+	33: "passport_type",
+	34: "precinct",
+	35: "province",
+	36: "religion",
+	37: "religionconf",
+	38: "result_code",
+	39: "server_name",
+	40: "server_ver",
+	41: "sex",
+	42: "sexconf",
+	43: "street",
+	44: "street_name",
 }
 
 // Decode decodes OCRResult from json.
@@ -692,6 +741,26 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"birthdayconf\"")
 			}
+		case "characteristics":
+			if err := func() error {
+				s.Characteristics.Reset()
+				if err := s.Characteristics.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"characteristics\"")
+			}
+		case "characteristics_conf":
+			if err := func() error {
+				s.CharacteristicsConf.Reset()
+				if err := s.CharacteristicsConf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"characteristics_conf\"")
+			}
 		case "class":
 			if err := func() error {
 				s.Class.Reset()
@@ -701,6 +770,16 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"class\"")
+			}
+		case "copyright":
+			if err := func() error {
+				s.Copyright.Reset()
+				if err := s.Copyright.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"copyright\"")
 			}
 		case "country":
 			if err := func() error {
@@ -741,6 +820,16 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"ethnicity\"")
+			}
+		case "ethnicityconf":
+			if err := func() error {
+				s.Ethnicityconf.Reset()
+				if err := s.Ethnicityconf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ethnicityconf\"")
 			}
 		case "expiry":
 			if err := func() error {
@@ -932,6 +1021,16 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"optinal_data\"")
 			}
+		case "optional_data":
+			if err := func() error {
+				s.OptionalData.Reset()
+				if err := s.OptionalData.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"optional_data\"")
+			}
 		case "passport_type":
 			if err := func() error {
 				s.PassportType.Reset()
@@ -1031,6 +1130,26 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"sexconf\"")
+			}
+		case "street":
+			if err := func() error {
+				s.Street.Reset()
+				if err := s.Street.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"street\"")
+			}
+		case "street_name":
+			if err := func() error {
+				s.StreetName.Reset()
+				if err := s.StreetName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"street_name\"")
 			}
 		default:
 			return d.Skip()

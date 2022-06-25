@@ -105,8 +105,14 @@ type OCRResult struct {
 	// Độ tin tưởng trường ngày tháng năm sinh (là chuỗi string của 1 mảng các giá
 	// trị float từ 0-1).
 	Birthdayconf OptString "json:\"birthdayconf\""
+	// Đặt điểm.
+	Characteristics OptString "json:\"characteristics\""
+	// Độ tin tưởng của trường đặt điểm (là chuỗi string của 1 mảng các giá
+	// trị float từ 0-1).
+	CharacteristicsConf OptString "json:\"characteristics_conf\""
 	// Loại BLX.
-	Class OptString "json:\"class\""
+	Class     OptString "json:\"class\""
+	Copyright OptString "json:\"copyright\""
 	// Quốc gia.
 	Country OptString "json:\"country\""
 	// Quận/Huyện.
@@ -126,6 +132,9 @@ type OCRResult struct {
 	Document OptOCRResultDocument "json:\"document\""
 	// Dân tộc.
 	Ethnicity OptString "json:\"ethnicity\""
+	// Độ tin tưởng của trường dân tộc (là chuỗi string của 1 mảng các giá trị
+	// float từ 0-1).
+	Ethnicityconf OptString "json:\"ethnicityconf\""
 	// Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn). Chú ý: trường
 	// ngày hết hạn có dạng dd-mm-yyyy hoặc Không thời hạn --> nếu không phù hợp
 	// với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A.
@@ -197,7 +206,8 @@ type OCRResult struct {
 	// Quốc gia.
 	National OptString "json:\"national\""
 	// Chỉ có ý nghĩa với passport. Số CMT của Vietnam.
-	OptinalData OptString "json:\"optinal_data\""
+	OptinalData  OptString "json:\"optinal_data\""
+	OptionalData OptString "json:\"optional_data\""
 	// Loại Passport (công vụ/thường - PK/P).
 	PassportType OptString "json:\"passport_type\""
 	Precinct     OptString "json:\"precinct\""
@@ -219,6 +229,10 @@ type OCRResult struct {
 	// Độ tin tưởng trường giới tính (là chuỗi string của 1 mảng các giá trị float
 	// từ 0-1).
 	Sexconf OptString "json:\"sexconf\""
+	// Đường phố.
+	Street OptString "json:\"street\""
+	// Tên đường.
+	StreetName OptString "json:\"street_name\""
 }
 
 func (*OCRResult) newOCRRecognitionRes() {}

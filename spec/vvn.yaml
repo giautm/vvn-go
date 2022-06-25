@@ -316,7 +316,29 @@ components:
           type: string
           description: >
             Độ tin tưởng của trường nơi cấp (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+        ethnicity:
+          type: string
+          description: Dân tộc
+        ethnicityconf:
+          x-go-name: EthnicityConfidence
+          type: string
+          description: >
+            Độ tin tưởng của trường dân tộc (là chuỗi string của 1 mảng các giá trị float từ 0-1)
+        characteristics:
+          type: string
+          description: Đặt điểm
+        characteristics_conf:
+          x-go-name: CharacteristicsConfidence
+          type: string
+          description: >
+            Độ tin tưởng của trường đặt điểm (là chuỗi string của 1 mảng các giá trị float từ 0-1)
 
+        street:
+          type: string
+          description: Đường phố
+        street_name:
+          type: string
+          description: Tên đường
         country:
           type: string
           description: Quốc gia
@@ -341,9 +363,10 @@ components:
           description: Quận/Huyện
         precinct:
           type: string
-        ethnicity:
+        optional_data:
           type: string
-          description: Dân tộc
+        copyright:
+          type: string
     FaceAntiSpoofStatus:
       type: object
       description: >
