@@ -69,7 +69,7 @@ const (
 // Ref: #/components/schemas/GatewayError
 type GatewayError struct {
 	// Thông điệp lỗi.
-	Message OptString "json:\"message\""
+	Message string "json:\"message\""
 }
 
 func (*GatewayError) newFaceIDVerificationRes() {}
@@ -830,52 +830,6 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-// NewOptVerificationMessage returns new OptVerificationMessage with value set to v.
-func NewOptVerificationMessage(v VerificationMessage) OptVerificationMessage {
-	return OptVerificationMessage{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptVerificationMessage is optional VerificationMessage.
-type OptVerificationMessage struct {
-	Value VerificationMessage
-	Set   bool
-}
-
-// IsSet returns true if OptVerificationMessage was set.
-func (o OptVerificationMessage) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptVerificationMessage) Reset() {
-	var v VerificationMessage
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptVerificationMessage) SetTo(v VerificationMessage) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptVerificationMessage) Get() (v VerificationMessage, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptVerificationMessage) Or(d VerificationMessage) VerificationMessage {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptVerificationResultVerifyResult returns new OptVerificationResultVerifyResult with value set to v.
 func NewOptVerificationResultVerifyResult(v VerificationResultVerifyResult) OptVerificationResultVerifyResult {
 	return OptVerificationResultVerifyResult{
@@ -1053,9 +1007,9 @@ type VerificationMessage struct {
 	// API version.
 	APIVersion OptString "json:\"api_version\""
 	// Mã lỗi.
-	ErrorCode OptString "json:\"error_code\""
+	ErrorCode string "json:\"error_code\""
 	// Mô tả lỗi.
-	ErrorMessage OptString "json:\"error_message\""
+	ErrorMessage string "json:\"error_message\""
 }
 
 // Ref: #/components/schemas/VerificationResult
@@ -1064,8 +1018,10 @@ type VerificationResult struct {
 	// Feature vector của khuôn mặt ở ảnh thẻ.
 	FeatureVectorFaceCard []float64 "json:\"feature_vector_face_card\""
 	// Feature vector của khuôn mặt ở ảnh chụp chân dung.
-	FeatureVectorFaceLive []float64              "json:\"feature_vector_face_live\""
-	Message               OptVerificationMessage "json:\"message\""
+	FeatureVectorFaceLive []float64           "json:\"feature_vector_face_live\""
+	Message               VerificationMessage "json:\"message\""
+	// Request ID.
+	RequestID string "json:\"request_id\""
 	// Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1].
 	Sim OptFloat64 "json:\"sim\""
 	// Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms).

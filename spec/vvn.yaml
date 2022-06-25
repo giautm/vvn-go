@@ -93,6 +93,8 @@ components:
   schemas:
     GatewayError:
       type: object
+      required:
+        - message
       description: >
         Thông báo lỗi trả về từ Gateway
       properties:
@@ -392,6 +394,9 @@ components:
             Score matching giữa ảnh live với 3 ảnh đưa vào kiểm tra
     VerificationMessage:
       type: object
+      required:
+        - error_code
+        - error_message
       description: >
         Thông tin thêm về kết quả trả về. Ví dụ:
         ```{"api_version": 1.0.4, "error_message": "000", "error_code": "OK"}```
@@ -479,7 +484,16 @@ components:
             ==> cùng 1 người
     VerificationResult:
       type: object
+      required:
+        - message
+        - request_id
       properties:
+        message:
+          $ref: '#/components/schemas/VerificationMessage'
+        request_id:
+          x-go-name: RequestID
+          type: string
+          description: Request ID
         verify_result:
           type: integer
           enum: [0, 1, 2]
@@ -523,8 +537,6 @@ components:
             độ tin tưởng đeo khẩu trang càng lớn score trong khoảng [0-1]
         face_anti_spoof_status:
           $ref: '#/components/schemas/FaceAntiSpoofStatus'
-        message:
-          $ref: '#/components/schemas/VerificationMessage'
   requestBodies:
     OCRRequest:
       required: true

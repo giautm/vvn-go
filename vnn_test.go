@@ -44,6 +44,6 @@ func TestNewOCRRecognition_integration(t *testing.T) {
 		r.NotEmpty(t.ID.Value)
 		r.Equal(t.IDCheck.Value, api.OCRResultIDCheckREAL)
 	case *api.GatewayError:
-		r.Fail(t.Message.Value)
+		r.Fail(t.Message)
 	}
 }
