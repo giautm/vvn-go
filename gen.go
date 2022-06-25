@@ -1,3 +1,3 @@
 package vvn
 
-//go:generate go run -mod=mod github.com/deepmap/oapi-codegen/cmd/oapi-codegen --config=config.yaml ./openapi.yaml
+//go:generate go run -mod=mod github.com/ogen-go/ogen/cmd/ogen --target api -package api --clean vvn.yaml

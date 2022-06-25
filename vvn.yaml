@@ -50,9 +50,32 @@ paths:
                 $ref: '#/components/schemas/VerificationResult'
 components:
   schemas:
-    VerificationBaseInput:
+    VerificationInput:
       type: object
+      required:
+        - request_id
+        - image_card
+        - image_live
       properties:
+        request_id:
+          x-go-name: RequestID
+          type: string
+          description: Request ID
+        image_card:
+          type: string
+          description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
+        image_live:
+          type: string
+          description: Ảnh chụp khuôn mặt
+        image_live1:
+          type: string
+          description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        image_live2:
+          type: string
+          description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        image_live3:
+          type: string
+          description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
         check_3_random_pose:
           x-go-name: Check3RandomPose
           type: integer
@@ -334,75 +357,17 @@ components:
           $ref: '#/components/schemas/VerificationMessage'
   requestBodies:
     OCRRequest:
+      required: true
       content:
         multipart/form-data:
           schema:
             $ref: '#/components/schemas/OCRInput'
     VerificationRequest:
+      required: true
       content:
         application/json:
           schema:
-            allOf:
-            - $ref: '#/components/schemas/VerificationBaseInput'
-            - type: object
-              required:
-                - request_id
-                - image_card
-                - image_live
-              properties:
-                request_id:
-                  x-go-name: RequestID
-                  type: string
-                  description: Request ID
-                image_card:
-                  type: string
-                  description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
-                image_live:
-                  type: string
-                  description: Ảnh chụp khuôn mặt
-                image_live1:
-                  type: string
-                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-                image_live2:
-                  type: string
-                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-                image_live3:
-                  type: string
-                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-        multipart/form-data:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/VerificationBaseInput'
-            - type: object
-              required:
-                - request_id
-                - image_card
-                - image_live
-              properties:
-                request_id:
-                  x-go-name: RequestID
-                  type: string
-                  description: Request ID
-                image_card:
-                  type: string
-                  description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
-                  format: binary
-                image_live:
-                  type: string
-                  description: Ảnh chụp khuôn mặt
-                  format: binary
-                image_live1:
-                  type: string
-                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-                  format: binary
-                image_live2:
-                  type: string
-                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-                  format: binary
-                image_live3:
-                  type: string
-                  description: Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-                  format: binary
+            $ref: '#/components/schemas/VerificationInput'
   securitySchemes:
     api_key:
       type: apiKey
