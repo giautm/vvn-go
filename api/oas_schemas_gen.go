@@ -1049,7 +1049,7 @@ type VerificationResult struct {
 	// Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1].
 	Sim OptFloat64 "json:\"sim\""
 	// Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms).
-	VerificationTime OptInt "json:\"verification_time\""
+	VerificationTime OptFloat64 "json:\"verification_time\""
 	// Kết quả xác thực dạng số:
 	// * `0` - not same
 	// * `1` - may be same

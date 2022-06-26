@@ -586,7 +586,7 @@ components:
         face_anti_spoof_status:
           $ref: '#/components/schemas/FaceAntiSpoofStatus'
         verification_time:
-          type: integer
+          type: number
           description: Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms)
         wearing_mask:
           type: string

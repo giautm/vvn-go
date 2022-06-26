@@ -47,3 +47,31 @@ func TestNewOCRRecognition_integration(t *testing.T) {
 		r.Fail(t.Message)
 	}
 }
+
+func TestNewFaceIDVerification_integration(t *testing.T) {
+	apiKey := os.Getenv("VVN_API_KEY")
+	if apiKey == "" {
+		t.Skip("VVN_API_KEY is not set")
+	}
+
+	r := require.New(t)
+	c, err := api.NewClient(vvn.ServerProduction, vvn.StaticKey(apiKey))
+	r.NoError(err)
+
+	res, err := c.NewFaceIDVerification(context.Background(), &api.VerificationInput{
+		RequestID: uuid.NewString(),
+		ImageCard: "https://cdnimg.vietnamplus.vn/t660/uploaded/hotnnz/2022_03_14/obama.jpg",
+		ImageLive: "http://c.files.bbci.co.uk/9E1D/production/_111777404_obamaendorsebiden.jpg",
+	})
+	r.NoError(err)
+
+	switch t := res.(type) {
+	case *api.VerificationResult:
+		r.Equal(t.Message.ErrorCode, "000")
+		r.Equal(t.Message.ErrorMessage, "OK")
+		r.Equal(t.VerifyResultText.Value, "Same person")
+		r.Equal(t.WearingMask.Value, api.VerificationResultWearingMaskNO)
+	case *api.GatewayError:
+		r.Fail(t.Message)
+	}
+}

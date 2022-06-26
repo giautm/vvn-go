@@ -696,6 +696,24 @@ func (s VerificationResult) Validate() error {
 		})
 	}
 	if err := func() error {
+		if s.VerificationTime.Set {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(s.VerificationTime.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "verification_time",
+			Error: err,
+		})
+	}
+	if err := func() error {
 		if s.VerifyResult.Set {
 			if err := func() error {
 				if err := s.VerifyResult.Value.Validate(); err != nil {
