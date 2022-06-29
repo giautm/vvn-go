@@ -5,6 +5,7 @@ package api
 import (
 	"context"
 	"io"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -51,40 +52,26 @@ func NewClient(serverURL string, sec SecuritySource, opts ...Option) (*Client, e
 	return c, nil
 }
 
-// NewFaceIDVerification invokes newFaceIDVerification operation.
+// FaceRecognition invokes faceRecognition operation.
 //
-// Face verification is the task of comparing a candidate face to another, and verifying whether it
-// is a match. It is a one-to-one mapping: you have to check if this person is the correct one.
+// A facial recognition system is a technology capable of identifying or verifying a person from a
+// digital image or a video frame from a video source.
 //
-// POST /v3.2/faceid/verification
-func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVerificationReq) (res NewFaceIDVerificationRes, err error) {
+// POST /v3.2/faceid/recognition
+func (c *Client) FaceRecognition(ctx context.Context, request FaceRecognitionReq) (res FaceRecognitionRes, err error) {
 	switch request := request.(type) {
-	case *VerificationInput:
-		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			return res, errors.Wrap(err, "validate")
-		}
-	case *VerificationInputForm:
-		if err := func() error {
-			if err := request.Validate(); err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			return res, errors.Wrap(err, "validate")
-		}
+	case *FaceIDRecognitionInput:
+		// Validation is not required for this type.
+	case *FaceIDRecognitionInputForm:
+		// Validation is not required for this type.
 	default:
 		return res, errors.Errorf("unexpected request type: %T", request)
 	}
 	startTime := time.Now()
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("newFaceIDVerification"),
+		otelogen.OperationID("faceRecognition"),
 	}
-	ctx, span := c.cfg.Tracer.Start(ctx, "NewFaceIDVerification",
+	ctx, span := c.cfg.Tracer.Start(ctx, "FaceRecognition",
 		trace.WithAttributes(otelAttrs...),
 		trace.WithSpanKind(trace.SpanKindClient),
 	)
@@ -99,21 +86,24 @@ func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVer
 		span.End()
 	}()
 	c.requests.Add(ctx, 1, otelAttrs...)
+	u := uri.Clone(c.serverURL)
+	u.Path += "/v3.2/faceid/recognition"
+
 	var (
 		contentType string
-		reqBody     func() (io.ReadCloser, error)
+		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
 	)
 	switch req := request.(type) {
-	case *VerificationInput:
+	case *FaceIDRecognitionInput:
 		contentType = "application/json"
-		fn, err := encodeNewFaceIDVerificationRequestJSON(*req, span)
+		fn, err := encodeFaceRecognitionRequestJSON(*req, span)
 		if err != nil {
 			return res, err
 		}
 		reqBody = fn
-	case *VerificationInputForm:
+	case *FaceIDRecognitionInputForm:
 		contentType = "multipart/form-data"
-		fn, ct, err := encodeNewFaceIDVerificationRequest(*req, span)
+		fn, ct, err := encodeFaceRecognitionRequest(*req, span)
 		if err != nil {
 			return res, err
 		}
@@ -123,21 +113,22 @@ func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVer
 		return res, errors.Errorf("unexpected request type: %T", request)
 	}
 
-	u := uri.Clone(c.serverURL)
-	u.Path += "/v3.2/faceid/verification"
+	var r *http.Request
+	if reqBody != nil {
+		body, err := reqBody()
+		if err != nil {
+			return res, errors.Wrap(err, "request body")
+		}
+		defer body.Close()
 
-	body, err := reqBody()
-	if err != nil {
-		return res, errors.Wrap(err, "request body")
+		r = ht.NewRequest(ctx, "POST", u, body)
+		r.GetBody = reqBody
+		r.Header.Set("Content-Type", contentType)
+	} else {
+		r = ht.NewRequest(ctx, "POST", u, nil)
 	}
-	defer body.Close()
 
-	r := ht.NewRequest(ctx, "POST", u, body)
-	r.GetBody = reqBody
-
-	r.Header.Set("Content-Type", contentType)
-
-	if err := c.securityAPIKey(ctx, "NewFaceIDVerification", r); err != nil {
+	if err := c.securityAPIKey(ctx, "FaceRecognition", r); err != nil {
 		return res, errors.Wrap(err, "security")
 	}
 
@@ -147,7 +138,7 @@ func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVer
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeNewFaceIDVerificationResponse(resp, span)
+	result, err := decodeFaceRecognitionResponse(resp, span)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -155,13 +146,286 @@ func (c *Client) NewFaceIDVerification(ctx context.Context, request NewFaceIDVer
 	return result, nil
 }
 
-// NewOCRRecognition invokes newOCRRecognition operation.
+// FaceRegister invokes faceRegister operation.
+//
+// Register image of consumer into database. System can not registerer if image is exist.
+//
+// POST /v3.2/faceid/register
+func (c *Client) FaceRegister(ctx context.Context, request FaceRegisterReq) (res FaceRegisterRes, err error) {
+	switch request := request.(type) {
+	case *FaceIDRegisterInput:
+		// Validation is not required for this type.
+	case *FaceIDRegisterInputForm:
+		// Validation is not required for this type.
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
+	}
+	startTime := time.Now()
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("faceRegister"),
+	}
+	ctx, span := c.cfg.Tracer.Start(ctx, "FaceRegister",
+		trace.WithAttributes(otelAttrs...),
+		trace.WithSpanKind(trace.SpanKindClient),
+	)
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		} else {
+			elapsedDuration := time.Since(startTime)
+			c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		}
+		span.End()
+	}()
+	c.requests.Add(ctx, 1, otelAttrs...)
+	u := uri.Clone(c.serverURL)
+	u.Path += "/v3.2/faceid/register"
+
+	var (
+		contentType string
+		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
+	)
+	switch req := request.(type) {
+	case *FaceIDRegisterInput:
+		contentType = "application/json"
+		fn, err := encodeFaceRegisterRequestJSON(*req, span)
+		if err != nil {
+			return res, err
+		}
+		reqBody = fn
+	case *FaceIDRegisterInputForm:
+		contentType = "multipart/form-data"
+		fn, ct, err := encodeFaceRegisterRequest(*req, span)
+		if err != nil {
+			return res, err
+		}
+		reqBody = fn
+		contentType = ct
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
+	}
+
+	var r *http.Request
+	if reqBody != nil {
+		body, err := reqBody()
+		if err != nil {
+			return res, errors.Wrap(err, "request body")
+		}
+		defer body.Close()
+
+		r = ht.NewRequest(ctx, "POST", u, body)
+		r.GetBody = reqBody
+		r.Header.Set("Content-Type", contentType)
+	} else {
+		r = ht.NewRequest(ctx, "POST", u, nil)
+	}
+
+	if err := c.securityAPIKey(ctx, "FaceRegister", r); err != nil {
+		return res, errors.Wrap(err, "security")
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeFaceRegisterResponse(resp, span)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// FaceUnregister invokes faceUnregister operation.
+//
+// Delete information image of consumer registered database.
+//
+// POST /v3.2/faceid/delete
+func (c *Client) FaceUnregister(ctx context.Context, request FaceUnregisterReq) (res FaceUnregisterRes, err error) {
+	startTime := time.Now()
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("faceUnregister"),
+	}
+	ctx, span := c.cfg.Tracer.Start(ctx, "FaceUnregister",
+		trace.WithAttributes(otelAttrs...),
+		trace.WithSpanKind(trace.SpanKindClient),
+	)
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		} else {
+			elapsedDuration := time.Since(startTime)
+			c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		}
+		span.End()
+	}()
+	c.requests.Add(ctx, 1, otelAttrs...)
+	u := uri.Clone(c.serverURL)
+	u.Path += "/v3.2/faceid/delete"
+
+	var (
+		contentType string
+		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
+	)
+	contentType = "application/json"
+	fn, err := encodeFaceUnregisterRequestJSON(request, span)
+	if err != nil {
+		return res, err
+	}
+	reqBody = fn
+
+	var r *http.Request
+	if reqBody != nil {
+		body, err := reqBody()
+		if err != nil {
+			return res, errors.Wrap(err, "request body")
+		}
+		defer body.Close()
+
+		r = ht.NewRequest(ctx, "POST", u, body)
+		r.GetBody = reqBody
+		r.Header.Set("Content-Type", contentType)
+	} else {
+		r = ht.NewRequest(ctx, "POST", u, nil)
+	}
+
+	if err := c.securityAPIKey(ctx, "FaceUnregister", r); err != nil {
+		return res, errors.Wrap(err, "security")
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeFaceUnregisterResponse(resp, span)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// FaceVerification invokes faceVerification operation.
+//
+// Face verification is the task of comparing a candidate face to another, and verifying whether it
+// is a match. It is a one-to-one mapping: you have to check if this person is the correct one.
+//
+// POST /v3.2/faceid/verification
+func (c *Client) FaceVerification(ctx context.Context, request FaceVerificationReq) (res FaceVerificationRes, err error) {
+	switch request := request.(type) {
+	case *FaceIDVerificationInput:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
+		}
+	case *FaceIDVerificationInputForm:
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return res, errors.Wrap(err, "validate")
+		}
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
+	}
+	startTime := time.Now()
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("faceVerification"),
+	}
+	ctx, span := c.cfg.Tracer.Start(ctx, "FaceVerification",
+		trace.WithAttributes(otelAttrs...),
+		trace.WithSpanKind(trace.SpanKindClient),
+	)
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			c.errors.Add(ctx, 1, otelAttrs...)
+		} else {
+			elapsedDuration := time.Since(startTime)
+			c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+		}
+		span.End()
+	}()
+	c.requests.Add(ctx, 1, otelAttrs...)
+	u := uri.Clone(c.serverURL)
+	u.Path += "/v3.2/faceid/verification"
+
+	var (
+		contentType string
+		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
+	)
+	switch req := request.(type) {
+	case *FaceIDVerificationInput:
+		contentType = "application/json"
+		fn, err := encodeFaceVerificationRequestJSON(*req, span)
+		if err != nil {
+			return res, err
+		}
+		reqBody = fn
+	case *FaceIDVerificationInputForm:
+		contentType = "multipart/form-data"
+		fn, ct, err := encodeFaceVerificationRequest(*req, span)
+		if err != nil {
+			return res, err
+		}
+		reqBody = fn
+		contentType = ct
+	default:
+		return res, errors.Errorf("unexpected request type: %T", request)
+	}
+
+	var r *http.Request
+	if reqBody != nil {
+		body, err := reqBody()
+		if err != nil {
+			return res, errors.Wrap(err, "request body")
+		}
+		defer body.Close()
+
+		r = ht.NewRequest(ctx, "POST", u, body)
+		r.GetBody = reqBody
+		r.Header.Set("Content-Type", contentType)
+	} else {
+		r = ht.NewRequest(ctx, "POST", u, nil)
+	}
+
+	if err := c.securityAPIKey(ctx, "FaceVerification", r); err != nil {
+		return res, errors.Wrap(err, "security")
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeFaceVerificationResponse(resp, span)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// OCRecognition invokes OCRecognition operation.
 //
 // Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như:
 // Giấy phép lái xe (GPLX), Passport, CMND, Căn cước công dân (CCCD) ...
 //
 // POST /v3.2/ocr/recognition
-func (c *Client) NewOCRRecognition(ctx context.Context, request OCRInputForm) (res NewOCRRecognitionRes, err error) {
+func (c *Client) OCRecognition(ctx context.Context, request OCRInputForm) (res OCRecognitionRes, err error) {
 	if err := func() error {
 		if err := request.Validate(); err != nil {
 			return err
@@ -172,9 +436,9 @@ func (c *Client) NewOCRRecognition(ctx context.Context, request OCRInputForm) (r
 	}
 	startTime := time.Now()
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("newOCRRecognition"),
+		otelogen.OperationID("OCRecognition"),
 	}
-	ctx, span := c.cfg.Tracer.Start(ctx, "NewOCRRecognition",
+	ctx, span := c.cfg.Tracer.Start(ctx, "OCRecognition",
 		trace.WithAttributes(otelAttrs...),
 		trace.WithSpanKind(trace.SpanKindClient),
 	)
@@ -189,33 +453,37 @@ func (c *Client) NewOCRRecognition(ctx context.Context, request OCRInputForm) (r
 		span.End()
 	}()
 	c.requests.Add(ctx, 1, otelAttrs...)
+	u := uri.Clone(c.serverURL)
+	u.Path += "/v3.2/ocr/recognition"
+
 	var (
 		contentType string
-		reqBody     func() (io.ReadCloser, error)
+		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
 	)
 	contentType = "multipart/form-data"
-	fn, ct, err := encodeNewOCRRecognitionRequest(request, span)
+	fn, ct, err := encodeOCRecognitionRequest(request, span)
 	if err != nil {
 		return res, err
 	}
 	reqBody = fn
 	contentType = ct
 
-	u := uri.Clone(c.serverURL)
-	u.Path += "/v3.2/ocr/recognition"
+	var r *http.Request
+	if reqBody != nil {
+		body, err := reqBody()
+		if err != nil {
+			return res, errors.Wrap(err, "request body")
+		}
+		defer body.Close()
 
-	body, err := reqBody()
-	if err != nil {
-		return res, errors.Wrap(err, "request body")
+		r = ht.NewRequest(ctx, "POST", u, body)
+		r.GetBody = reqBody
+		r.Header.Set("Content-Type", contentType)
+	} else {
+		r = ht.NewRequest(ctx, "POST", u, nil)
 	}
-	defer body.Close()
 
-	r := ht.NewRequest(ctx, "POST", u, body)
-	r.GetBody = reqBody
-
-	r.Header.Set("Content-Type", contentType)
-
-	if err := c.securityAPIKey(ctx, "NewOCRRecognition", r); err != nil {
+	if err := c.securityAPIKey(ctx, "OCRecognition", r); err != nil {
 		return res, errors.Wrap(err, "security")
 	}
 
@@ -225,7 +493,7 @@ func (c *Client) NewOCRRecognition(ctx context.Context, request OCRInputForm) (r
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeNewOCRRecognitionResponse(resp, span)
+	result, err := decodeOCRecognitionResponse(resp, span)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

@@ -4,9 +4,9 @@ go 1.18
 
 require (
 	github.com/go-faster/errors v0.6.1
-	github.com/go-faster/jx v0.37.0
+	github.com/go-faster/jx v0.38.0
 	github.com/google/uuid v1.3.0
-	github.com/ogen-go/ogen v0.40.1-0.20220625204447-dfb7c6ecd168
+	github.com/ogen-go/ogen v0.40.1-0.20220629180009-c32616b6ac95
 	github.com/stretchr/testify v1.7.5
 	go.opentelemetry.io/otel v1.7.0
 	go.opentelemetry.io/otel/metric v0.30.0

@@ -29,7 +29,7 @@ func TestNewOCRRecognition_integration(t *testing.T) {
 	f, err := os.OpenFile(documentFile, os.O_RDONLY, 0666)
 	r.NoError(err)
 
-	res, err := c.NewOCRRecognition(context.Background(), api.OCRInputForm{
+	res, err := c.OCRecognition(context.Background(), api.OCRInputForm{
 		RequestID: uuid.NewString(),
 		Image: http.MultipartFile{
 			Name: "random_name_abc.jpeg",
@@ -42,13 +42,13 @@ func TestNewOCRRecognition_integration(t *testing.T) {
 	switch t := res.(type) {
 	case *api.OCRResult:
 		r.NotEmpty(t.ID.Value)
-		r.Equal(t.IDCheck.Value, api.OCRResultIDCheckREAL)
+		r.Equal(t.IDCheck.Value, api.IDCheckEnumREAL)
 	case *api.GatewayError:
 		r.Fail(t.Message)
 	}
 }
 
-func TestNewFaceIDVerification_integration(t *testing.T) {
+func TestFaceIDVerification_integration(t *testing.T) {
 	apiKey := os.Getenv("VVN_API_KEY")
 	if apiKey == "" {
 		t.Skip("VVN_API_KEY is not set")
@@ -58,7 +58,7 @@ func TestNewFaceIDVerification_integration(t *testing.T) {
 	c, err := api.NewClient(vvn.ServerProduction, vvn.StaticKey(apiKey))
 	r.NoError(err)
 
-	res, err := c.NewFaceIDVerification(context.Background(), &api.VerificationInput{
+	res, err := c.FaceVerification(context.Background(), &api.FaceIDVerificationInput{
 		RequestID: uuid.NewString(),
 		ImageCard: "https://cdnimg.vietnamplus.vn/t660/uploaded/hotnnz/2022_03_14/obama.jpg",
 		ImageLive: "http://c.files.bbci.co.uk/9E1D/production/_111777404_obamaendorsebiden.jpg",
@@ -66,11 +66,41 @@ func TestNewFaceIDVerification_integration(t *testing.T) {
 	r.NoError(err)
 
 	switch t := res.(type) {
-	case *api.VerificationResult:
+	case *api.FaceIDVerificationResult:
 		r.Equal(t.Message.ErrorCode, "000")
 		r.Equal(t.Message.ErrorMessage, "OK")
+
 		r.Equal(t.VerifyResultText.Value, "Same person")
-		r.Equal(t.WearingMask.Value, api.VerificationResultWearingMaskNO)
+		r.Equal(t.WearingMask.Value, api.MaskResultEnumNO)
+	case *api.GatewayError:
+		r.Fail(t.Message)
+	}
+}
+
+func TestFaceRecognition_integration(t *testing.T) {
+	apiKey := os.Getenv("VVN_API_KEY")
+	if apiKey == "" {
+		t.Skip("VVN_API_KEY is not set")
+	}
+
+	r := require.New(t)
+	c, err := api.NewClient(vvn.ServerProduction, vvn.StaticKey(apiKey))
+	r.NoError(err)
+
+	res, err := c.FaceRecognition(context.Background(), &api.FaceIDRecognitionInput{
+		RequestID: uuid.NewString(),
+		Image:     "https://cdnimg.vietnamplus.vn/t660/uploaded/hotnnz/2022_03_14/obama.jpg",
+	})
+	r.NoError(err)
+
+	switch t := res.(type) {
+	case *api.FaceIDRecognitionResult:
+		r.Equal(t.Message.ErrorCode, "000")
+		r.Equal(t.Message.ErrorMessage, "OK")
+
+		r.Len(t.RecognitionResult, 1)
+		r.Len(t.RecognitionResult[0].TopK, 5)
+		r.Equal(t.RecognitionResult[0].TopK[0].UniqueName, "FUNDIIN-BLACKLIST-3043544A51EC68E1202B840FE2C30E98")
 	case *api.GatewayError:
 		r.Fail(t.Message)
 	}

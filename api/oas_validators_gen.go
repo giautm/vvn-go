@@ -10,6 +10,30 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+func (s DocumentEnum) Validate() error {
+	switch s {
+	case "CCCD":
+		return nil
+	case "NEW ID":
+		return nil
+	case "OLD ID":
+		return nil
+	case "PASSPORT":
+		return nil
+	case "DRIVER LICENSE OLD":
+		return nil
+	case "DRIVER LICENSE PET":
+		return nil
+	case "CHIP ID":
+		return nil
+	case "POLICE ID":
+		return nil
+	case "ARMY ID":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
 func (s FaceAntiSpoofStatus) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
@@ -98,55 +122,68 @@ func (s FaceAntiSpoofStatus) Validate() error {
 	}
 	return nil
 }
-func (s FaceAntiSpoofStatusFakeCode) Validate() error {
-	switch s {
-	case "FAKE":
-		return nil
-	case "REAL":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
+func (s FaceFeature) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
 	}
-}
-func (s FaceAntiSpoofStatusFakeType) Validate() error {
-	switch s {
-	case "N/A":
-		return nil
-	case "SCREEN":
-		return nil
-	case "RANDOM_POSE":
-		return nil
-	case "STRAIGHT_POSE":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
+	if err := (validate.Array{
+		MinLength:    512,
+		MinLengthSet: true,
+		MaxLength:    512,
+		MaxLengthSet: true,
+	}).ValidateLength(len(s)); err != nil {
+		return errors.Wrap(err, "array")
 	}
-}
-func (s FaceAntiSpoofStatusStatus) Validate() error {
-	switch s {
-	case "FAKE":
-		return nil
-	case "REAL":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
+	var failures []validate.FieldError
+	for i, elem := range s {
+		if err := func() error {
+			if err := (validate.Float{}).Validate(float64(elem)); err != nil {
+				return errors.Wrap(err, "float")
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  fmt.Sprintf("[%d]", i),
+				Error: err,
+			})
+		}
 	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
 }
-func (s OCRInput) Validate() error {
+func (s FaceIDRecognitionResult) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.IDFullThr.Set {
+		var failures []validate.FieldError
+		for i, elem := range s.RecognitionResult {
 			if err := func() error {
-				if err := (validate.Float{
-					MinSet:        true,
-					Min:           0,
-					MaxSet:        true,
-					Max:           1,
-					MinExclusive:  false,
-					MaxExclusive:  false,
-					MultipleOfSet: false,
-					MultipleOf:    nil,
-				}).Validate(float64(s.IDFullThr.Value)); err != nil {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "recognition_result",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.RecognitionTime.Set {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(s.RecognitionTime.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -157,7 +194,7 @@ func (s OCRInput) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "id_full_thr",
+			Name:  "recognition_time",
 			Error: err,
 		})
 	}
@@ -166,21 +203,31 @@ func (s OCRInput) Validate() error {
 	}
 	return nil
 }
-func (s OCRInputForm) Validate() error {
+func (s FaceIDRegisterResult) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.IDFullThr.Set {
+		if s.FaceLoc == nil {
+			return errors.New("nil is invalid value")
+		}
+		if err := (validate.Array{
+			MinLength:    4,
+			MinLengthSet: true,
+			MaxLength:    4,
+			MaxLengthSet: true,
+		}).ValidateLength(len(s.FaceLoc)); err != nil {
+			return errors.Wrap(err, "array")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "face_loc",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.MatchedScore.Set {
 			if err := func() error {
-				if err := (validate.Float{
-					MinSet:        true,
-					Min:           0,
-					MaxSet:        true,
-					Max:           1,
-					MinExclusive:  false,
-					MaxExclusive:  false,
-					MultipleOfSet: false,
-					MultipleOf:    nil,
-				}).Validate(float64(s.IDFullThr.Value)); err != nil {
+				if err := (validate.Float{}).Validate(float64(s.MatchedScore.Value)); err != nil {
 					return errors.Wrap(err, "float")
 				}
 				return nil
@@ -191,7 +238,34 @@ func (s OCRInputForm) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "id_full_thr",
+			Name:  "matched_score",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.SamePersonThr.Set {
+			if err := func() error {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.SamePersonThr.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "same_person_thr",
 			Error: err,
 		})
 	}
@@ -200,59 +274,25 @@ func (s OCRInputForm) Validate() error {
 	}
 	return nil
 }
-func (s OCRResult) Validate() error {
+func (s FaceIDResult) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.Document.Set {
-			if err := func() error {
-				if err := s.Document.Value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := (validate.Float{
+			MinSet:        true,
+			Min:           0,
+			MaxSet:        true,
+			Max:           1,
+			MinExclusive:  false,
+			MaxExclusive:  false,
+			MultipleOfSet: false,
+			MultipleOf:    nil,
+		}).Validate(float64(s.CompareScore)); err != nil {
+			return errors.Wrap(err, "float")
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "document",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.IDCheck.Set {
-			if err := func() error {
-				if err := s.IDCheck.Value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "id_check",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.ResultCode.Set {
-			if err := func() error {
-				if err := s.ResultCode.Value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "result_code",
+			Name:  "compare_score",
 			Error: err,
 		})
 	}
@@ -261,66 +301,7 @@ func (s OCRResult) Validate() error {
 	}
 	return nil
 }
-func (s OCRResultDocument) Validate() error {
-	switch s {
-	case "CCCD":
-		return nil
-	case "NEW ID":
-		return nil
-	case "OLD ID":
-		return nil
-	case "PASSPORT":
-		return nil
-	case "DRIVER LICENSE OLD":
-		return nil
-	case "DRIVER LICENSE PET":
-		return nil
-	case "CHIP ID":
-		return nil
-	case "POLICE ID":
-		return nil
-	case "ARMY ID":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-func (s OCRResultIDCheck) Validate() error {
-	switch s {
-	case "BW":
-		return nil
-	case "CONER":
-		return nil
-	case "FAKE":
-		return nil
-	case "PUNCH":
-		return nil
-	case "REAL":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-func (s OCRResultResultCode) Validate() error {
-	switch s {
-	case 200:
-		return nil
-	case 500:
-		return nil
-	case 501:
-		return nil
-	case 401:
-		return nil
-	case 402:
-		return nil
-	case 201:
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
-func (s VerificationInput) Validate() error {
+func (s FaceIDVerificationInput) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
 		if s.FakeThreshold.Set {
@@ -435,7 +416,7 @@ func (s VerificationInput) Validate() error {
 	}
 	return nil
 }
-func (s VerificationInputForm) Validate() error {
+func (s FaceIDVerificationInputForm) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
 		if s.FakeThreshold.Set {
@@ -550,7 +531,7 @@ func (s VerificationInputForm) Validate() error {
 	}
 	return nil
 }
-func (s VerificationResult) Validate() error {
+func (s FaceIDVerificationResult) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
 		if s.FaceAntiSpoofStatus.Set {
@@ -571,13 +552,16 @@ func (s VerificationResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := (validate.Array{
-			MinLength:    4,
-			MinLengthSet: true,
-			MaxLength:    4,
-			MaxLengthSet: true,
-		}).ValidateLength(len(s.FaceLocCard)); err != nil {
-			return errors.Wrap(err, "array")
+		if s.FaceLocCard == nil {
+			return nil // optional
+		}
+		if err := func() error {
+			if err := s.FaceLocCard.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrap(err, "pointer")
 		}
 		return nil
 	}(); err != nil {
@@ -587,13 +571,16 @@ func (s VerificationResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := (validate.Array{
-			MinLength:    4,
-			MinLengthSet: true,
-			MaxLength:    4,
-			MaxLengthSet: true,
-		}).ValidateLength(len(s.FaceLocLive)); err != nil {
-			return errors.Wrap(err, "array")
+		if s.FaceLocLive == nil {
+			return nil // optional
+		}
+		if err := func() error {
+			if err := s.FaceLocLive.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrap(err, "pointer")
 		}
 		return nil
 	}(); err != nil {
@@ -603,30 +590,16 @@ func (s VerificationResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := (validate.Array{
-			MinLength:    512,
-			MinLengthSet: true,
-			MaxLength:    512,
-			MaxLengthSet: true,
-		}).ValidateLength(len(s.FeatureVectorFaceCard)); err != nil {
-			return errors.Wrap(err, "array")
+		if s.FeatureVectorFaceCard == nil {
+			return nil // optional
 		}
-		var failures []validate.FieldError
-		for i, elem := range s.FeatureVectorFaceCard {
-			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(elem)); err != nil {
-					return errors.Wrap(err, "float")
-				}
-				return nil
-			}(); err != nil {
-				failures = append(failures, validate.FieldError{
-					Name:  fmt.Sprintf("[%d]", i),
-					Error: err,
-				})
+		if err := func() error {
+			if err := s.FeatureVectorFaceCard.Validate(); err != nil {
+				return err
 			}
-		}
-		if len(failures) > 0 {
-			return &validate.Error{Fields: failures}
+			return nil
+		}(); err != nil {
+			return errors.Wrap(err, "pointer")
 		}
 		return nil
 	}(); err != nil {
@@ -636,30 +609,16 @@ func (s VerificationResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := (validate.Array{
-			MinLength:    512,
-			MinLengthSet: true,
-			MaxLength:    512,
-			MaxLengthSet: true,
-		}).ValidateLength(len(s.FeatureVectorFaceLive)); err != nil {
-			return errors.Wrap(err, "array")
+		if s.FeatureVectorFaceLive == nil {
+			return nil // optional
 		}
-		var failures []validate.FieldError
-		for i, elem := range s.FeatureVectorFaceLive {
-			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(elem)); err != nil {
-					return errors.Wrap(err, "float")
-				}
-				return nil
-			}(); err != nil {
-				failures = append(failures, validate.FieldError{
-					Name:  fmt.Sprintf("[%d]", i),
-					Error: err,
-				})
+		if err := func() error {
+			if err := s.FeatureVectorFaceLive.Validate(); err != nil {
+				return err
 			}
-		}
-		if len(failures) > 0 {
-			return &validate.Error{Fields: failures}
+			return nil
+		}(); err != nil {
+			return errors.Wrap(err, "pointer")
 		}
 		return nil
 	}(); err != nil {
@@ -781,7 +740,67 @@ func (s VerificationResult) Validate() error {
 	}
 	return nil
 }
-func (s VerificationResultVerifyResult) Validate() error {
+func (s FaceLocation) Validate() error {
+	if s == nil {
+		return errors.New("nil is invalid value")
+	}
+	if err := (validate.Array{
+		MinLength:    4,
+		MinLengthSet: true,
+		MaxLength:    4,
+		MaxLengthSet: true,
+	}).ValidateLength(len(s)); err != nil {
+		return errors.Wrap(err, "array")
+	}
+	return nil
+}
+func (s FaceRecognitionResult) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.FaceLoc.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "face_loc",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.TopK == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.TopK {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "top_k",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s FaceVerifyResultEnum) Validate() error {
 	switch s {
 	case 0:
 		return nil
@@ -793,11 +812,227 @@ func (s VerificationResultVerifyResult) Validate() error {
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
-func (s VerificationResultWearingMask) Validate() error {
+func (s FakeTypeEnum) Validate() error {
+	switch s {
+	case "N/A":
+		return nil
+	case "SCREEN":
+		return nil
+	case "RANDOM_POSE":
+		return nil
+	case "STRAIGHT_POSE":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+func (s IDCheckEnum) Validate() error {
+	switch s {
+	case "BW":
+		return nil
+	case "CONER":
+		return nil
+	case "FAKE":
+		return nil
+	case "PUNCH":
+		return nil
+	case "REAL":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+func (s IDTypeEnum) Validate() error {
+	switch s {
+	case "0":
+		return nil
+	case "1":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+func (s MaskResultEnum) Validate() error {
 	switch s {
 	case "YES":
 		return nil
 	case "NO":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+func (s OCRInput) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.IDFullThr.Set {
+			if err := func() error {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.IDFullThr.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "id_full_thr",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s OCRInputForm) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.IDFullThr.Set {
+			if err := func() error {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.IDFullThr.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "id_full_thr",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s OCRResult) Validate() error {
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Document.Set {
+			if err := func() error {
+				if err := s.Document.Value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "document",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.IDCheck.Set {
+			if err := func() error {
+				if err := s.IDCheck.Value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "id_check",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.IDType.Set {
+			if err := func() error {
+				if err := s.IDType.Value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "id_type",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.ResultCode.Set {
+			if err := func() error {
+				if err := s.ResultCode.Value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "result_code",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+func (s OCRResultResultCode) Validate() error {
+	switch s {
+	case 200:
+		return nil
+	case 500:
+		return nil
+	case 501:
+		return nil
+	case 401:
+		return nil
+	case 402:
+		return nil
+	case 201:
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s SpoofStatusEnum) Validate() error {
+	switch s {
+	case "FAKE":
+		return nil
+	case "REAL":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

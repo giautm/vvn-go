@@ -14,7 +14,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeNewFaceIDVerificationResponse(resp *http.Response, span trace.Span) (res NewFaceIDVerificationRes, err error) {
+func decodeFaceRecognitionResponse(resp *http.Response, span trace.Span) (res FaceRecognitionRes, err error) {
 	switch resp.StatusCode {
 	case 200:
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
@@ -29,7 +29,7 @@ func decodeNewFaceIDVerificationResponse(resp *http.Response, span trace.Span) (
 			}
 
 			d := jx.DecodeBytes(b)
-			var response VerificationResult
+			var response FaceIDRecognitionResult
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -72,7 +72,181 @@ func decodeNewFaceIDVerificationResponse(resp *http.Response, span trace.Span) (
 		return res, validate.UnexpectedStatusCode(resp.StatusCode)
 	}
 }
-func decodeNewOCRRecognitionResponse(resp *http.Response, span trace.Span) (res NewOCRRecognitionRes, err error) {
+func decodeFaceRegisterResponse(resp *http.Response, span trace.Span) (res FaceRegisterRes, err error) {
+	switch resp.StatusCode {
+	case 200:
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+
+			d := jx.DecodeBytes(b)
+			var response FaceIDRegisterResult
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 401:
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+
+			d := jx.DecodeBytes(b)
+			var response GatewayError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	default:
+		return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	}
+}
+func decodeFaceUnregisterResponse(resp *http.Response, span trace.Span) (res FaceUnregisterRes, err error) {
+	switch resp.StatusCode {
+	case 200:
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+
+			d := jx.DecodeBytes(b)
+			var response FaceUnregisterOK
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 401:
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+
+			d := jx.DecodeBytes(b)
+			var response GatewayError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	default:
+		return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	}
+}
+func decodeFaceVerificationResponse(resp *http.Response, span trace.Span) (res FaceVerificationRes, err error) {
+	switch resp.StatusCode {
+	case 200:
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+
+			d := jx.DecodeBytes(b)
+			var response FaceIDVerificationResult
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 401:
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+
+			d := jx.DecodeBytes(b)
+			var response GatewayError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	default:
+		return res, validate.UnexpectedStatusCode(resp.StatusCode)
+	}
+}
+func decodeOCRecognitionResponse(resp *http.Response, span trace.Span) (res OCRecognitionRes, err error) {
 	switch resp.StatusCode {
 	case 200:
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))

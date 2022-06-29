@@ -3,6 +3,46 @@
 package api
 
 // setDefaults set default value of fields.
+func (s *FaceIDRegisterInput) setDefaults() {
+	{
+		val := int(0)
+		s.Force.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *FaceIDRegisterInputForm) setDefaults() {
+	{
+		val := int(0)
+		s.Force.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *FaceIDVerificationInput) setDefaults() {
+	{
+		val := float64(0.6)
+		s.SimThresholdLevel1.SetTo(val)
+	}
+	{
+		val := float64(0.75)
+		s.SimThresholdLevel2.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
+func (s *FaceIDVerificationInputForm) setDefaults() {
+	{
+		val := float64(0.6)
+		s.SimThresholdLevel1.SetTo(val)
+	}
+	{
+		val := float64(0.75)
+		s.SimThresholdLevel2.SetTo(val)
+	}
+}
+
+// setDefaults set default value of fields.
 func (s *OCRInput) setDefaults() {
 	{
 		val := float32(0.8)
@@ -15,29 +55,5 @@ func (s *OCRInputForm) setDefaults() {
 	{
 		val := float32(0.8)
 		s.IDFullThr.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *VerificationInput) setDefaults() {
-	{
-		val := float64(0.6)
-		s.SimThresholdLevel1.SetTo(val)
-	}
-	{
-		val := float64(0.75)
-		s.SimThresholdLevel2.SetTo(val)
-	}
-}
-
-// setDefaults set default value of fields.
-func (s *VerificationInputForm) setDefaults() {
-	{
-		val := float64(0.6)
-		s.SimThresholdLevel1.SetTo(val)
-	}
-	{
-		val := float64(0.75)
-		s.SimThresholdLevel2.SetTo(val)
 	}
 }

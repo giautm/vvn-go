@@ -32,9 +32,77 @@ tags:
   - name: v3.2
     description: API V3.2
 paths:
+  /v3.2/faceid/recognition:
+    post:
+      operationId: faceRecognition
+      summary: FACE RECOGNITION
+      description: >
+        A facial recognition system is a technology capable of identifying or verifying a person from a digital image or a video frame from a video source.
+      tags:
+        - v3.2
+      security:
+        - api_key: []
+      requestBody:
+        $ref: '#/components/requestBodies/FaceIDRecognitionRequest'
+      responses:
+        '200':
+          description: 'recognition OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceIDRecognitionResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v3.2/faceid/register:
+    post:
+      operationId: faceRegister
+      summary: FACE REGISTER
+      description: >
+        Register image of consumer into database.
+        System can not registerer if image is exist
+      tags:
+        - v3.2
+      security:
+        - api_key: []
+      requestBody:
+        $ref: '#/components/requestBodies/FaceIDRegisterRequest'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceIDRegisterResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v3.2/faceid/delete:
+    post:
+      operationId: faceUnregister
+      summary: FACE DELETE
+      description: Delete information image of consumer registered database
+      tags:
+        - v3.2
+      security:
+        - api_key: []
+      requestBody:
+        $ref: '#/components/requestBodies/FaceIDUnregisterRequest'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /v3.2/faceid/verification:
     post:
-      operationId: newFaceIDVerification
+      operationId: faceVerification
       summary: FACE VERIFICATION
       description: >
         Face verification is the task of comparing a candidate face to another, and verifying whether it is a match.
@@ -44,23 +112,19 @@ paths:
       security:
         - api_key: []
       requestBody:
-        $ref: '#/components/requestBodies/VerificationRequest'
+        $ref: '#/components/requestBodies/FaceIDVerificationRequest'
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VerificationResult'
+                $ref: '#/components/schemas/FaceIDVerificationResult'
         '401':
-          description: Unauthorized request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GatewayError'
+          $ref: '#/components/responses/Unauthorized'
   /v3.2/ocr/recognition:
     post:
-      operationId: newOCRRecognition
+      operationId: OCRecognition
       summary: OCR RECOGNITION
       description: >
         Cung cấp phương thức để trích xuất thông tin trên các văn bản tài liệu như:
@@ -79,11 +143,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OCRResult'
         '401':
-          description: Unauthorized request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GatewayError'
+          $ref: '#/components/responses/Unauthorized'
 components:
   securitySchemes:
     api_key:
@@ -91,6 +151,31 @@ components:
       name: key
       in: header
   schemas:
+    Message:
+      type: object
+      required:
+        - error_code
+        - error_message
+      description: >
+        Thông tin thêm về kết quả trả về. Ví dụ:
+
+        ```{"error_message": "000", "error_code": "OK"}```
+      properties:
+        error_code:
+          type: string
+          description: Mã lỗi
+        error_message:
+          type: string
+          description: Mô tả lỗi
+        api_version:
+          type: string
+          description: API version
+        copy_right:
+          type: string
+          description: Copyright
+        info:
+          type: string
+          description: Information
     GatewayError:
       type: object
       required:
@@ -101,6 +186,397 @@ components:
         message:
           type: string
           description: Thông điệp lỗi
+    DocumentEnum:
+      type: string
+      description: >
+        Thông tin mô tả các loại giấy tờ:
+          * `CCCD` - (Căn cước công dân)
+          * `NEW ID` - (CMT 12 số)
+          * `OLD ID` - (CMT 9 số)
+          * `PASSPORT`
+          * `DRIVER LICENSE OLD`
+          * `DRIVER LICENSE PET`
+          * `CHIP ID`
+          * `POLICE ID`
+          * `ARMY ID`
+
+        *Chú ý*: Không phân biệt được mặt sau của CMT 12 số và CCCD
+        -> mặt sau của 2 loại giấy tờ này hoàn toàn giống nhau về mặt hình ảnh và ý nghĩa
+      enum:
+        - CCCD
+        - NEW ID
+        - OLD ID
+        - PASSPORT
+        - DRIVER LICENSE OLD
+        - DRIVER LICENSE PET
+        - CHIP ID
+        - POLICE ID
+        - ARMY ID
+    IDCheckEnum:
+      type: string
+      description: >
+        Kết quả kiểm tra văn bản:
+          * `FAKE` - giả mạo
+          * `CONER`
+          * `REAL` - giấy tờ thực
+          * `PUNCH` - Đục lỗ
+          * `BW` - photocopy đen trắng
+          * `REAL` - giấy tờ OK
+      enum:
+        - BW
+        - CONER
+        - FAKE
+        - PUNCH
+        - REAL
+    IDTypeEnum:
+      type: string
+      enum: ['0', '1']
+      description: >
+        Phân biệt mặt trước/mặt sau:
+          * `0` - mặt trước
+          * `1` - mặt sau
+    MaskResultEnum:
+      type: string
+      enum:
+        - 'YES'
+        - 'NO'
+    FaceVerifyResultEnum:
+      type: integer
+      enum: [0, 1, 2]
+      description: >
+        Kết quả xác thực dạng số:
+          * `0` - not same
+          * `1` - may be same
+          * `2` - same person
+    FaceFeature:
+      type: array
+      items:
+        type: number
+      minItems: 512
+      maxItems: 512
+      description: Feature vector của khuôn mặt
+    FaceLocation:
+      type: array
+      description: >
+        Vị trí của khuôn mặt detect được trong ảnh.
+        Format: [left, top, right, bottom]
+      items:
+        type: integer
+      minItems: 4
+      maxItems: 4
+    FaceID:
+      type: object
+      required:
+        - unique_name
+      properties:
+        unique_name:
+          type: string
+          description: >
+            Customer is unique name. Used in case many customers have the same real name
+    FaceIDResult:
+      allOf:
+        - $ref: '#/components/schemas/FaceID'
+        - type: object
+          required:
+            - compare_score
+            - info
+          properties:
+            compare_score:
+              type: number
+              minimum: 0
+              maximum: 1
+            info:
+              type: object
+              additionalProperties:
+                type: string
+            person_name:
+              type: string
+              description: 'name of consumer'
+    FaceRecognitionResult:
+      type: object
+      required:
+        - face_loc
+        - face_size
+        - top_k
+      properties:
+        face_loc:
+          $ref: '#/components/schemas/FaceLocation'
+        face_size:
+          type: integer
+          description: Size of face in pixels
+        top_k:
+          type: array
+          description: >
+            List of top-k faces with highest confidence.
+          items:
+            $ref: '#/components/schemas/FaceIDResult'
+    SpoofStatusEnum:
+      type: string
+      enum:
+        - FAKE
+        - REAL
+    FakeTypeEnum:
+      type: string
+      description: >
+        Trả về loại lỗi giả mạo
+          * `N/A` - ảnh selfie là ảnh thật
+          * `SCREEN` - ảnh chụp lại từ màn hình
+          * `RANDOM_POSE` - ảnh giả mạo do kiểm tra với 3 ảnh chụp quay các hướng
+          * `STRAIGHT_POSE` - ảnh giả mạo do kiểm tra 3 ảnh chụp thẳng liên tiếp
+      enum:
+        - N/A
+        - SCREEN
+        - RANDOM_POSE
+        - STRAIGHT_POSE
+    FaceAntiSpoofStatus:
+      type: object
+      description: >
+        Thông tin đánh giá giả mạo khuôn mặt. Có thể kiểm tra thêm
+        3 random pose hoặc 3 ảnh thẳng mặt liên tiếp.
+        ```
+        {
+          "fake_code": "REAL",
+          "fake_score": 0.0,
+          "status": "REAL",
+          "liveness_compare_scores": [float]
+        }
+        ```
+      properties:
+        status:
+          $ref: '#/components/schemas/SpoofStatusEnum'
+        fake_code:
+          $ref: '#/components/schemas/SpoofStatusEnum'
+        fake_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: >
+            Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]:
+              - 1.0: ảnh giả
+              - 0.0: ảnh thật
+
+            NOTE: By our experiments, threshold to judge an image is fake is fake_score > 0.63
+        fake_type:
+          $ref: '#/components/schemas/FakeTypeEnum'
+        liveness_compare_scores:
+          type: string
+          description: >
+            Trả về khi check_3_random_pose==1.
+            Score matching giữa ảnh live với 3 ảnh đưa vào kiểm tra
+    FaceIDRecognitionInput:
+      type: object
+      required:
+        - image
+        - request_id
+      properties:
+        request_id:
+          type: string
+        image:
+          type: string
+          format: binary
+    FaceIDRecognitionResult:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          $ref: '#/components/schemas/Message'
+        recognition_result:
+          type: array
+          description: List of photos with faces similar to the one imported.
+          items:
+            $ref: '#/components/schemas/FaceRecognitionResult'
+        recognition_time:
+          type: number
+          description: Time handle request
+    FaceIDRegisterInput:
+      allOf:
+        - $ref: '#/components/schemas/FaceID'
+        - type: object
+          required:
+            - image
+          properties:
+            image:
+              type: string
+              format: binary
+              description: >
+                Image of consumer
+            person_name:
+              type: string
+              description: 'name of consumer'
+            force:
+              type: integer
+              default: 0
+              description: >
+                Optional field,request system overrides customer registration.
+                Used in case this photo or similar photo of the customer has been previously registered.
+                  * `0` - Default registration is not required
+                  * `1` - Registration required
+    FaceIDRegisterResult:
+      type: object
+      required:
+        - face_angle
+        - face_loc
+        - message
+      properties:
+        face_card_angle:
+          type: integer
+          description: Góc nghiêng của khuôn mặt ở ảnh.
+        face_loc:
+          type: array
+          description: >
+            Position of faces in photos.
+            Format: [left, top, right, bottom]
+          items:
+            type: integer
+          minItems: 4
+          maxItems: 4
+        message:
+          $ref: '#/components/schemas/Message'
+        unique_name:
+          type: string
+        face_id:
+          type: integer
+          description: ID of face register in database
+        matched_score:
+          type: number
+        same_person_thr:
+          type: number
+          minimum: 0
+          maximum: 1
+    FaceIDVerificationInput:
+      type: object
+      required:
+        - request_id
+        - image_card
+        - image_live
+      properties:
+        request_id:
+          type: string
+          description: Request ID
+        image_card:
+          type: string
+          format: binary
+          description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
+        image_live:
+          type: string
+          format: binary
+          description: Ảnh chụp khuôn mặt
+        image_live1:
+          type: string
+          format: binary
+          description: >
+            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        image_live2:
+          type: string
+          format: binary
+          description: >
+            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        image_live3:
+          type: string
+          format: binary
+          description: >
+            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
+        check_3_random_pose:
+          x-go-name: Check3RandomPose
+          type: integer
+          description: Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không
+        check_3_straight_pose:
+          x-go-name: Check3StraightPose
+          type: integer
+          description: Kiểm tra các ảnh khuôn mặt có fake hay không
+        return_feature:
+          type: integer
+          description: Trả về face feature vector hay không
+        mask_threshold:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Threshold để kiểm tra xem có đeo khẩu trang hay không
+        fake_threshold:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Giá trị dùng để check xem khuôn mặt live có phải fake
+        sim_threshold_level1:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.60
+          description: >
+            độ tương đồng <= sim_threshold_level1
+            => không cùng 1 người
+            sim_threshold_level1 < độ tương đồng < sim_threshold_level2
+            ==> có thể cùng 1 người
+            độ tương đồng >= sim_threshold_level2
+            ==> cùng 1 người
+        sim_threshold_level2:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.75
+          description: >
+            độ tương đồng <= sim_threshold_level1
+            => không cùng 1 người
+            sim_threshold_level1 < độ tương đồng < sim_threshold_level2
+            ==> có thể cùng 1 người
+            độ tương đồng >= sim_threshold_level2
+            ==> cùng 1 người
+    FaceIDVerificationResult:
+      type: object
+      required:
+        - message
+        - request_id
+      properties:
+        message:
+          $ref: '#/components/schemas/Message'
+        request_id:
+          type: string
+          description: Request ID
+        verify_result:
+          $ref: '#/components/schemas/FaceVerifyResultEnum'
+        verify_result_text:
+          type: string
+          description: Kết quả xác thực dạng text
+        sim:
+          type: number
+          description: Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1]
+          minimum: 0
+          maximum: 1
+        face_loc_card:
+          $ref: '#/components/schemas/FaceLocation'
+          description: >
+            Vị trí của khuôn mặt detect được trong ảnh card id.
+        face_card_angle:
+          type: integer
+          description: Góc nghiêng của khuôn mặt ở ảnh card id.
+        face_loc_live:
+          $ref: '#/components/schemas/FaceLocation'
+          description: >
+            Vị trí của khuôn mặt detect được trong ảnh chụp chân dung.
+        face_live_angle:
+          type: integer
+          description: Góc nghiêng của khuôn mặt ở ảnh chụp chân dung.
+        feature_vector_face_card:
+          $ref: '#/components/schemas/FaceFeature'
+          description: Feature vector của khuôn mặt ở ảnh thẻ
+        feature_vector_face_live:
+          $ref: '#/components/schemas/FaceFeature'
+          description: Feature vector của khuôn mặt ở ảnh chụp chân dung
+        face_anti_spoof_status:
+          $ref: '#/components/schemas/FaceAntiSpoofStatus'
+        verification_time:
+          type: number
+          description: Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms)
+        wearing_mask:
+          $ref: '#/components/schemas/MaskResultEnum'
+        wearing_mask_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: >
+            Điểm score khi nhận dạng khẩu trang, điểm càng cao thì
+            độ tin tưởng đeo khẩu trang càng lớn score trong khoảng [0-1]
     OCRInput:
       type: object
       required:
@@ -108,10 +584,8 @@ components:
         - request_id
       properties:
         request_id:
-          x-go-name: RequestID
           type: string
         image:
-          x-go-name: Image
           type: string
           format: binary
         id_full_thr:
@@ -128,31 +602,7 @@ components:
       type: object
       properties:
         document:
-          type: string
-          description: >
-            Thông tin mô tả các loại giấy tờ:
-              * `CCCD` - (Căn cước công dân)
-              * `NEW ID` - (CMT 12 số)
-              * `OLD ID` - (CMT 9 số)
-              * `PASSPORT`
-              * `DRIVER LICENSE OLD`
-              * `DRIVER LICENSE PET`
-              * `CHIP ID`
-              * `POLICE ID`
-              * `ARMY ID`
-
-            *Chú ý*: Không phân biệt được mặt sau của CMT 12 số và CCCD
-            -> mặt sau của 2 loại giấy tờ này hoàn toàn giống nhau về mặt hình ảnh và ý nghĩa
-          enum:
-            - CCCD
-            - NEW ID
-            - OLD ID
-            - PASSPORT
-            - DRIVER LICENSE OLD
-            - DRIVER LICENSE PET
-            - CHIP ID
-            - POLICE ID
-            - ARMY ID
+          $ref: '#/components/schemas/DocumentEnum'
         result_code:
           type: integer
           description: Mã kết quả
@@ -167,28 +617,11 @@ components:
           type: string
           description: container id
         server_ver:
-          x-go-name: ServerVersion
           type: string
           description: server version
         id_check:
-          x-go-name: IDCheck
-          type: string
-          description: >
-            Kết quả kiểm tra văn bản:
-              * `FAKE` - giả mạo
-              * `CONER`
-              * `REAL` - giấy tờ thực
-              * `PUNCH` - Đục lỗ
-              * `BW` - photocopy đen trắng
-              * `REAL` - giấy tờ OK
-          enum:
-            - BW
-            - CONER
-            - FAKE
-            - PUNCH
-            - REAL
+          $ref: '#/components/schemas/IDCheckEnum'
         id_full:
-          x-go-name: IDFull
           type: integer
           description: >
             Check xem giấy tờ có full về mặt THÔNG TIN hay không
@@ -198,14 +631,12 @@ components:
             Note: trường hợp số ID bị che (dẫn tới score < id_full_thr (mặc định 0.8) --> not full)
             Giấy tờ có thể không đầy đủ về mặt hình ảnh(ví dụ không có hình ảnh khuôn mặt), nhưng nếu vẫn đầy đủ thông tin -- > id_full =1
         id_logic:
-          x-go-name: IDLogic
           type: string
           description: >
             ID logic:
               * `0` - check not OK
               * `1` - check OK
         id_logic_message:
-          x-go-name: IDLogicMessage
           type: string
           description: >
             Nội dung kiểm tra logic:
@@ -217,16 +648,10 @@ components:
               * `Expiry subtract birthday not good` - Ngày tháng năm sinh và ngày tháng hết hạn không hợp lệ (đối với CCCD; ngày hết hạn là khi công dân đủ 25, 40, 60 tuổi hoặc không có thời hạn)
               * `ID can be fake` - trường hợp có thể đang bị giả mạo về chữ "CĂN CƯỚC CÔNG DÂN/CHỨNG MINH NHÂN DÂN" đối với giấy tờ thẻ cứng
         id_type:
-          x-go-name: IDType
-          type: string
-          description: >
-            Phân biệt mặt trước/mặt sau:
-              * `0` - mặt trước
-              * `1` - mặt sau
+          $ref: '#/components/schemas/IDTypeEnum'
 
         # Data with confidence value
         id:
-          x-go-name: ID
           type: string
         idconf:
           x-go-name: IDConfidence
@@ -367,252 +792,58 @@ components:
           type: string
         copyright:
           type: string
-    FaceAntiSpoofStatus:
-      type: object
-      description: >
-        Thông tin đánh giá giả mạo khuôn mặt. Có thể kiểm tra thêm
-        3 random pose hoặc 3 ảnh thẳng mặt liên tiếp.
-        ```
-        {
-          "fake_code": "REAL",
-          "fake_score": 0.0,
-          "status": "REAL",
-          "liveness_compare_scores": [float]
-        }
-        ```
-      properties:
-        status:
-          type: string
-          enum:
-            - FAKE
-            - REAL
-        fake_code:
-          type: string
-          enum:
-            - FAKE
-            - REAL
-        fake_score:
-          type: number
-          minimum: 0
-          maximum: 1
-          description: >
-            Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]:
-              - 1.0: ảnh giả
-              - 0.0: ảnh thật
-
-            NOTE: By our experiments, threshold to judge an image is fake is fake_score > 0.63
-        fake_type:
-          type: string
-          description: >
-            Trả về loại lỗi giả mạo
-              * `N/A` - ảnh selfie là ảnh thật
-              * `SCREEN` - ảnh chụp lại từ màn hình
-              * `RANDOM_POSE` - ảnh giả mạo do kiểm tra với 3 ảnh chụp quay các hướng
-              * `STRAIGHT_POSE` - ảnh giả mạo do kiểm tra 3 ảnh chụp thẳng liên tiếp
-          enum:
-            - N/A # ảnh selfie là ảnh thật
-            - SCREEN # ảnh chụp lại từ màn hình
-            - RANDOM_POSE # ảnh giả mạo do kiểm tra với 3 ảnh chụp quay các hướng
-            - STRAIGHT_POSE # ảnh giả mạo do kiểm tra 3 ảnh chụp thẳng liên tiếp
-        liveness_compare_scores:
-          type: string
-          description: >
-            Trả về khi check_3_random_pose==1.
-            Score matching giữa ảnh live với 3 ảnh đưa vào kiểm tra
-    VerificationMessage:
-      type: object
-      required:
-        - error_code
-        - error_message
-      description: >
-        Thông tin thêm về kết quả trả về. Ví dụ:
-        ```{"api_version": 1.0.4, "error_message": "000", "error_code": "OK"}```
-      properties:
-        api_version:
-          x-go-name: APIVersion
-          type: string
-          description: API version
-        error_code:
-          type: string
-          description: Mã lỗi
-        error_message:
-          type: string
-          description: Mô tả lỗi
-    VerificationInput:
-      type: object
-      required:
-        - request_id
-        - image_card
-        - image_live
-      properties:
-        request_id:
-          x-go-name: RequestID
-          type: string
-          description: Request ID
-        image_card:
-          type: string
-          format: binary
-          description: Ảnh card id (chứng minh thư, căn cước công dân) của người dùng
-        image_live:
-          type: string
-          format: binary
-          description: Ảnh chụp khuôn mặt
-        image_live1:
-          type: string
-          format: binary
-          description: >
-            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-        image_live2:
-          type: string
-          format: binary
-          description: >
-            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-        image_live3:
-          type: string
-          format: binary
-          description: >
-            Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác thực khuôn mặt
-        check_3_random_pose:
-          x-go-name: Check3RandomPose
-          type: integer
-          description: Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không
-        check_3_straight_pose:
-          x-go-name: Check3StraightPose
-          type: integer
-          description: Kiểm tra các ảnh khuôn mặt có fake hay không
-        return_feature:
-          type: integer
-          description: Trả về face feature vector hay không
-        mask_threshold:
-          type: number
-          minimum: 0
-          maximum: 1
-          description: Threshold để kiểm tra xem có đeo khẩu trang hay không
-        fake_threshold:
-          type: number
-          minimum: 0
-          maximum: 1
-          description: Giá trị dùng để check xem khuôn mặt live có phải fake
-        sim_threshold_level1:
-          type: number
-          minimum: 0
-          maximum: 1
-          default: 0.60
-          description: >
-            độ tương đồng <= sim_threshold_level1
-            => không cùng 1 người
-            sim_threshold_level1 < độ tương đồng < sim_threshold_level2
-            ==> có thể cùng 1 người
-            độ tương đồng >= sim_threshold_level2
-            ==> cùng 1 người
-        sim_threshold_level2:
-          type: number
-          minimum: 0
-          maximum: 1
-          default: 0.75
-          description: >
-            độ tương đồng <= sim_threshold_level1
-            => không cùng 1 người
-            sim_threshold_level1 < độ tương đồng < sim_threshold_level2
-            ==> có thể cùng 1 người
-            độ tương đồng >= sim_threshold_level2
-            ==> cùng 1 người
-    VerificationResult:
-      type: object
-      required:
-        - message
-        - request_id
-      properties:
-        message:
-          $ref: '#/components/schemas/VerificationMessage'
-        request_id:
-          x-go-name: RequestID
-          type: string
-          description: Request ID
-        verify_result:
-          type: integer
-          enum: [0, 1, 2]
-          description: >
-            Kết quả xác thực dạng số:
-             * `0` - not same
-             * `1` - may be same
-             * `2` - same person
-        verify_result_text:
-          type: string
-          description: Kết quả xác thực dạng text
-        sim:
-          type: number
-          description: Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1]
-          minimum: 0
-          maximum: 1
-        face_loc_card:
-          type: array
-          description: >
-            Vị trí của khuôn mặt detect được trong ảnh card id.
-            Format: [left, top, right, bottom]
-          items:
-            type: integer
-          minItems: 4
-          maxItems: 4
-        face_card_angle:
-          type: integer
-          description: Góc nghiêng của khuôn mặt ở ảnh card id.
-        face_loc_live:
-          description: >
-            Vị trí của khuôn mặt detect được trong ảnh chụp chân dung.
-            Format: [left, top, right, bottom]
-          type: array
-          items:
-            type: integer
-          minItems: 4
-          maxItems: 4
-        face_live_angle:
-          type: integer
-          description: Góc nghiêng của khuôn mặt ở ảnh chụp chân dung.
-        feature_vector_face_card:
-          type: array
-          items:
-            type: number
-          minItems: 512
-          maxItems: 512
-          description: Feature vector của khuôn mặt ở ảnh thẻ
-        feature_vector_face_live:
-          type: array
-          items:
-            type: number
-          minItems: 512
-          maxItems: 512
-          description: Feature vector của khuôn mặt ở ảnh chụp chân dung
-        face_anti_spoof_status:
-          $ref: '#/components/schemas/FaceAntiSpoofStatus'
-        verification_time:
-          type: number
-          description: Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms)
-        wearing_mask:
-          type: string
-          enum:
-            - 'YES'
-            - 'NO'
-        wearing_mask_score:
-          type: number
-          minimum: 0
-          maximum: 1
-          description: >
-            Điểm score khi nhận dạng khẩu trang, điểm càng cao thì
-            độ tin tưởng đeo khẩu trang càng lớn score trong khoảng [0-1]
   requestBodies:
+    FaceIDRecognitionRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FaceIDRecognitionInput'
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/FaceIDRecognitionInput'
+    FaceIDRegisterRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FaceIDRegisterInput'
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/FaceIDRegisterInput'
+    FaceIDUnregisterRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/FaceID'
+              - type: object
+                properties:
+                  face_id:
+                    type: string
+                    description: >
+                      Customer is Face ID, returned in the result when registering a Customer is photo of the face in the system.
+                      If face_id is not provided, all customer photos with unique_name will be removed from the system
+    FaceIDVerificationRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FaceIDVerificationInput'
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/FaceIDVerificationInput'
     OCRRequest:
       required: true
       content:
         multipart/form-data:
           schema:
             $ref: '#/components/schemas/OCRInput'
-    VerificationRequest:
-      required: true
+  responses:
+    Unauthorized:
+      description: Unauthorized request.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/VerificationInput'
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/VerificationInput'
+            $ref: '#/components/schemas/GatewayError'

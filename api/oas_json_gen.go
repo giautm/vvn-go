@@ -12,6 +12,60 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+// Encode encodes DocumentEnum as json.
+func (s DocumentEnum) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes DocumentEnum from json.
+func (s *DocumentEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DocumentEnum to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch DocumentEnum(v) {
+	case DocumentEnumCCCD:
+		*s = DocumentEnumCCCD
+	case DocumentEnumNEWID:
+		*s = DocumentEnumNEWID
+	case DocumentEnumOLDID:
+		*s = DocumentEnumOLDID
+	case DocumentEnumPASSPORT:
+		*s = DocumentEnumPASSPORT
+	case DocumentEnumDRIVERLICENSEOLD:
+		*s = DocumentEnumDRIVERLICENSEOLD
+	case DocumentEnumDRIVERLICENSEPET:
+		*s = DocumentEnumDRIVERLICENSEPET
+	case DocumentEnumCHIPID:
+		*s = DocumentEnumCHIPID
+	case DocumentEnumPOLICEID:
+		*s = DocumentEnumPOLICEID
+	case DocumentEnumARMYID:
+		*s = DocumentEnumARMYID
+	default:
+		*s = DocumentEnum(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s DocumentEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DocumentEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s FaceAntiSpoofStatus) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -143,126 +197,1999 @@ func (s *FaceAntiSpoofStatus) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes FaceAntiSpoofStatusFakeCode as json.
-func (s FaceAntiSpoofStatusFakeCode) Encode(e *jx.Encoder) {
-	e.Str(string(s))
+// Encode encodes FaceFeature as json.
+func (s FaceFeature) Encode(e *jx.Encoder) {
+	unwrapped := []float64(s)
+
+	e.ArrStart()
+	for _, elem := range unwrapped {
+		e.Float64(elem)
+	}
+	e.ArrEnd()
 }
 
-// Decode decodes FaceAntiSpoofStatusFakeCode from json.
-func (s *FaceAntiSpoofStatusFakeCode) Decode(d *jx.Decoder) error {
+// Decode decodes FaceFeature from json.
+func (s *FaceFeature) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode FaceAntiSpoofStatusFakeCode to nil")
+		return errors.New("invalid: unable to decode FaceFeature to nil")
 	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
+	var unwrapped []float64
+	if err := func() error {
+		unwrapped = make([]float64, 0)
+		if err := d.Arr(func(d *jx.Decoder) error {
+			var elem float64
+			v, err := d.Float64()
+			elem = float64(v)
+			if err != nil {
+				return err
+			}
+			unwrapped = append(unwrapped, elem)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
 	}
-	// Try to use constant string.
-	switch FaceAntiSpoofStatusFakeCode(v) {
-	case FaceAntiSpoofStatusFakeCodeFAKE:
-		*s = FaceAntiSpoofStatusFakeCodeFAKE
-	case FaceAntiSpoofStatusFakeCodeREAL:
-		*s = FaceAntiSpoofStatusFakeCodeREAL
-	default:
-		*s = FaceAntiSpoofStatusFakeCode(v)
-	}
-
+	*s = FaceFeature(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s FaceAntiSpoofStatusFakeCode) MarshalJSON() ([]byte, error) {
+func (s FaceFeature) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *FaceAntiSpoofStatusFakeCode) UnmarshalJSON(data []byte) error {
+func (s *FaceFeature) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes FaceAntiSpoofStatusFakeType as json.
-func (s FaceAntiSpoofStatusFakeType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
+// Encode implements json.Marshaler.
+func (s FaceIDRecognitionInput) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
 }
 
-// Decode decodes FaceAntiSpoofStatusFakeType from json.
-func (s *FaceAntiSpoofStatusFakeType) Decode(d *jx.Decoder) error {
+// encodeFields encodes fields.
+func (s FaceIDRecognitionInput) encodeFields(e *jx.Encoder) {
+	{
+
+		e.FieldStart("image")
+		e.Str(s.Image)
+	}
+	{
+
+		e.FieldStart("request_id")
+		e.Str(s.RequestID)
+	}
+}
+
+var jsonFieldsNameOfFaceIDRecognitionInput = [2]string{
+	0: "image",
+	1: "request_id",
+}
+
+// Decode decodes FaceIDRecognitionInput from json.
+func (s *FaceIDRecognitionInput) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode FaceAntiSpoofStatusFakeType to nil")
+		return errors.New("invalid: unable to decode FaceIDRecognitionInput to nil")
 	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "image":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Image = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"image\"")
+			}
+		case "request_id":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.RequestID = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"request_id\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceIDRecognitionInput")
 	}
-	// Try to use constant string.
-	switch FaceAntiSpoofStatusFakeType(v) {
-	case FaceAntiSpoofStatusFakeTypeNSlashA:
-		*s = FaceAntiSpoofStatusFakeTypeNSlashA
-	case FaceAntiSpoofStatusFakeTypeSCREEN:
-		*s = FaceAntiSpoofStatusFakeTypeSCREEN
-	case FaceAntiSpoofStatusFakeTypeRANDOMPOSE:
-		*s = FaceAntiSpoofStatusFakeTypeRANDOMPOSE
-	case FaceAntiSpoofStatusFakeTypeSTRAIGHTPOSE:
-		*s = FaceAntiSpoofStatusFakeTypeSTRAIGHTPOSE
-	default:
-		*s = FaceAntiSpoofStatusFakeType(v)
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceIDRecognitionInput) {
+					name = jsonFieldsNameOfFaceIDRecognitionInput[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s FaceAntiSpoofStatusFakeType) MarshalJSON() ([]byte, error) {
+func (s FaceIDRecognitionInput) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *FaceAntiSpoofStatusFakeType) UnmarshalJSON(data []byte) error {
+func (s *FaceIDRecognitionInput) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes FaceAntiSpoofStatusStatus as json.
-func (s FaceAntiSpoofStatusStatus) Encode(e *jx.Encoder) {
-	e.Str(string(s))
+// Encode implements json.Marshaler.
+func (s FaceIDRecognitionResult) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
 }
 
-// Decode decodes FaceAntiSpoofStatusStatus from json.
-func (s *FaceAntiSpoofStatusStatus) Decode(d *jx.Decoder) error {
+// encodeFields encodes fields.
+func (s FaceIDRecognitionResult) encodeFields(e *jx.Encoder) {
+	{
+
+		e.FieldStart("message")
+		s.Message.Encode(e)
+	}
+	{
+		if s.RecognitionResult != nil {
+			e.FieldStart("recognition_result")
+			e.ArrStart()
+			for _, elem := range s.RecognitionResult {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.RecognitionTime.Set {
+			e.FieldStart("recognition_time")
+			s.RecognitionTime.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfFaceIDRecognitionResult = [3]string{
+	0: "message",
+	1: "recognition_result",
+	2: "recognition_time",
+}
+
+// Decode decodes FaceIDRecognitionResult from json.
+func (s *FaceIDRecognitionResult) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode FaceAntiSpoofStatusStatus to nil")
+		return errors.New("invalid: unable to decode FaceIDRecognitionResult to nil")
 	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "message":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "recognition_result":
+			if err := func() error {
+				s.RecognitionResult = make([]FaceRecognitionResult, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem FaceRecognitionResult
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.RecognitionResult = append(s.RecognitionResult, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"recognition_result\"")
+			}
+		case "recognition_time":
+			if err := func() error {
+				s.RecognitionTime.Reset()
+				if err := s.RecognitionTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"recognition_time\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceIDRecognitionResult")
 	}
-	// Try to use constant string.
-	switch FaceAntiSpoofStatusStatus(v) {
-	case FaceAntiSpoofStatusStatusFAKE:
-		*s = FaceAntiSpoofStatusStatusFAKE
-	case FaceAntiSpoofStatusStatusREAL:
-		*s = FaceAntiSpoofStatusStatusREAL
-	default:
-		*s = FaceAntiSpoofStatusStatus(v)
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceIDRecognitionResult) {
+					name = jsonFieldsNameOfFaceIDRecognitionResult[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s FaceAntiSpoofStatusStatus) MarshalJSON() ([]byte, error) {
+func (s FaceIDRecognitionResult) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *FaceAntiSpoofStatusStatus) UnmarshalJSON(data []byte) error {
+func (s *FaceIDRecognitionResult) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceIDRegisterInput) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s FaceIDRegisterInput) encodeFields(e *jx.Encoder) {
+	{
+
+		e.FieldStart("unique_name")
+		e.Str(s.UniqueName)
+	}
+	{
+		if s.Force.Set {
+			e.FieldStart("force")
+			s.Force.Encode(e)
+		}
+	}
+	{
+
+		e.FieldStart("image")
+		e.Str(s.Image)
+	}
+	{
+		if s.PersonName.Set {
+			e.FieldStart("person_name")
+			s.PersonName.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfFaceIDRegisterInput = [4]string{
+	0: "unique_name",
+	1: "force",
+	2: "image",
+	3: "person_name",
+}
+
+// Decode decodes FaceIDRegisterInput from json.
+func (s *FaceIDRegisterInput) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceIDRegisterInput to nil")
+	}
+	var requiredBitSet [1]uint8
+	s.setDefaults()
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "unique_name":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.UniqueName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"unique_name\"")
+			}
+		case "force":
+			if err := func() error {
+				s.Force.Reset()
+				if err := s.Force.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"force\"")
+			}
+		case "image":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Str()
+				s.Image = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"image\"")
+			}
+		case "person_name":
+			if err := func() error {
+				s.PersonName.Reset()
+				if err := s.PersonName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"person_name\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceIDRegisterInput")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000101,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceIDRegisterInput) {
+					name = jsonFieldsNameOfFaceIDRegisterInput[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceIDRegisterInput) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceIDRegisterInput) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceIDRegisterResult) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s FaceIDRegisterResult) encodeFields(e *jx.Encoder) {
+	{
+		if s.FaceCardAngle.Set {
+			e.FieldStart("face_card_angle")
+			s.FaceCardAngle.Encode(e)
+		}
+	}
+	{
+		if s.FaceID.Set {
+			e.FieldStart("face_id")
+			s.FaceID.Encode(e)
+		}
+	}
+	{
+
+		e.FieldStart("face_loc")
+		e.ArrStart()
+		for _, elem := range s.FaceLoc {
+			e.Int(elem)
+		}
+		e.ArrEnd()
+	}
+	{
+		if s.MatchedScore.Set {
+			e.FieldStart("matched_score")
+			s.MatchedScore.Encode(e)
+		}
+	}
+	{
+
+		e.FieldStart("message")
+		s.Message.Encode(e)
+	}
+	{
+		if s.SamePersonThr.Set {
+			e.FieldStart("same_person_thr")
+			s.SamePersonThr.Encode(e)
+		}
+	}
+	{
+		if s.UniqueName.Set {
+			e.FieldStart("unique_name")
+			s.UniqueName.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfFaceIDRegisterResult = [7]string{
+	0: "face_card_angle",
+	1: "face_id",
+	2: "face_loc",
+	3: "matched_score",
+	4: "message",
+	5: "same_person_thr",
+	6: "unique_name",
+}
+
+// Decode decodes FaceIDRegisterResult from json.
+func (s *FaceIDRegisterResult) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceIDRegisterResult to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "face_card_angle":
+			if err := func() error {
+				s.FaceCardAngle.Reset()
+				if err := s.FaceCardAngle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_card_angle\"")
+			}
+		case "face_id":
+			if err := func() error {
+				s.FaceID.Reset()
+				if err := s.FaceID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_id\"")
+			}
+		case "face_loc":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				s.FaceLoc = make([]int, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem int
+					v, err := d.Int()
+					elem = int(v)
+					if err != nil {
+						return err
+					}
+					s.FaceLoc = append(s.FaceLoc, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_loc\"")
+			}
+		case "matched_score":
+			if err := func() error {
+				s.MatchedScore.Reset()
+				if err := s.MatchedScore.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"matched_score\"")
+			}
+		case "message":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "same_person_thr":
+			if err := func() error {
+				s.SamePersonThr.Reset()
+				if err := s.SamePersonThr.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"same_person_thr\"")
+			}
+		case "unique_name":
+			if err := func() error {
+				s.UniqueName.Reset()
+				if err := s.UniqueName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"unique_name\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceIDRegisterResult")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00010100,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceIDRegisterResult) {
+					name = jsonFieldsNameOfFaceIDRegisterResult[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceIDRegisterResult) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceIDRegisterResult) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceIDResult) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s FaceIDResult) encodeFields(e *jx.Encoder) {
+	{
+
+		e.FieldStart("unique_name")
+		e.Str(s.UniqueName)
+	}
+	{
+
+		e.FieldStart("compare_score")
+		e.Float64(s.CompareScore)
+	}
+	{
+
+		e.FieldStart("info")
+		s.Info.Encode(e)
+	}
+	{
+		if s.PersonName.Set {
+			e.FieldStart("person_name")
+			s.PersonName.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfFaceIDResult = [4]string{
+	0: "unique_name",
+	1: "compare_score",
+	2: "info",
+	3: "person_name",
+}
+
+// Decode decodes FaceIDResult from json.
+func (s *FaceIDResult) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceIDResult to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "unique_name":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.UniqueName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"unique_name\"")
+			}
+		case "compare_score":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Float64()
+				s.CompareScore = float64(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"compare_score\"")
+			}
+		case "info":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				if err := s.Info.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"info\"")
+			}
+		case "person_name":
+			if err := func() error {
+				s.PersonName.Reset()
+				if err := s.PersonName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"person_name\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceIDResult")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceIDResult) {
+					name = jsonFieldsNameOfFaceIDResult[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceIDResult) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceIDResult) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceIDResultInfo) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields implements json.Marshaler.
+func (s FaceIDResultInfo) encodeFields(e *jx.Encoder) {
+	for k, elem := range s {
+		e.FieldStart(k)
+
+		e.Str(elem)
+	}
+}
+
+// Decode decodes FaceIDResultInfo from json.
+func (s *FaceIDResultInfo) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceIDResultInfo to nil")
+	}
+	m := s.init()
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		var elem string
+		if err := func() error {
+			v, err := d.Str()
+			elem = string(v)
+			if err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrapf(err, "decode field %q", k)
+		}
+		m[string(k)] = elem
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceIDResultInfo")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceIDResultInfo) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceIDResultInfo) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceIDVerificationInput) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s FaceIDVerificationInput) encodeFields(e *jx.Encoder) {
+	{
+		if s.Check3RandomPose.Set {
+			e.FieldStart("check_3_random_pose")
+			s.Check3RandomPose.Encode(e)
+		}
+	}
+	{
+		if s.Check3StraightPose.Set {
+			e.FieldStart("check_3_straight_pose")
+			s.Check3StraightPose.Encode(e)
+		}
+	}
+	{
+		if s.FakeThreshold.Set {
+			e.FieldStart("fake_threshold")
+			s.FakeThreshold.Encode(e)
+		}
+	}
+	{
+
+		e.FieldStart("image_card")
+		e.Str(s.ImageCard)
+	}
+	{
+
+		e.FieldStart("image_live")
+		e.Str(s.ImageLive)
+	}
+	{
+		if s.ImageLive1.Set {
+			e.FieldStart("image_live1")
+			s.ImageLive1.Encode(e)
+		}
+	}
+	{
+		if s.ImageLive2.Set {
+			e.FieldStart("image_live2")
+			s.ImageLive2.Encode(e)
+		}
+	}
+	{
+		if s.ImageLive3.Set {
+			e.FieldStart("image_live3")
+			s.ImageLive3.Encode(e)
+		}
+	}
+	{
+		if s.MaskThreshold.Set {
+			e.FieldStart("mask_threshold")
+			s.MaskThreshold.Encode(e)
+		}
+	}
+	{
+
+		e.FieldStart("request_id")
+		e.Str(s.RequestID)
+	}
+	{
+		if s.ReturnFeature.Set {
+			e.FieldStart("return_feature")
+			s.ReturnFeature.Encode(e)
+		}
+	}
+	{
+		if s.SimThresholdLevel1.Set {
+			e.FieldStart("sim_threshold_level1")
+			s.SimThresholdLevel1.Encode(e)
+		}
+	}
+	{
+		if s.SimThresholdLevel2.Set {
+			e.FieldStart("sim_threshold_level2")
+			s.SimThresholdLevel2.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfFaceIDVerificationInput = [13]string{
+	0:  "check_3_random_pose",
+	1:  "check_3_straight_pose",
+	2:  "fake_threshold",
+	3:  "image_card",
+	4:  "image_live",
+	5:  "image_live1",
+	6:  "image_live2",
+	7:  "image_live3",
+	8:  "mask_threshold",
+	9:  "request_id",
+	10: "return_feature",
+	11: "sim_threshold_level1",
+	12: "sim_threshold_level2",
+}
+
+// Decode decodes FaceIDVerificationInput from json.
+func (s *FaceIDVerificationInput) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceIDVerificationInput to nil")
+	}
+	var requiredBitSet [2]uint8
+	s.setDefaults()
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "check_3_random_pose":
+			if err := func() error {
+				s.Check3RandomPose.Reset()
+				if err := s.Check3RandomPose.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"check_3_random_pose\"")
+			}
+		case "check_3_straight_pose":
+			if err := func() error {
+				s.Check3StraightPose.Reset()
+				if err := s.Check3StraightPose.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"check_3_straight_pose\"")
+			}
+		case "fake_threshold":
+			if err := func() error {
+				s.FakeThreshold.Reset()
+				if err := s.FakeThreshold.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"fake_threshold\"")
+			}
+		case "image_card":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.ImageCard = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"image_card\"")
+			}
+		case "image_live":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Str()
+				s.ImageLive = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"image_live\"")
+			}
+		case "image_live1":
+			if err := func() error {
+				s.ImageLive1.Reset()
+				if err := s.ImageLive1.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"image_live1\"")
+			}
+		case "image_live2":
+			if err := func() error {
+				s.ImageLive2.Reset()
+				if err := s.ImageLive2.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"image_live2\"")
+			}
+		case "image_live3":
+			if err := func() error {
+				s.ImageLive3.Reset()
+				if err := s.ImageLive3.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"image_live3\"")
+			}
+		case "mask_threshold":
+			if err := func() error {
+				s.MaskThreshold.Reset()
+				if err := s.MaskThreshold.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mask_threshold\"")
+			}
+		case "request_id":
+			requiredBitSet[1] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.RequestID = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"request_id\"")
+			}
+		case "return_feature":
+			if err := func() error {
+				s.ReturnFeature.Reset()
+				if err := s.ReturnFeature.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"return_feature\"")
+			}
+		case "sim_threshold_level1":
+			if err := func() error {
+				s.SimThresholdLevel1.Reset()
+				if err := s.SimThresholdLevel1.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sim_threshold_level1\"")
+			}
+		case "sim_threshold_level2":
+			if err := func() error {
+				s.SimThresholdLevel2.Reset()
+				if err := s.SimThresholdLevel2.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sim_threshold_level2\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceIDVerificationInput")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b00011000,
+		0b00000010,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceIDVerificationInput) {
+					name = jsonFieldsNameOfFaceIDVerificationInput[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceIDVerificationInput) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceIDVerificationInput) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceIDVerificationResult) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s FaceIDVerificationResult) encodeFields(e *jx.Encoder) {
+	{
+		if s.FaceAntiSpoofStatus.Set {
+			e.FieldStart("face_anti_spoof_status")
+			s.FaceAntiSpoofStatus.Encode(e)
+		}
+	}
+	{
+		if s.FaceCardAngle.Set {
+			e.FieldStart("face_card_angle")
+			s.FaceCardAngle.Encode(e)
+		}
+	}
+	{
+		if s.FaceLiveAngle.Set {
+			e.FieldStart("face_live_angle")
+			s.FaceLiveAngle.Encode(e)
+		}
+	}
+	{
+		if s.FaceLocCard != nil {
+			e.FieldStart("face_loc_card")
+			s.FaceLocCard.Encode(e)
+		}
+	}
+	{
+		if s.FaceLocLive != nil {
+			e.FieldStart("face_loc_live")
+			s.FaceLocLive.Encode(e)
+		}
+	}
+	{
+		if s.FeatureVectorFaceCard != nil {
+			e.FieldStart("feature_vector_face_card")
+			s.FeatureVectorFaceCard.Encode(e)
+		}
+	}
+	{
+		if s.FeatureVectorFaceLive != nil {
+			e.FieldStart("feature_vector_face_live")
+			s.FeatureVectorFaceLive.Encode(e)
+		}
+	}
+	{
+
+		e.FieldStart("message")
+		s.Message.Encode(e)
+	}
+	{
+
+		e.FieldStart("request_id")
+		e.Str(s.RequestID)
+	}
+	{
+		if s.Sim.Set {
+			e.FieldStart("sim")
+			s.Sim.Encode(e)
+		}
+	}
+	{
+		if s.VerificationTime.Set {
+			e.FieldStart("verification_time")
+			s.VerificationTime.Encode(e)
+		}
+	}
+	{
+		if s.VerifyResult.Set {
+			e.FieldStart("verify_result")
+			s.VerifyResult.Encode(e)
+		}
+	}
+	{
+		if s.VerifyResultText.Set {
+			e.FieldStart("verify_result_text")
+			s.VerifyResultText.Encode(e)
+		}
+	}
+	{
+		if s.WearingMask.Set {
+			e.FieldStart("wearing_mask")
+			s.WearingMask.Encode(e)
+		}
+	}
+	{
+		if s.WearingMaskScore.Set {
+			e.FieldStart("wearing_mask_score")
+			s.WearingMaskScore.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfFaceIDVerificationResult = [15]string{
+	0:  "face_anti_spoof_status",
+	1:  "face_card_angle",
+	2:  "face_live_angle",
+	3:  "face_loc_card",
+	4:  "face_loc_live",
+	5:  "feature_vector_face_card",
+	6:  "feature_vector_face_live",
+	7:  "message",
+	8:  "request_id",
+	9:  "sim",
+	10: "verification_time",
+	11: "verify_result",
+	12: "verify_result_text",
+	13: "wearing_mask",
+	14: "wearing_mask_score",
+}
+
+// Decode decodes FaceIDVerificationResult from json.
+func (s *FaceIDVerificationResult) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceIDVerificationResult to nil")
+	}
+	var requiredBitSet [2]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "face_anti_spoof_status":
+			if err := func() error {
+				s.FaceAntiSpoofStatus.Reset()
+				if err := s.FaceAntiSpoofStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_anti_spoof_status\"")
+			}
+		case "face_card_angle":
+			if err := func() error {
+				s.FaceCardAngle.Reset()
+				if err := s.FaceCardAngle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_card_angle\"")
+			}
+		case "face_live_angle":
+			if err := func() error {
+				s.FaceLiveAngle.Reset()
+				if err := s.FaceLiveAngle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_live_angle\"")
+			}
+		case "face_loc_card":
+			if err := func() error {
+				s.FaceLocCard = nil
+				var elem FaceLocation
+				if err := elem.Decode(d); err != nil {
+					return err
+				}
+				s.FaceLocCard = &elem
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_loc_card\"")
+			}
+		case "face_loc_live":
+			if err := func() error {
+				s.FaceLocLive = nil
+				var elem FaceLocation
+				if err := elem.Decode(d); err != nil {
+					return err
+				}
+				s.FaceLocLive = &elem
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_loc_live\"")
+			}
+		case "feature_vector_face_card":
+			if err := func() error {
+				s.FeatureVectorFaceCard = nil
+				var elem FaceFeature
+				if err := elem.Decode(d); err != nil {
+					return err
+				}
+				s.FeatureVectorFaceCard = &elem
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"feature_vector_face_card\"")
+			}
+		case "feature_vector_face_live":
+			if err := func() error {
+				s.FeatureVectorFaceLive = nil
+				var elem FaceFeature
+				if err := elem.Decode(d); err != nil {
+					return err
+				}
+				s.FeatureVectorFaceLive = &elem
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"feature_vector_face_live\"")
+			}
+		case "message":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "request_id":
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.RequestID = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"request_id\"")
+			}
+		case "sim":
+			if err := func() error {
+				s.Sim.Reset()
+				if err := s.Sim.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sim\"")
+			}
+		case "verification_time":
+			if err := func() error {
+				s.VerificationTime.Reset()
+				if err := s.VerificationTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"verification_time\"")
+			}
+		case "verify_result":
+			if err := func() error {
+				s.VerifyResult.Reset()
+				if err := s.VerifyResult.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"verify_result\"")
+			}
+		case "verify_result_text":
+			if err := func() error {
+				s.VerifyResultText.Reset()
+				if err := s.VerifyResultText.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"verify_result_text\"")
+			}
+		case "wearing_mask":
+			if err := func() error {
+				s.WearingMask.Reset()
+				if err := s.WearingMask.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"wearing_mask\"")
+			}
+		case "wearing_mask_score":
+			if err := func() error {
+				s.WearingMaskScore.Reset()
+				if err := s.WearingMaskScore.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"wearing_mask_score\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceIDVerificationResult")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b10000000,
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceIDVerificationResult) {
+					name = jsonFieldsNameOfFaceIDVerificationResult[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceIDVerificationResult) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceIDVerificationResult) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes FaceLocation as json.
+func (s FaceLocation) Encode(e *jx.Encoder) {
+	unwrapped := []int(s)
+
+	e.ArrStart()
+	for _, elem := range unwrapped {
+		e.Int(elem)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes FaceLocation from json.
+func (s *FaceLocation) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceLocation to nil")
+	}
+	var unwrapped []int
+	if err := func() error {
+		unwrapped = make([]int, 0)
+		if err := d.Arr(func(d *jx.Decoder) error {
+			var elem int
+			v, err := d.Int()
+			elem = int(v)
+			if err != nil {
+				return err
+			}
+			unwrapped = append(unwrapped, elem)
+			return nil
+		}); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = FaceLocation(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceLocation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceLocation) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceRecognitionResult) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s FaceRecognitionResult) encodeFields(e *jx.Encoder) {
+	{
+
+		e.FieldStart("face_loc")
+		s.FaceLoc.Encode(e)
+	}
+	{
+
+		e.FieldStart("face_size")
+		e.Int(s.FaceSize)
+	}
+	{
+
+		e.FieldStart("top_k")
+		e.ArrStart()
+		for _, elem := range s.TopK {
+			elem.Encode(e)
+		}
+		e.ArrEnd()
+	}
+}
+
+var jsonFieldsNameOfFaceRecognitionResult = [3]string{
+	0: "face_loc",
+	1: "face_size",
+	2: "top_k",
+}
+
+// Decode decodes FaceRecognitionResult from json.
+func (s *FaceRecognitionResult) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceRecognitionResult to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "face_loc":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.FaceLoc.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_loc\"")
+			}
+		case "face_size":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Int()
+				s.FaceSize = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_size\"")
+			}
+		case "top_k":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				s.TopK = make([]FaceIDResult, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem FaceIDResult
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.TopK = append(s.TopK, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"top_k\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceRecognitionResult")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceRecognitionResult) {
+					name = jsonFieldsNameOfFaceRecognitionResult[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceRecognitionResult) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceRecognitionResult) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceUnregisterOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s FaceUnregisterOK) encodeFields(e *jx.Encoder) {
+	{
+
+		e.FieldStart("message")
+		s.Message.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfFaceUnregisterOK = [1]string{
+	0: "message",
+}
+
+// Decode decodes FaceUnregisterOK from json.
+func (s *FaceUnregisterOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceUnregisterOK to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "message":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceUnregisterOK")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceUnregisterOK) {
+					name = jsonFieldsNameOfFaceUnregisterOK[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceUnregisterOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceUnregisterOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s FaceUnregisterReq) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s FaceUnregisterReq) encodeFields(e *jx.Encoder) {
+	{
+
+		e.FieldStart("unique_name")
+		e.Str(s.UniqueName)
+	}
+	{
+		if s.FaceID.Set {
+			e.FieldStart("face_id")
+			s.FaceID.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfFaceUnregisterReq = [2]string{
+	0: "unique_name",
+	1: "face_id",
+}
+
+// Decode decodes FaceUnregisterReq from json.
+func (s *FaceUnregisterReq) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceUnregisterReq to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "unique_name":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.UniqueName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"unique_name\"")
+			}
+		case "face_id":
+			if err := func() error {
+				s.FaceID.Reset()
+				if err := s.FaceID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_id\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode FaceUnregisterReq")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfFaceUnregisterReq) {
+					name = jsonFieldsNameOfFaceUnregisterReq[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceUnregisterReq) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceUnregisterReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes FaceVerifyResultEnum as json.
+func (s FaceVerifyResultEnum) Encode(e *jx.Encoder) {
+	e.Int(int(s))
+}
+
+// Decode decodes FaceVerifyResultEnum from json.
+func (s *FaceVerifyResultEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FaceVerifyResultEnum to nil")
+	}
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	*s = FaceVerifyResultEnum(v)
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FaceVerifyResultEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FaceVerifyResultEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes FakeTypeEnum as json.
+func (s FakeTypeEnum) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes FakeTypeEnum from json.
+func (s *FakeTypeEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode FakeTypeEnum to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch FakeTypeEnum(v) {
+	case FakeTypeEnumNSlashA:
+		*s = FakeTypeEnumNSlashA
+	case FakeTypeEnumSCREEN:
+		*s = FakeTypeEnumSCREEN
+	case FakeTypeEnumRANDOMPOSE:
+		*s = FakeTypeEnumRANDOMPOSE
+	case FakeTypeEnumSTRAIGHTPOSE:
+		*s = FakeTypeEnumSTRAIGHTPOSE
+	default:
+		*s = FakeTypeEnum(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s FakeTypeEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *FakeTypeEnum) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -360,6 +2287,298 @@ func (s GatewayError) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *GatewayError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes IDCheckEnum as json.
+func (s IDCheckEnum) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes IDCheckEnum from json.
+func (s *IDCheckEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode IDCheckEnum to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch IDCheckEnum(v) {
+	case IDCheckEnumBW:
+		*s = IDCheckEnumBW
+	case IDCheckEnumCONER:
+		*s = IDCheckEnumCONER
+	case IDCheckEnumFAKE:
+		*s = IDCheckEnumFAKE
+	case IDCheckEnumPUNCH:
+		*s = IDCheckEnumPUNCH
+	case IDCheckEnumREAL:
+		*s = IDCheckEnumREAL
+	default:
+		*s = IDCheckEnum(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s IDCheckEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *IDCheckEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes IDTypeEnum as json.
+func (s IDTypeEnum) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes IDTypeEnum from json.
+func (s *IDTypeEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode IDTypeEnum to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch IDTypeEnum(v) {
+	case IDTypeEnum0:
+		*s = IDTypeEnum0
+	case IDTypeEnum1:
+		*s = IDTypeEnum1
+	default:
+		*s = IDTypeEnum(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s IDTypeEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *IDTypeEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes MaskResultEnum as json.
+func (s MaskResultEnum) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes MaskResultEnum from json.
+func (s *MaskResultEnum) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode MaskResultEnum to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch MaskResultEnum(v) {
+	case MaskResultEnumYES:
+		*s = MaskResultEnumYES
+	case MaskResultEnumNO:
+		*s = MaskResultEnumNO
+	default:
+		*s = MaskResultEnum(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s MaskResultEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *MaskResultEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s Message) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s Message) encodeFields(e *jx.Encoder) {
+	{
+		if s.APIVersion.Set {
+			e.FieldStart("api_version")
+			s.APIVersion.Encode(e)
+		}
+	}
+	{
+		if s.CopyRight.Set {
+			e.FieldStart("copy_right")
+			s.CopyRight.Encode(e)
+		}
+	}
+	{
+
+		e.FieldStart("error_code")
+		e.Str(s.ErrorCode)
+	}
+	{
+
+		e.FieldStart("error_message")
+		e.Str(s.ErrorMessage)
+	}
+	{
+		if s.Info.Set {
+			e.FieldStart("info")
+			s.Info.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfMessage = [5]string{
+	0: "api_version",
+	1: "copy_right",
+	2: "error_code",
+	3: "error_message",
+	4: "info",
+}
+
+// Decode decodes Message from json.
+func (s *Message) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode Message to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "api_version":
+			if err := func() error {
+				s.APIVersion.Reset()
+				if err := s.APIVersion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"api_version\"")
+			}
+		case "copy_right":
+			if err := func() error {
+				s.CopyRight.Reset()
+				if err := s.CopyRight.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"copy_right\"")
+			}
+		case "error_code":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Str()
+				s.ErrorCode = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"error_code\"")
+			}
+		case "error_message":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.ErrorMessage = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"error_message\"")
+			}
+		case "info":
+			if err := func() error {
+				s.Info.Reset()
+				if err := s.Info.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"info\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode Message")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00001100,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfMessage) {
+					name = jsonFieldsNameOfMessage[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s Message) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *Message) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1175,106 +3394,6 @@ func (s *OCRResult) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes OCRResultDocument as json.
-func (s OCRResultDocument) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes OCRResultDocument from json.
-func (s *OCRResultDocument) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OCRResultDocument to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch OCRResultDocument(v) {
-	case OCRResultDocumentCCCD:
-		*s = OCRResultDocumentCCCD
-	case OCRResultDocumentNEWID:
-		*s = OCRResultDocumentNEWID
-	case OCRResultDocumentOLDID:
-		*s = OCRResultDocumentOLDID
-	case OCRResultDocumentPASSPORT:
-		*s = OCRResultDocumentPASSPORT
-	case OCRResultDocumentDRIVERLICENSEOLD:
-		*s = OCRResultDocumentDRIVERLICENSEOLD
-	case OCRResultDocumentDRIVERLICENSEPET:
-		*s = OCRResultDocumentDRIVERLICENSEPET
-	case OCRResultDocumentCHIPID:
-		*s = OCRResultDocumentCHIPID
-	case OCRResultDocumentPOLICEID:
-		*s = OCRResultDocumentPOLICEID
-	case OCRResultDocumentARMYID:
-		*s = OCRResultDocumentARMYID
-	default:
-		*s = OCRResultDocument(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OCRResultDocument) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OCRResultDocument) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OCRResultIDCheck as json.
-func (s OCRResultIDCheck) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes OCRResultIDCheck from json.
-func (s *OCRResultIDCheck) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode OCRResultIDCheck to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch OCRResultIDCheck(v) {
-	case OCRResultIDCheckBW:
-		*s = OCRResultIDCheckBW
-	case OCRResultIDCheckCONER:
-		*s = OCRResultIDCheckCONER
-	case OCRResultIDCheckFAKE:
-		*s = OCRResultIDCheckFAKE
-	case OCRResultIDCheckPUNCH:
-		*s = OCRResultIDCheckPUNCH
-	case OCRResultIDCheckREAL:
-		*s = OCRResultIDCheckREAL
-	default:
-		*s = OCRResultIDCheck(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OCRResultIDCheck) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OCRResultIDCheck) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes OCRResultResultCode as json.
 func (s OCRResultResultCode) Encode(e *jx.Encoder) {
 	e.Int(int(s))
@@ -1303,6 +3422,39 @@ func (s OCRResultResultCode) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OCRResultResultCode) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DocumentEnum as json.
+func (o OptDocumentEnum) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes DocumentEnum from json.
+func (o *OptDocumentEnum) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptDocumentEnum to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptDocumentEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptDocumentEnum) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1340,18 +3492,18 @@ func (s *OptFaceAntiSpoofStatus) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes FaceAntiSpoofStatusFakeCode as json.
-func (o OptFaceAntiSpoofStatusFakeCode) Encode(e *jx.Encoder) {
+// Encode encodes FaceVerifyResultEnum as json.
+func (o OptFaceVerifyResultEnum) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	e.Str(string(o.Value))
+	e.Int(int(o.Value))
 }
 
-// Decode decodes FaceAntiSpoofStatusFakeCode from json.
-func (o *OptFaceAntiSpoofStatusFakeCode) Decode(d *jx.Decoder) error {
+// Decode decodes FaceVerifyResultEnum from json.
+func (o *OptFaceVerifyResultEnum) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptFaceAntiSpoofStatusFakeCode to nil")
+		return errors.New("invalid: unable to decode OptFaceVerifyResultEnum to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -1361,30 +3513,30 @@ func (o *OptFaceAntiSpoofStatusFakeCode) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptFaceAntiSpoofStatusFakeCode) MarshalJSON() ([]byte, error) {
+func (s OptFaceVerifyResultEnum) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptFaceAntiSpoofStatusFakeCode) UnmarshalJSON(data []byte) error {
+func (s *OptFaceVerifyResultEnum) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes FaceAntiSpoofStatusFakeType as json.
-func (o OptFaceAntiSpoofStatusFakeType) Encode(e *jx.Encoder) {
+// Encode encodes FakeTypeEnum as json.
+func (o OptFakeTypeEnum) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
 	e.Str(string(o.Value))
 }
 
-// Decode decodes FaceAntiSpoofStatusFakeType from json.
-func (o *OptFaceAntiSpoofStatusFakeType) Decode(d *jx.Decoder) error {
+// Decode decodes FakeTypeEnum from json.
+func (o *OptFakeTypeEnum) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptFaceAntiSpoofStatusFakeType to nil")
+		return errors.New("invalid: unable to decode OptFakeTypeEnum to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -1394,47 +3546,14 @@ func (o *OptFaceAntiSpoofStatusFakeType) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptFaceAntiSpoofStatusFakeType) MarshalJSON() ([]byte, error) {
+func (s OptFakeTypeEnum) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptFaceAntiSpoofStatusFakeType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes FaceAntiSpoofStatusStatus as json.
-func (o OptFaceAntiSpoofStatusStatus) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes FaceAntiSpoofStatusStatus from json.
-func (o *OptFaceAntiSpoofStatusStatus) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptFaceAntiSpoofStatusStatus to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptFaceAntiSpoofStatusStatus) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptFaceAntiSpoofStatusStatus) UnmarshalJSON(data []byte) error {
+func (s *OptFakeTypeEnum) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1474,6 +3593,72 @@ func (s *OptFloat64) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes IDCheckEnum as json.
+func (o OptIDCheckEnum) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes IDCheckEnum from json.
+func (o *OptIDCheckEnum) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptIDCheckEnum to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptIDCheckEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptIDCheckEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes IDTypeEnum as json.
+func (o OptIDTypeEnum) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes IDTypeEnum from json.
+func (o *OptIDTypeEnum) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptIDTypeEnum to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptIDTypeEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptIDTypeEnum) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes int as json.
 func (o OptInt) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -1509,18 +3694,18 @@ func (s *OptInt) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes OCRResultDocument as json.
-func (o OptOCRResultDocument) Encode(e *jx.Encoder) {
+// Encode encodes MaskResultEnum as json.
+func (o OptMaskResultEnum) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
 	e.Str(string(o.Value))
 }
 
-// Decode decodes OCRResultDocument from json.
-func (o *OptOCRResultDocument) Decode(d *jx.Decoder) error {
+// Decode decodes MaskResultEnum from json.
+func (o *OptMaskResultEnum) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptOCRResultDocument to nil")
+		return errors.New("invalid: unable to decode OptMaskResultEnum to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -1530,47 +3715,14 @@ func (o *OptOCRResultDocument) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptOCRResultDocument) MarshalJSON() ([]byte, error) {
+func (s OptMaskResultEnum) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptOCRResultDocument) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes OCRResultIDCheck as json.
-func (o OptOCRResultIDCheck) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes OCRResultIDCheck from json.
-func (o *OptOCRResultIDCheck) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptOCRResultIDCheck to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptOCRResultIDCheck) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptOCRResultIDCheck) UnmarshalJSON(data []byte) error {
+func (s *OptMaskResultEnum) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1604,6 +3756,39 @@ func (s OptOCRResultResultCode) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptOCRResultResultCode) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes SpoofStatusEnum as json.
+func (o OptSpoofStatusEnum) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes SpoofStatusEnum from json.
+func (o *OptSpoofStatusEnum) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptSpoofStatusEnum to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptSpoofStatusEnum) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptSpoofStatusEnum) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1643,964 +3828,42 @@ func (s *OptString) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes VerificationResultVerifyResult as json.
-func (o OptVerificationResultVerifyResult) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Int(int(o.Value))
-}
-
-// Decode decodes VerificationResultVerifyResult from json.
-func (o *OptVerificationResultVerifyResult) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptVerificationResultVerifyResult to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptVerificationResultVerifyResult) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptVerificationResultVerifyResult) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes VerificationResultWearingMask as json.
-func (o OptVerificationResultWearingMask) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes VerificationResultWearingMask from json.
-func (o *OptVerificationResultWearingMask) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptVerificationResultWearingMask to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptVerificationResultWearingMask) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptVerificationResultWearingMask) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s VerificationInput) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s VerificationInput) encodeFields(e *jx.Encoder) {
-	{
-		if s.Check3RandomPose.Set {
-			e.FieldStart("check_3_random_pose")
-			s.Check3RandomPose.Encode(e)
-		}
-	}
-	{
-		if s.Check3StraightPose.Set {
-			e.FieldStart("check_3_straight_pose")
-			s.Check3StraightPose.Encode(e)
-		}
-	}
-	{
-		if s.FakeThreshold.Set {
-			e.FieldStart("fake_threshold")
-			s.FakeThreshold.Encode(e)
-		}
-	}
-	{
-
-		e.FieldStart("image_card")
-		e.Str(s.ImageCard)
-	}
-	{
-
-		e.FieldStart("image_live")
-		e.Str(s.ImageLive)
-	}
-	{
-		if s.ImageLive1.Set {
-			e.FieldStart("image_live1")
-			s.ImageLive1.Encode(e)
-		}
-	}
-	{
-		if s.ImageLive2.Set {
-			e.FieldStart("image_live2")
-			s.ImageLive2.Encode(e)
-		}
-	}
-	{
-		if s.ImageLive3.Set {
-			e.FieldStart("image_live3")
-			s.ImageLive3.Encode(e)
-		}
-	}
-	{
-		if s.MaskThreshold.Set {
-			e.FieldStart("mask_threshold")
-			s.MaskThreshold.Encode(e)
-		}
-	}
-	{
-
-		e.FieldStart("request_id")
-		e.Str(s.RequestID)
-	}
-	{
-		if s.ReturnFeature.Set {
-			e.FieldStart("return_feature")
-			s.ReturnFeature.Encode(e)
-		}
-	}
-	{
-		if s.SimThresholdLevel1.Set {
-			e.FieldStart("sim_threshold_level1")
-			s.SimThresholdLevel1.Encode(e)
-		}
-	}
-	{
-		if s.SimThresholdLevel2.Set {
-			e.FieldStart("sim_threshold_level2")
-			s.SimThresholdLevel2.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfVerificationInput = [13]string{
-	0:  "check_3_random_pose",
-	1:  "check_3_straight_pose",
-	2:  "fake_threshold",
-	3:  "image_card",
-	4:  "image_live",
-	5:  "image_live1",
-	6:  "image_live2",
-	7:  "image_live3",
-	8:  "mask_threshold",
-	9:  "request_id",
-	10: "return_feature",
-	11: "sim_threshold_level1",
-	12: "sim_threshold_level2",
-}
-
-// Decode decodes VerificationInput from json.
-func (s *VerificationInput) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode VerificationInput to nil")
-	}
-	var requiredBitSet [2]uint8
-	s.setDefaults()
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "check_3_random_pose":
-			if err := func() error {
-				s.Check3RandomPose.Reset()
-				if err := s.Check3RandomPose.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"check_3_random_pose\"")
-			}
-		case "check_3_straight_pose":
-			if err := func() error {
-				s.Check3StraightPose.Reset()
-				if err := s.Check3StraightPose.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"check_3_straight_pose\"")
-			}
-		case "fake_threshold":
-			if err := func() error {
-				s.FakeThreshold.Reset()
-				if err := s.FakeThreshold.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"fake_threshold\"")
-			}
-		case "image_card":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := d.Str()
-				s.ImageCard = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"image_card\"")
-			}
-		case "image_live":
-			requiredBitSet[0] |= 1 << 4
-			if err := func() error {
-				v, err := d.Str()
-				s.ImageLive = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"image_live\"")
-			}
-		case "image_live1":
-			if err := func() error {
-				s.ImageLive1.Reset()
-				if err := s.ImageLive1.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"image_live1\"")
-			}
-		case "image_live2":
-			if err := func() error {
-				s.ImageLive2.Reset()
-				if err := s.ImageLive2.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"image_live2\"")
-			}
-		case "image_live3":
-			if err := func() error {
-				s.ImageLive3.Reset()
-				if err := s.ImageLive3.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"image_live3\"")
-			}
-		case "mask_threshold":
-			if err := func() error {
-				s.MaskThreshold.Reset()
-				if err := s.MaskThreshold.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mask_threshold\"")
-			}
-		case "request_id":
-			requiredBitSet[1] |= 1 << 1
-			if err := func() error {
-				v, err := d.Str()
-				s.RequestID = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"request_id\"")
-			}
-		case "return_feature":
-			if err := func() error {
-				s.ReturnFeature.Reset()
-				if err := s.ReturnFeature.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"return_feature\"")
-			}
-		case "sim_threshold_level1":
-			if err := func() error {
-				s.SimThresholdLevel1.Reset()
-				if err := s.SimThresholdLevel1.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"sim_threshold_level1\"")
-			}
-		case "sim_threshold_level2":
-			if err := func() error {
-				s.SimThresholdLevel2.Reset()
-				if err := s.SimThresholdLevel2.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"sim_threshold_level2\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode VerificationInput")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
-		0b00011000,
-		0b00000010,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfVerificationInput) {
-					name = jsonFieldsNameOfVerificationInput[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s VerificationInput) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VerificationInput) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s VerificationMessage) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s VerificationMessage) encodeFields(e *jx.Encoder) {
-	{
-		if s.APIVersion.Set {
-			e.FieldStart("api_version")
-			s.APIVersion.Encode(e)
-		}
-	}
-	{
-
-		e.FieldStart("error_code")
-		e.Str(s.ErrorCode)
-	}
-	{
-
-		e.FieldStart("error_message")
-		e.Str(s.ErrorMessage)
-	}
-}
-
-var jsonFieldsNameOfVerificationMessage = [3]string{
-	0: "api_version",
-	1: "error_code",
-	2: "error_message",
-}
-
-// Decode decodes VerificationMessage from json.
-func (s *VerificationMessage) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode VerificationMessage to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "api_version":
-			if err := func() error {
-				s.APIVersion.Reset()
-				if err := s.APIVersion.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"api_version\"")
-			}
-		case "error_code":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Str()
-				s.ErrorCode = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error_code\"")
-			}
-		case "error_message":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Str()
-				s.ErrorMessage = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error_message\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode VerificationMessage")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000110,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfVerificationMessage) {
-					name = jsonFieldsNameOfVerificationMessage[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s VerificationMessage) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VerificationMessage) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s VerificationResult) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s VerificationResult) encodeFields(e *jx.Encoder) {
-	{
-		if s.FaceAntiSpoofStatus.Set {
-			e.FieldStart("face_anti_spoof_status")
-			s.FaceAntiSpoofStatus.Encode(e)
-		}
-	}
-	{
-		if s.FaceCardAngle.Set {
-			e.FieldStart("face_card_angle")
-			s.FaceCardAngle.Encode(e)
-		}
-	}
-	{
-		if s.FaceLiveAngle.Set {
-			e.FieldStart("face_live_angle")
-			s.FaceLiveAngle.Encode(e)
-		}
-	}
-	{
-		if s.FaceLocCard != nil {
-			e.FieldStart("face_loc_card")
-			e.ArrStart()
-			for _, elem := range s.FaceLocCard {
-				e.Int(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.FaceLocLive != nil {
-			e.FieldStart("face_loc_live")
-			e.ArrStart()
-			for _, elem := range s.FaceLocLive {
-				e.Int(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.FeatureVectorFaceCard != nil {
-			e.FieldStart("feature_vector_face_card")
-			e.ArrStart()
-			for _, elem := range s.FeatureVectorFaceCard {
-				e.Float64(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.FeatureVectorFaceLive != nil {
-			e.FieldStart("feature_vector_face_live")
-			e.ArrStart()
-			for _, elem := range s.FeatureVectorFaceLive {
-				e.Float64(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-
-		e.FieldStart("message")
-		s.Message.Encode(e)
-	}
-	{
-
-		e.FieldStart("request_id")
-		e.Str(s.RequestID)
-	}
-	{
-		if s.Sim.Set {
-			e.FieldStart("sim")
-			s.Sim.Encode(e)
-		}
-	}
-	{
-		if s.VerificationTime.Set {
-			e.FieldStart("verification_time")
-			s.VerificationTime.Encode(e)
-		}
-	}
-	{
-		if s.VerifyResult.Set {
-			e.FieldStart("verify_result")
-			s.VerifyResult.Encode(e)
-		}
-	}
-	{
-		if s.VerifyResultText.Set {
-			e.FieldStart("verify_result_text")
-			s.VerifyResultText.Encode(e)
-		}
-	}
-	{
-		if s.WearingMask.Set {
-			e.FieldStart("wearing_mask")
-			s.WearingMask.Encode(e)
-		}
-	}
-	{
-		if s.WearingMaskScore.Set {
-			e.FieldStart("wearing_mask_score")
-			s.WearingMaskScore.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfVerificationResult = [15]string{
-	0:  "face_anti_spoof_status",
-	1:  "face_card_angle",
-	2:  "face_live_angle",
-	3:  "face_loc_card",
-	4:  "face_loc_live",
-	5:  "feature_vector_face_card",
-	6:  "feature_vector_face_live",
-	7:  "message",
-	8:  "request_id",
-	9:  "sim",
-	10: "verification_time",
-	11: "verify_result",
-	12: "verify_result_text",
-	13: "wearing_mask",
-	14: "wearing_mask_score",
-}
-
-// Decode decodes VerificationResult from json.
-func (s *VerificationResult) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode VerificationResult to nil")
-	}
-	var requiredBitSet [2]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "face_anti_spoof_status":
-			if err := func() error {
-				s.FaceAntiSpoofStatus.Reset()
-				if err := s.FaceAntiSpoofStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_anti_spoof_status\"")
-			}
-		case "face_card_angle":
-			if err := func() error {
-				s.FaceCardAngle.Reset()
-				if err := s.FaceCardAngle.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_card_angle\"")
-			}
-		case "face_live_angle":
-			if err := func() error {
-				s.FaceLiveAngle.Reset()
-				if err := s.FaceLiveAngle.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_live_angle\"")
-			}
-		case "face_loc_card":
-			if err := func() error {
-				s.FaceLocCard = make([]int, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem int
-					v, err := d.Int()
-					elem = int(v)
-					if err != nil {
-						return err
-					}
-					s.FaceLocCard = append(s.FaceLocCard, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_loc_card\"")
-			}
-		case "face_loc_live":
-			if err := func() error {
-				s.FaceLocLive = make([]int, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem int
-					v, err := d.Int()
-					elem = int(v)
-					if err != nil {
-						return err
-					}
-					s.FaceLocLive = append(s.FaceLocLive, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_loc_live\"")
-			}
-		case "feature_vector_face_card":
-			if err := func() error {
-				s.FeatureVectorFaceCard = make([]float64, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem float64
-					v, err := d.Float64()
-					elem = float64(v)
-					if err != nil {
-						return err
-					}
-					s.FeatureVectorFaceCard = append(s.FeatureVectorFaceCard, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"feature_vector_face_card\"")
-			}
-		case "feature_vector_face_live":
-			if err := func() error {
-				s.FeatureVectorFaceLive = make([]float64, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem float64
-					v, err := d.Float64()
-					elem = float64(v)
-					if err != nil {
-						return err
-					}
-					s.FeatureVectorFaceLive = append(s.FeatureVectorFaceLive, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"feature_vector_face_live\"")
-			}
-		case "message":
-			requiredBitSet[0] |= 1 << 7
-			if err := func() error {
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"message\"")
-			}
-		case "request_id":
-			requiredBitSet[1] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.RequestID = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"request_id\"")
-			}
-		case "sim":
-			if err := func() error {
-				s.Sim.Reset()
-				if err := s.Sim.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"sim\"")
-			}
-		case "verification_time":
-			if err := func() error {
-				s.VerificationTime.Reset()
-				if err := s.VerificationTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"verification_time\"")
-			}
-		case "verify_result":
-			if err := func() error {
-				s.VerifyResult.Reset()
-				if err := s.VerifyResult.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"verify_result\"")
-			}
-		case "verify_result_text":
-			if err := func() error {
-				s.VerifyResultText.Reset()
-				if err := s.VerifyResultText.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"verify_result_text\"")
-			}
-		case "wearing_mask":
-			if err := func() error {
-				s.WearingMask.Reset()
-				if err := s.WearingMask.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"wearing_mask\"")
-			}
-		case "wearing_mask_score":
-			if err := func() error {
-				s.WearingMaskScore.Reset()
-				if err := s.WearingMaskScore.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"wearing_mask_score\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode VerificationResult")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
-		0b10000000,
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfVerificationResult) {
-					name = jsonFieldsNameOfVerificationResult[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s VerificationResult) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VerificationResult) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes VerificationResultVerifyResult as json.
-func (s VerificationResultVerifyResult) Encode(e *jx.Encoder) {
-	e.Int(int(s))
-}
-
-// Decode decodes VerificationResultVerifyResult from json.
-func (s *VerificationResultVerifyResult) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode VerificationResultVerifyResult to nil")
-	}
-	v, err := d.Int()
-	if err != nil {
-		return err
-	}
-	*s = VerificationResultVerifyResult(v)
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s VerificationResultVerifyResult) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VerificationResultVerifyResult) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes VerificationResultWearingMask as json.
-func (s VerificationResultWearingMask) Encode(e *jx.Encoder) {
+// Encode encodes SpoofStatusEnum as json.
+func (s SpoofStatusEnum) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes VerificationResultWearingMask from json.
-func (s *VerificationResultWearingMask) Decode(d *jx.Decoder) error {
+// Decode decodes SpoofStatusEnum from json.
+func (s *SpoofStatusEnum) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VerificationResultWearingMask to nil")
+		return errors.New("invalid: unable to decode SpoofStatusEnum to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch VerificationResultWearingMask(v) {
-	case VerificationResultWearingMaskYES:
-		*s = VerificationResultWearingMaskYES
-	case VerificationResultWearingMaskNO:
-		*s = VerificationResultWearingMaskNO
+	switch SpoofStatusEnum(v) {
+	case SpoofStatusEnumFAKE:
+		*s = SpoofStatusEnumFAKE
+	case SpoofStatusEnumREAL:
+		*s = SpoofStatusEnumREAL
 	default:
-		*s = VerificationResultWearingMask(v)
+		*s = SpoofStatusEnum(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s VerificationResultWearingMask) MarshalJSON() ([]byte, error) {
+func (s SpoofStatusEnum) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VerificationResultWearingMask) UnmarshalJSON(data []byte) error {
+func (s *SpoofStatusEnum) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
