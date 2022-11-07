@@ -4,14 +4,12 @@ package api
 
 import (
 	"context"
-	"io"
-	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/go-faster/errors"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric/instrument/syncint64"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 
 	ht "github.com/ogen-go/ogen/http"
@@ -23,10 +21,7 @@ import (
 type Client struct {
 	serverURL *url.URL
 	sec       SecuritySource
-	cfg       config
-	requests  syncint64.Counter
-	errors    syncint64.Counter
-	duration  syncint64.Histogram
+	baseClient
 }
 
 // NewClient initializes new Client defined by OAS.
@@ -35,21 +30,30 @@ func NewClient(serverURL string, sec SecuritySource, opts ...Option) (*Client, e
 	if err != nil {
 		return nil, err
 	}
-	c := &Client{
-		cfg:       newConfig(opts...),
-		sec:       sec,
-		serverURL: u,
-	}
-	if c.requests, err = c.cfg.Meter.SyncInt64().Counter(otelogen.ClientRequestCount); err != nil {
+	c, err := newConfig(opts...).baseClient()
+	if err != nil {
 		return nil, err
 	}
-	if c.errors, err = c.cfg.Meter.SyncInt64().Counter(otelogen.ClientErrorsCount); err != nil {
-		return nil, err
+	return &Client{
+		serverURL:  u,
+		sec:        sec,
+		baseClient: c,
+	}, nil
+}
+
+type serverURLKey struct{}
+
+// WithServerURL sets context key to override server URL.
+func WithServerURL(ctx context.Context, u *url.URL) context.Context {
+	return context.WithValue(ctx, serverURLKey{}, u)
+}
+
+func (c *Client) requestURL(ctx context.Context) *url.URL {
+	u, ok := ctx.Value(serverURLKey{}).(*url.URL)
+	if !ok {
+		return c.serverURL
 	}
-	if c.duration, err = c.cfg.Meter.SyncInt64().Histogram(otelogen.ClientDuration); err != nil {
-		return nil, err
-	}
-	return c, nil
+	return u
 }
 
 // FaceRecognition invokes faceRecognition operation.
@@ -59,6 +63,10 @@ func NewClient(serverURL string, sec SecuritySource, opts ...Option) (*Client, e
 //
 // POST /v3.2/faceid/recognition
 func (c *Client) FaceRecognition(ctx context.Context, request FaceRecognitionReq) (res FaceRecognitionRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("faceRecognition"),
+	}
+	// Validate request before sending.
 	switch request := request.(type) {
 	case *FaceIDRecognitionInput:
 		// Validation is not required for this type.
@@ -67,78 +75,60 @@ func (c *Client) FaceRecognition(ctx context.Context, request FaceRecognitionReq
 	default:
 		return res, errors.Errorf("unexpected request type: %T", request)
 	}
+
+	// Run stopwatch.
 	startTime := time.Now()
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("faceRecognition"),
-	}
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "FaceRecognition",
 		trace.WithAttributes(otelAttrs...),
-		trace.WithSpanKind(trace.SpanKindClient),
+		clientSpanKind,
 	)
+	// Track stage for error reporting.
+	var stage string
 	defer func() {
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
 			c.errors.Add(ctx, 1, otelAttrs...)
-		} else {
-			elapsedDuration := time.Since(startTime)
-			c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
 		}
 		span.End()
 	}()
-	c.requests.Add(ctx, 1, otelAttrs...)
-	u := uri.Clone(c.serverURL)
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
 	u.Path += "/v3.2/faceid/recognition"
 
-	var (
-		contentType string
-		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
-	)
-	switch req := request.(type) {
-	case *FaceIDRecognitionInput:
-		contentType = "application/json"
-		fn, err := encodeFaceRecognitionRequestJSON(*req, span)
-		if err != nil {
-			return res, err
-		}
-		reqBody = fn
-	case *FaceIDRecognitionInputForm:
-		contentType = "multipart/form-data"
-		fn, ct, err := encodeFaceRecognitionRequest(*req, span)
-		if err != nil {
-			return res, err
-		}
-		reqBody = fn
-		contentType = ct
-	default:
-		return res, errors.Errorf("unexpected request type: %T", request)
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeFaceRecognitionRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
 	}
 
-	var r *http.Request
-	if reqBody != nil {
-		body, err := reqBody()
-		if err != nil {
-			return res, errors.Wrap(err, "request body")
-		}
-		defer body.Close()
-
-		r = ht.NewRequest(ctx, "POST", u, body)
-		r.GetBody = reqBody
-		r.Header.Set("Content-Type", contentType)
-	} else {
-		r = ht.NewRequest(ctx, "POST", u, nil)
-	}
-
+	stage = "Security:APIKey"
 	if err := c.securityAPIKey(ctx, "FaceRecognition", r); err != nil {
-		return res, errors.Wrap(err, "security")
+		return res, errors.Wrap(err, "security \"APIKey\"")
 	}
 
+	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeFaceRecognitionResponse(resp, span)
+	stage = "DecodeResponse"
+	result, err := decodeFaceRecognitionResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -152,6 +142,10 @@ func (c *Client) FaceRecognition(ctx context.Context, request FaceRecognitionReq
 //
 // POST /v3.2/faceid/register
 func (c *Client) FaceRegister(ctx context.Context, request FaceRegisterReq) (res FaceRegisterRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("faceRegister"),
+	}
+	// Validate request before sending.
 	switch request := request.(type) {
 	case *FaceIDRegisterInput:
 		// Validation is not required for this type.
@@ -160,78 +154,60 @@ func (c *Client) FaceRegister(ctx context.Context, request FaceRegisterReq) (res
 	default:
 		return res, errors.Errorf("unexpected request type: %T", request)
 	}
+
+	// Run stopwatch.
 	startTime := time.Now()
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("faceRegister"),
-	}
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "FaceRegister",
 		trace.WithAttributes(otelAttrs...),
-		trace.WithSpanKind(trace.SpanKindClient),
+		clientSpanKind,
 	)
+	// Track stage for error reporting.
+	var stage string
 	defer func() {
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
 			c.errors.Add(ctx, 1, otelAttrs...)
-		} else {
-			elapsedDuration := time.Since(startTime)
-			c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
 		}
 		span.End()
 	}()
-	c.requests.Add(ctx, 1, otelAttrs...)
-	u := uri.Clone(c.serverURL)
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
 	u.Path += "/v3.2/faceid/register"
 
-	var (
-		contentType string
-		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
-	)
-	switch req := request.(type) {
-	case *FaceIDRegisterInput:
-		contentType = "application/json"
-		fn, err := encodeFaceRegisterRequestJSON(*req, span)
-		if err != nil {
-			return res, err
-		}
-		reqBody = fn
-	case *FaceIDRegisterInputForm:
-		contentType = "multipart/form-data"
-		fn, ct, err := encodeFaceRegisterRequest(*req, span)
-		if err != nil {
-			return res, err
-		}
-		reqBody = fn
-		contentType = ct
-	default:
-		return res, errors.Errorf("unexpected request type: %T", request)
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeFaceRegisterRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
 	}
 
-	var r *http.Request
-	if reqBody != nil {
-		body, err := reqBody()
-		if err != nil {
-			return res, errors.Wrap(err, "request body")
-		}
-		defer body.Close()
-
-		r = ht.NewRequest(ctx, "POST", u, body)
-		r.GetBody = reqBody
-		r.Header.Set("Content-Type", contentType)
-	} else {
-		r = ht.NewRequest(ctx, "POST", u, nil)
-	}
-
+	stage = "Security:APIKey"
 	if err := c.securityAPIKey(ctx, "FaceRegister", r); err != nil {
-		return res, errors.Wrap(err, "security")
+		return res, errors.Wrap(err, "security \"APIKey\"")
 	}
 
+	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeFaceRegisterResponse(resp, span)
+	stage = "DecodeResponse"
+	result, err := decodeFaceRegisterResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -245,65 +221,64 @@ func (c *Client) FaceRegister(ctx context.Context, request FaceRegisterReq) (res
 //
 // POST /v3.2/faceid/delete
 func (c *Client) FaceUnregister(ctx context.Context, request FaceUnregisterReq) (res FaceUnregisterRes, err error) {
-	startTime := time.Now()
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("faceUnregister"),
 	}
+	// Validate request before sending.
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "FaceUnregister",
 		trace.WithAttributes(otelAttrs...),
-		trace.WithSpanKind(trace.SpanKindClient),
+		clientSpanKind,
 	)
+	// Track stage for error reporting.
+	var stage string
 	defer func() {
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
 			c.errors.Add(ctx, 1, otelAttrs...)
-		} else {
-			elapsedDuration := time.Since(startTime)
-			c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
 		}
 		span.End()
 	}()
-	c.requests.Add(ctx, 1, otelAttrs...)
-	u := uri.Clone(c.serverURL)
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
 	u.Path += "/v3.2/faceid/delete"
 
-	var (
-		contentType string
-		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
-	)
-	contentType = "application/json"
-	fn, err := encodeFaceUnregisterRequestJSON(request, span)
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
 	if err != nil {
-		return res, err
+		return res, errors.Wrap(err, "create request")
 	}
-	reqBody = fn
-
-	var r *http.Request
-	if reqBody != nil {
-		body, err := reqBody()
-		if err != nil {
-			return res, errors.Wrap(err, "request body")
-		}
-		defer body.Close()
-
-		r = ht.NewRequest(ctx, "POST", u, body)
-		r.GetBody = reqBody
-		r.Header.Set("Content-Type", contentType)
-	} else {
-		r = ht.NewRequest(ctx, "POST", u, nil)
+	if err := encodeFaceUnregisterRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
 	}
 
+	stage = "Security:APIKey"
 	if err := c.securityAPIKey(ctx, "FaceUnregister", r); err != nil {
-		return res, errors.Wrap(err, "security")
+		return res, errors.Wrap(err, "security \"APIKey\"")
 	}
 
+	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeFaceUnregisterResponse(resp, span)
+	stage = "DecodeResponse"
+	result, err := decodeFaceUnregisterResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -318,6 +293,10 @@ func (c *Client) FaceUnregister(ctx context.Context, request FaceUnregisterReq) 
 //
 // POST /v3.2/faceid/verification
 func (c *Client) FaceVerification(ctx context.Context, request FaceVerificationReq) (res FaceVerificationRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("faceVerification"),
+	}
+	// Validate request before sending.
 	switch request := request.(type) {
 	case *FaceIDVerificationInput:
 		if err := func() error {
@@ -340,78 +319,60 @@ func (c *Client) FaceVerification(ctx context.Context, request FaceVerificationR
 	default:
 		return res, errors.Errorf("unexpected request type: %T", request)
 	}
+
+	// Run stopwatch.
 	startTime := time.Now()
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("faceVerification"),
-	}
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "FaceVerification",
 		trace.WithAttributes(otelAttrs...),
-		trace.WithSpanKind(trace.SpanKindClient),
+		clientSpanKind,
 	)
+	// Track stage for error reporting.
+	var stage string
 	defer func() {
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
 			c.errors.Add(ctx, 1, otelAttrs...)
-		} else {
-			elapsedDuration := time.Since(startTime)
-			c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
 		}
 		span.End()
 	}()
-	c.requests.Add(ctx, 1, otelAttrs...)
-	u := uri.Clone(c.serverURL)
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
 	u.Path += "/v3.2/faceid/verification"
 
-	var (
-		contentType string
-		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
-	)
-	switch req := request.(type) {
-	case *FaceIDVerificationInput:
-		contentType = "application/json"
-		fn, err := encodeFaceVerificationRequestJSON(*req, span)
-		if err != nil {
-			return res, err
-		}
-		reqBody = fn
-	case *FaceIDVerificationInputForm:
-		contentType = "multipart/form-data"
-		fn, ct, err := encodeFaceVerificationRequest(*req, span)
-		if err != nil {
-			return res, err
-		}
-		reqBody = fn
-		contentType = ct
-	default:
-		return res, errors.Errorf("unexpected request type: %T", request)
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeFaceVerificationRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
 	}
 
-	var r *http.Request
-	if reqBody != nil {
-		body, err := reqBody()
-		if err != nil {
-			return res, errors.Wrap(err, "request body")
-		}
-		defer body.Close()
-
-		r = ht.NewRequest(ctx, "POST", u, body)
-		r.GetBody = reqBody
-		r.Header.Set("Content-Type", contentType)
-	} else {
-		r = ht.NewRequest(ctx, "POST", u, nil)
-	}
-
+	stage = "Security:APIKey"
 	if err := c.securityAPIKey(ctx, "FaceVerification", r); err != nil {
-		return res, errors.Wrap(err, "security")
+		return res, errors.Wrap(err, "security \"APIKey\"")
 	}
 
+	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeFaceVerificationResponse(resp, span)
+	stage = "DecodeResponse"
+	result, err := decodeFaceVerificationResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -426,6 +387,10 @@ func (c *Client) FaceVerification(ctx context.Context, request FaceVerificationR
 //
 // POST /v3.2/ocr/recognition
 func (c *Client) OCRecognition(ctx context.Context, request OCRInputForm) (res OCRecognitionRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("OCRecognition"),
+	}
+	// Validate request before sending.
 	if err := func() error {
 		if err := request.Validate(); err != nil {
 			return err
@@ -434,66 +399,60 @@ func (c *Client) OCRecognition(ctx context.Context, request OCRInputForm) (res O
 	}(); err != nil {
 		return res, errors.Wrap(err, "validate")
 	}
+
+	// Run stopwatch.
 	startTime := time.Now()
-	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("OCRecognition"),
-	}
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, otelAttrs...)
+
+	// Start a span for this request.
 	ctx, span := c.cfg.Tracer.Start(ctx, "OCRecognition",
 		trace.WithAttributes(otelAttrs...),
-		trace.WithSpanKind(trace.SpanKindClient),
+		clientSpanKind,
 	)
+	// Track stage for error reporting.
+	var stage string
 	defer func() {
 		if err != nil {
 			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
 			c.errors.Add(ctx, 1, otelAttrs...)
-		} else {
-			elapsedDuration := time.Since(startTime)
-			c.duration.Record(ctx, elapsedDuration.Microseconds(), otelAttrs...)
 		}
 		span.End()
 	}()
-	c.requests.Add(ctx, 1, otelAttrs...)
-	u := uri.Clone(c.serverURL)
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
 	u.Path += "/v3.2/ocr/recognition"
 
-	var (
-		contentType string
-		reqBody     func() (io.ReadCloser, error) // nil, if request type is optional and value is not set.
-	)
-	contentType = "multipart/form-data"
-	fn, ct, err := encodeOCRecognitionRequest(request, span)
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u, nil)
 	if err != nil {
-		return res, err
+		return res, errors.Wrap(err, "create request")
 	}
-	reqBody = fn
-	contentType = ct
-
-	var r *http.Request
-	if reqBody != nil {
-		body, err := reqBody()
-		if err != nil {
-			return res, errors.Wrap(err, "request body")
-		}
-		defer body.Close()
-
-		r = ht.NewRequest(ctx, "POST", u, body)
-		r.GetBody = reqBody
-		r.Header.Set("Content-Type", contentType)
-	} else {
-		r = ht.NewRequest(ctx, "POST", u, nil)
+	if err := encodeOCRecognitionRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
 	}
 
+	stage = "Security:APIKey"
 	if err := c.securityAPIKey(ctx, "OCRecognition", r); err != nil {
-		return res, errors.Wrap(err, "security")
+		return res, errors.Wrap(err, "security \"APIKey\"")
 	}
 
+	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeOCRecognitionResponse(resp, span)
+	stage = "DecodeResponse"
+	result, err := decodeOCRecognitionResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

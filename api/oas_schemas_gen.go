@@ -10,6 +10,16 @@ type APIKey struct {
 	APIKey string
 }
 
+// GetAPIKey returns the value of APIKey.
+func (s APIKey) GetAPIKey() string {
+	return s.APIKey
+}
+
+// SetAPIKey sets the value of APIKey.
+func (s *APIKey) SetAPIKey(val string) {
+	s.APIKey = val
+}
+
 // Thông tin mô tả các loại giấy tờ:
 // * `CCCD` - (Căn cước công dân)
 // * `NEW ID` - (CMT 12 số)
@@ -46,44 +56,164 @@ const (
 // } ```.
 // Ref: #/components/schemas/FaceAntiSpoofStatus
 type FaceAntiSpoofStatus struct {
-	FakeCode OptSpoofStatusEnum "json:\"fake_code\""
+	Status   OptSpoofStatusEnum `json:"status"`
+	FakeCode OptSpoofStatusEnum `json:"fake_code"`
 	// Mức độ giả mạo ảnh chụp chân dung, khoảng giá trị [0-1.0]:
 	// - 1.0: ảnh giả
 	// - 0.0: ảnh thật
 	// NOTE: By our experiments, threshold to judge an image is fake is fake_score > 0.63.
-	FakeScore OptFloat64      "json:\"fake_score\""
-	FakeType  OptFakeTypeEnum "json:\"fake_type\""
+	FakeScore OptFloat64      `json:"fake_score"`
+	FakeType  OptFakeTypeEnum `json:"fake_type"`
 	// Trả về khi check_3_random_pose==1. Score matching giữa ảnh live với 3 ảnh đưa vào
 	// kiểm tra.
-	LivenessCompareScores OptString          "json:\"liveness_compare_scores\""
-	Status                OptSpoofStatusEnum "json:\"status\""
+	LivenessCompareScores OptString `json:"liveness_compare_scores"`
+}
+
+// GetStatus returns the value of Status.
+func (s FaceAntiSpoofStatus) GetStatus() OptSpoofStatusEnum {
+	return s.Status
+}
+
+// GetFakeCode returns the value of FakeCode.
+func (s FaceAntiSpoofStatus) GetFakeCode() OptSpoofStatusEnum {
+	return s.FakeCode
+}
+
+// GetFakeScore returns the value of FakeScore.
+func (s FaceAntiSpoofStatus) GetFakeScore() OptFloat64 {
+	return s.FakeScore
+}
+
+// GetFakeType returns the value of FakeType.
+func (s FaceAntiSpoofStatus) GetFakeType() OptFakeTypeEnum {
+	return s.FakeType
+}
+
+// GetLivenessCompareScores returns the value of LivenessCompareScores.
+func (s FaceAntiSpoofStatus) GetLivenessCompareScores() OptString {
+	return s.LivenessCompareScores
+}
+
+// SetStatus sets the value of Status.
+func (s *FaceAntiSpoofStatus) SetStatus(val OptSpoofStatusEnum) {
+	s.Status = val
+}
+
+// SetFakeCode sets the value of FakeCode.
+func (s *FaceAntiSpoofStatus) SetFakeCode(val OptSpoofStatusEnum) {
+	s.FakeCode = val
+}
+
+// SetFakeScore sets the value of FakeScore.
+func (s *FaceAntiSpoofStatus) SetFakeScore(val OptFloat64) {
+	s.FakeScore = val
+}
+
+// SetFakeType sets the value of FakeType.
+func (s *FaceAntiSpoofStatus) SetFakeType(val OptFakeTypeEnum) {
+	s.FakeType = val
+}
+
+// SetLivenessCompareScores sets the value of LivenessCompareScores.
+func (s *FaceAntiSpoofStatus) SetLivenessCompareScores(val OptString) {
+	s.LivenessCompareScores = val
 }
 
 type FaceFeature []float64
 
 // Ref: #/components/schemas/FaceIDRecognitionInput
 type FaceIDRecognitionInput struct {
-	Image     string "json:\"image\""
-	RequestID string "json:\"request_id\""
+	RequestID string `json:"request_id"`
+	Image     string `json:"image"`
+}
+
+// GetRequestID returns the value of RequestID.
+func (s FaceIDRecognitionInput) GetRequestID() string {
+	return s.RequestID
+}
+
+// GetImage returns the value of Image.
+func (s FaceIDRecognitionInput) GetImage() string {
+	return s.Image
+}
+
+// SetRequestID sets the value of RequestID.
+func (s *FaceIDRecognitionInput) SetRequestID(val string) {
+	s.RequestID = val
+}
+
+// SetImage sets the value of Image.
+func (s *FaceIDRecognitionInput) SetImage(val string) {
+	s.Image = val
 }
 
 func (*FaceIDRecognitionInput) faceRecognitionReq() {}
 
 // Ref: #/components/schemas/FaceIDRecognitionInput
 type FaceIDRecognitionInputForm struct {
-	Image     ht.MultipartFile "json:\"image\""
-	RequestID string           "json:\"request_id\""
+	RequestID string           `json:"request_id"`
+	Image     ht.MultipartFile `json:"image"`
+}
+
+// GetRequestID returns the value of RequestID.
+func (s FaceIDRecognitionInputForm) GetRequestID() string {
+	return s.RequestID
+}
+
+// GetImage returns the value of Image.
+func (s FaceIDRecognitionInputForm) GetImage() ht.MultipartFile {
+	return s.Image
+}
+
+// SetRequestID sets the value of RequestID.
+func (s *FaceIDRecognitionInputForm) SetRequestID(val string) {
+	s.RequestID = val
+}
+
+// SetImage sets the value of Image.
+func (s *FaceIDRecognitionInputForm) SetImage(val ht.MultipartFile) {
+	s.Image = val
 }
 
 func (*FaceIDRecognitionInputForm) faceRecognitionReq() {}
 
 // Ref: #/components/schemas/FaceIDRecognitionResult
 type FaceIDRecognitionResult struct {
-	Message Message "json:\"message\""
+	Message Message `json:"message"`
 	// List of photos with faces similar to the one imported.
-	RecognitionResult []FaceRecognitionResult "json:\"recognition_result\""
+	RecognitionResult []FaceRecognitionResult `json:"recognition_result"`
 	// Time handle request.
-	RecognitionTime OptFloat64 "json:\"recognition_time\""
+	RecognitionTime OptFloat64 `json:"recognition_time"`
+}
+
+// GetMessage returns the value of Message.
+func (s FaceIDRecognitionResult) GetMessage() Message {
+	return s.Message
+}
+
+// GetRecognitionResult returns the value of RecognitionResult.
+func (s FaceIDRecognitionResult) GetRecognitionResult() []FaceRecognitionResult {
+	return s.RecognitionResult
+}
+
+// GetRecognitionTime returns the value of RecognitionTime.
+func (s FaceIDRecognitionResult) GetRecognitionTime() OptFloat64 {
+	return s.RecognitionTime
+}
+
+// SetMessage sets the value of Message.
+func (s *FaceIDRecognitionResult) SetMessage(val Message) {
+	s.Message = val
+}
+
+// SetRecognitionResult sets the value of RecognitionResult.
+func (s *FaceIDRecognitionResult) SetRecognitionResult(val []FaceRecognitionResult) {
+	s.RecognitionResult = val
+}
+
+// SetRecognitionTime sets the value of RecognitionTime.
+func (s *FaceIDRecognitionResult) SetRecognitionTime(val OptFloat64) {
+	s.RecognitionTime = val
 }
 
 func (*FaceIDRecognitionResult) faceRecognitionRes() {}
@@ -92,16 +222,56 @@ func (*FaceIDRecognitionResult) faceRecognitionRes() {}
 // Ref: #/components/schemas/FaceIDRegisterInput
 type FaceIDRegisterInput struct {
 	// Customer is unique name. Used in case many customers have the same real name.
-	UniqueName string "json:\"unique_name\""
+	UniqueName string `json:"unique_name"`
+	// Image of consumer.
+	Image string `json:"image"`
+	// Name of consumer.
+	PersonName OptString `json:"person_name"`
 	// Optional field,request system overrides customer registration. Used in case this photo or similar
 	// photo of the customer has been previously registered.
 	// * `0` - Default registration is not required
 	// * `1` - Registration required.
-	Force OptInt "json:\"force\""
-	// Image of consumer.
-	Image string "json:\"image\""
-	// Name of consumer.
-	PersonName OptString "json:\"person_name\""
+	Force OptInt `json:"force"`
+}
+
+// GetUniqueName returns the value of UniqueName.
+func (s FaceIDRegisterInput) GetUniqueName() string {
+	return s.UniqueName
+}
+
+// GetImage returns the value of Image.
+func (s FaceIDRegisterInput) GetImage() string {
+	return s.Image
+}
+
+// GetPersonName returns the value of PersonName.
+func (s FaceIDRegisterInput) GetPersonName() OptString {
+	return s.PersonName
+}
+
+// GetForce returns the value of Force.
+func (s FaceIDRegisterInput) GetForce() OptInt {
+	return s.Force
+}
+
+// SetUniqueName sets the value of UniqueName.
+func (s *FaceIDRegisterInput) SetUniqueName(val string) {
+	s.UniqueName = val
+}
+
+// SetImage sets the value of Image.
+func (s *FaceIDRegisterInput) SetImage(val string) {
+	s.Image = val
+}
+
+// SetPersonName sets the value of PersonName.
+func (s *FaceIDRegisterInput) SetPersonName(val OptString) {
+	s.PersonName = val
+}
+
+// SetForce sets the value of Force.
+func (s *FaceIDRegisterInput) SetForce(val OptInt) {
+	s.Force = val
 }
 
 func (*FaceIDRegisterInput) faceRegisterReq() {}
@@ -110,16 +280,56 @@ func (*FaceIDRegisterInput) faceRegisterReq() {}
 // Ref: #/components/schemas/FaceIDRegisterInput
 type FaceIDRegisterInputForm struct {
 	// Customer is unique name. Used in case many customers have the same real name.
-	UniqueName string "json:\"unique_name\""
+	UniqueName string `json:"unique_name"`
+	// Image of consumer.
+	Image ht.MultipartFile `json:"image"`
+	// Name of consumer.
+	PersonName OptString `json:"person_name"`
 	// Optional field,request system overrides customer registration. Used in case this photo or similar
 	// photo of the customer has been previously registered.
 	// * `0` - Default registration is not required
 	// * `1` - Registration required.
-	Force OptInt "json:\"force\""
-	// Image of consumer.
-	Image ht.MultipartFile "json:\"image\""
-	// Name of consumer.
-	PersonName OptString "json:\"person_name\""
+	Force OptInt `json:"force"`
+}
+
+// GetUniqueName returns the value of UniqueName.
+func (s FaceIDRegisterInputForm) GetUniqueName() string {
+	return s.UniqueName
+}
+
+// GetImage returns the value of Image.
+func (s FaceIDRegisterInputForm) GetImage() ht.MultipartFile {
+	return s.Image
+}
+
+// GetPersonName returns the value of PersonName.
+func (s FaceIDRegisterInputForm) GetPersonName() OptString {
+	return s.PersonName
+}
+
+// GetForce returns the value of Force.
+func (s FaceIDRegisterInputForm) GetForce() OptInt {
+	return s.Force
+}
+
+// SetUniqueName sets the value of UniqueName.
+func (s *FaceIDRegisterInputForm) SetUniqueName(val string) {
+	s.UniqueName = val
+}
+
+// SetImage sets the value of Image.
+func (s *FaceIDRegisterInputForm) SetImage(val ht.MultipartFile) {
+	s.Image = val
+}
+
+// SetPersonName sets the value of PersonName.
+func (s *FaceIDRegisterInputForm) SetPersonName(val OptString) {
+	s.PersonName = val
+}
+
+// SetForce sets the value of Force.
+func (s *FaceIDRegisterInputForm) SetForce(val OptInt) {
+	s.Force = val
 }
 
 func (*FaceIDRegisterInputForm) faceRegisterReq() {}
@@ -127,15 +337,85 @@ func (*FaceIDRegisterInputForm) faceRegisterReq() {}
 // Ref: #/components/schemas/FaceIDRegisterResult
 type FaceIDRegisterResult struct {
 	// Góc nghiêng của khuôn mặt ở ảnh.
-	FaceCardAngle OptInt "json:\"face_card_angle\""
-	// ID of face register in database.
-	FaceID OptInt "json:\"face_id\""
+	FaceCardAngle OptInt `json:"face_card_angle"`
 	// Position of faces in photos. Format: [left, top, right, bottom].
-	FaceLoc       []int      "json:\"face_loc\""
-	MatchedScore  OptFloat64 "json:\"matched_score\""
-	Message       Message    "json:\"message\""
-	SamePersonThr OptFloat64 "json:\"same_person_thr\""
-	UniqueName    OptString  "json:\"unique_name\""
+	FaceLoc    []int     `json:"face_loc"`
+	Message    Message   `json:"message"`
+	UniqueName OptString `json:"unique_name"`
+	// ID of face register in database.
+	FaceID        OptInt     `json:"face_id"`
+	MatchedScore  OptFloat64 `json:"matched_score"`
+	SamePersonThr OptFloat64 `json:"same_person_thr"`
+}
+
+// GetFaceCardAngle returns the value of FaceCardAngle.
+func (s FaceIDRegisterResult) GetFaceCardAngle() OptInt {
+	return s.FaceCardAngle
+}
+
+// GetFaceLoc returns the value of FaceLoc.
+func (s FaceIDRegisterResult) GetFaceLoc() []int {
+	return s.FaceLoc
+}
+
+// GetMessage returns the value of Message.
+func (s FaceIDRegisterResult) GetMessage() Message {
+	return s.Message
+}
+
+// GetUniqueName returns the value of UniqueName.
+func (s FaceIDRegisterResult) GetUniqueName() OptString {
+	return s.UniqueName
+}
+
+// GetFaceID returns the value of FaceID.
+func (s FaceIDRegisterResult) GetFaceID() OptInt {
+	return s.FaceID
+}
+
+// GetMatchedScore returns the value of MatchedScore.
+func (s FaceIDRegisterResult) GetMatchedScore() OptFloat64 {
+	return s.MatchedScore
+}
+
+// GetSamePersonThr returns the value of SamePersonThr.
+func (s FaceIDRegisterResult) GetSamePersonThr() OptFloat64 {
+	return s.SamePersonThr
+}
+
+// SetFaceCardAngle sets the value of FaceCardAngle.
+func (s *FaceIDRegisterResult) SetFaceCardAngle(val OptInt) {
+	s.FaceCardAngle = val
+}
+
+// SetFaceLoc sets the value of FaceLoc.
+func (s *FaceIDRegisterResult) SetFaceLoc(val []int) {
+	s.FaceLoc = val
+}
+
+// SetMessage sets the value of Message.
+func (s *FaceIDRegisterResult) SetMessage(val Message) {
+	s.Message = val
+}
+
+// SetUniqueName sets the value of UniqueName.
+func (s *FaceIDRegisterResult) SetUniqueName(val OptString) {
+	s.UniqueName = val
+}
+
+// SetFaceID sets the value of FaceID.
+func (s *FaceIDRegisterResult) SetFaceID(val OptInt) {
+	s.FaceID = val
+}
+
+// SetMatchedScore sets the value of MatchedScore.
+func (s *FaceIDRegisterResult) SetMatchedScore(val OptFloat64) {
+	s.MatchedScore = val
+}
+
+// SetSamePersonThr sets the value of SamePersonThr.
+func (s *FaceIDRegisterResult) SetSamePersonThr(val OptFloat64) {
+	s.SamePersonThr = val
 }
 
 func (*FaceIDRegisterResult) faceRegisterRes() {}
@@ -144,11 +424,51 @@ func (*FaceIDRegisterResult) faceRegisterRes() {}
 // Ref: #/components/schemas/FaceIDResult
 type FaceIDResult struct {
 	// Customer is unique name. Used in case many customers have the same real name.
-	UniqueName   string           "json:\"unique_name\""
-	CompareScore float64          "json:\"compare_score\""
-	Info         FaceIDResultInfo "json:\"info\""
+	UniqueName   string           `json:"unique_name"`
+	CompareScore float64          `json:"compare_score"`
+	Info         FaceIDResultInfo `json:"info"`
 	// Name of consumer.
-	PersonName OptString "json:\"person_name\""
+	PersonName OptString `json:"person_name"`
+}
+
+// GetUniqueName returns the value of UniqueName.
+func (s FaceIDResult) GetUniqueName() string {
+	return s.UniqueName
+}
+
+// GetCompareScore returns the value of CompareScore.
+func (s FaceIDResult) GetCompareScore() float64 {
+	return s.CompareScore
+}
+
+// GetInfo returns the value of Info.
+func (s FaceIDResult) GetInfo() FaceIDResultInfo {
+	return s.Info
+}
+
+// GetPersonName returns the value of PersonName.
+func (s FaceIDResult) GetPersonName() OptString {
+	return s.PersonName
+}
+
+// SetUniqueName sets the value of UniqueName.
+func (s *FaceIDResult) SetUniqueName(val string) {
+	s.UniqueName = val
+}
+
+// SetCompareScore sets the value of CompareScore.
+func (s *FaceIDResult) SetCompareScore(val float64) {
+	s.CompareScore = val
+}
+
+// SetInfo sets the value of Info.
+func (s *FaceIDResult) SetInfo(val FaceIDResultInfo) {
+	s.Info = val
+}
+
+// SetPersonName sets the value of PersonName.
+func (s *FaceIDResult) SetPersonName(val OptString) {
+	s.PersonName = val
 }
 
 type FaceIDResultInfo map[string]string
@@ -164,111 +484,521 @@ func (s *FaceIDResultInfo) init() FaceIDResultInfo {
 
 // Ref: #/components/schemas/FaceIDVerificationInput
 type FaceIDVerificationInput struct {
-	// Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không.
-	Check3RandomPose OptInt "json:\"check_3_random_pose\""
-	// Kiểm tra các ảnh khuôn mặt có fake hay không.
-	Check3StraightPose OptInt "json:\"check_3_straight_pose\""
-	// Giá trị dùng để check xem khuôn mặt live có phải fake.
-	FakeThreshold OptFloat64 "json:\"fake_threshold\""
-	// Ảnh card id (chứng minh thư, căn cước công dân) của người dùng.
-	ImageCard string "json:\"image_card\""
-	// Ảnh chụp khuôn mặt.
-	ImageLive string "json:\"image_live\""
-	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
-	// thực khuôn mặt.
-	ImageLive1 OptString "json:\"image_live1\""
-	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
-	// thực khuôn mặt.
-	ImageLive2 OptString "json:\"image_live2\""
-	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
-	// thực khuôn mặt.
-	ImageLive3 OptString "json:\"image_live3\""
-	// Threshold để kiểm tra xem có đeo khẩu trang hay không.
-	MaskThreshold OptFloat64 "json:\"mask_threshold\""
 	// Request ID.
-	RequestID string "json:\"request_id\""
+	RequestID string `json:"request_id"`
+	// Ảnh card id (chứng minh thư, căn cước công dân) của người dùng.
+	ImageCard string `json:"image_card"`
+	// Ảnh chụp khuôn mặt.
+	ImageLive string `json:"image_live"`
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive1 OptString `json:"image_live1"`
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive2 OptString `json:"image_live2"`
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive3 OptString `json:"image_live3"`
+	// Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không.
+	Check3RandomPose OptInt `json:"check_3_random_pose"`
+	// Kiểm tra các ảnh khuôn mặt có fake hay không.
+	Check3StraightPose OptInt `json:"check_3_straight_pose"`
 	// Trả về face feature vector hay không.
-	ReturnFeature OptInt "json:\"return_feature\""
+	ReturnFeature OptInt `json:"return_feature"`
+	// Threshold để kiểm tra xem có đeo khẩu trang hay không.
+	MaskThreshold OptFloat64 `json:"mask_threshold"`
+	// Giá trị dùng để check xem khuôn mặt live có phải fake.
+	FakeThreshold OptFloat64 `json:"fake_threshold"`
 	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
 	// độ tương đồng < sim_threshold_level2 ==> có thể cùng 1 người độ tương đồng
 	// >= sim_threshold_level2 ==> cùng 1 người.
-	SimThresholdLevel1 OptFloat64 "json:\"sim_threshold_level1\""
+	SimThresholdLevel1 OptFloat64 `json:"sim_threshold_level1"`
 	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
 	// độ tương đồng < sim_threshold_level2 ==> có thể cùng 1 người độ tương đồng
 	// >= sim_threshold_level2 ==> cùng 1 người.
-	SimThresholdLevel2 OptFloat64 "json:\"sim_threshold_level2\""
+	SimThresholdLevel2 OptFloat64 `json:"sim_threshold_level2"`
+}
+
+// GetRequestID returns the value of RequestID.
+func (s FaceIDVerificationInput) GetRequestID() string {
+	return s.RequestID
+}
+
+// GetImageCard returns the value of ImageCard.
+func (s FaceIDVerificationInput) GetImageCard() string {
+	return s.ImageCard
+}
+
+// GetImageLive returns the value of ImageLive.
+func (s FaceIDVerificationInput) GetImageLive() string {
+	return s.ImageLive
+}
+
+// GetImageLive1 returns the value of ImageLive1.
+func (s FaceIDVerificationInput) GetImageLive1() OptString {
+	return s.ImageLive1
+}
+
+// GetImageLive2 returns the value of ImageLive2.
+func (s FaceIDVerificationInput) GetImageLive2() OptString {
+	return s.ImageLive2
+}
+
+// GetImageLive3 returns the value of ImageLive3.
+func (s FaceIDVerificationInput) GetImageLive3() OptString {
+	return s.ImageLive3
+}
+
+// GetCheck3RandomPose returns the value of Check3RandomPose.
+func (s FaceIDVerificationInput) GetCheck3RandomPose() OptInt {
+	return s.Check3RandomPose
+}
+
+// GetCheck3StraightPose returns the value of Check3StraightPose.
+func (s FaceIDVerificationInput) GetCheck3StraightPose() OptInt {
+	return s.Check3StraightPose
+}
+
+// GetReturnFeature returns the value of ReturnFeature.
+func (s FaceIDVerificationInput) GetReturnFeature() OptInt {
+	return s.ReturnFeature
+}
+
+// GetMaskThreshold returns the value of MaskThreshold.
+func (s FaceIDVerificationInput) GetMaskThreshold() OptFloat64 {
+	return s.MaskThreshold
+}
+
+// GetFakeThreshold returns the value of FakeThreshold.
+func (s FaceIDVerificationInput) GetFakeThreshold() OptFloat64 {
+	return s.FakeThreshold
+}
+
+// GetSimThresholdLevel1 returns the value of SimThresholdLevel1.
+func (s FaceIDVerificationInput) GetSimThresholdLevel1() OptFloat64 {
+	return s.SimThresholdLevel1
+}
+
+// GetSimThresholdLevel2 returns the value of SimThresholdLevel2.
+func (s FaceIDVerificationInput) GetSimThresholdLevel2() OptFloat64 {
+	return s.SimThresholdLevel2
+}
+
+// SetRequestID sets the value of RequestID.
+func (s *FaceIDVerificationInput) SetRequestID(val string) {
+	s.RequestID = val
+}
+
+// SetImageCard sets the value of ImageCard.
+func (s *FaceIDVerificationInput) SetImageCard(val string) {
+	s.ImageCard = val
+}
+
+// SetImageLive sets the value of ImageLive.
+func (s *FaceIDVerificationInput) SetImageLive(val string) {
+	s.ImageLive = val
+}
+
+// SetImageLive1 sets the value of ImageLive1.
+func (s *FaceIDVerificationInput) SetImageLive1(val OptString) {
+	s.ImageLive1 = val
+}
+
+// SetImageLive2 sets the value of ImageLive2.
+func (s *FaceIDVerificationInput) SetImageLive2(val OptString) {
+	s.ImageLive2 = val
+}
+
+// SetImageLive3 sets the value of ImageLive3.
+func (s *FaceIDVerificationInput) SetImageLive3(val OptString) {
+	s.ImageLive3 = val
+}
+
+// SetCheck3RandomPose sets the value of Check3RandomPose.
+func (s *FaceIDVerificationInput) SetCheck3RandomPose(val OptInt) {
+	s.Check3RandomPose = val
+}
+
+// SetCheck3StraightPose sets the value of Check3StraightPose.
+func (s *FaceIDVerificationInput) SetCheck3StraightPose(val OptInt) {
+	s.Check3StraightPose = val
+}
+
+// SetReturnFeature sets the value of ReturnFeature.
+func (s *FaceIDVerificationInput) SetReturnFeature(val OptInt) {
+	s.ReturnFeature = val
+}
+
+// SetMaskThreshold sets the value of MaskThreshold.
+func (s *FaceIDVerificationInput) SetMaskThreshold(val OptFloat64) {
+	s.MaskThreshold = val
+}
+
+// SetFakeThreshold sets the value of FakeThreshold.
+func (s *FaceIDVerificationInput) SetFakeThreshold(val OptFloat64) {
+	s.FakeThreshold = val
+}
+
+// SetSimThresholdLevel1 sets the value of SimThresholdLevel1.
+func (s *FaceIDVerificationInput) SetSimThresholdLevel1(val OptFloat64) {
+	s.SimThresholdLevel1 = val
+}
+
+// SetSimThresholdLevel2 sets the value of SimThresholdLevel2.
+func (s *FaceIDVerificationInput) SetSimThresholdLevel2(val OptFloat64) {
+	s.SimThresholdLevel2 = val
 }
 
 func (*FaceIDVerificationInput) faceVerificationReq() {}
 
 // Ref: #/components/schemas/FaceIDVerificationInput
 type FaceIDVerificationInputForm struct {
-	// Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không.
-	Check3RandomPose OptInt "json:\"check_3_random_pose\""
-	// Kiểm tra các ảnh khuôn mặt có fake hay không.
-	Check3StraightPose OptInt "json:\"check_3_straight_pose\""
-	// Giá trị dùng để check xem khuôn mặt live có phải fake.
-	FakeThreshold OptFloat64 "json:\"fake_threshold\""
-	// Ảnh card id (chứng minh thư, căn cước công dân) của người dùng.
-	ImageCard ht.MultipartFile "json:\"image_card\""
-	// Ảnh chụp khuôn mặt.
-	ImageLive ht.MultipartFile "json:\"image_live\""
-	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
-	// thực khuôn mặt.
-	ImageLive1 OptMultipartFile "json:\"image_live1\""
-	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
-	// thực khuôn mặt.
-	ImageLive2 OptMultipartFile "json:\"image_live2\""
-	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
-	// thực khuôn mặt.
-	ImageLive3 OptMultipartFile "json:\"image_live3\""
-	// Threshold để kiểm tra xem có đeo khẩu trang hay không.
-	MaskThreshold OptFloat64 "json:\"mask_threshold\""
 	// Request ID.
-	RequestID string "json:\"request_id\""
+	RequestID string `json:"request_id"`
+	// Ảnh card id (chứng minh thư, căn cước công dân) của người dùng.
+	ImageCard ht.MultipartFile `json:"image_card"`
+	// Ảnh chụp khuôn mặt.
+	ImageLive ht.MultipartFile `json:"image_live"`
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive1 OptMultipartFile `json:"image_live1"`
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive2 OptMultipartFile `json:"image_live2"`
+	// Ảnh chụp khuôn mặt ở các góc độ khác nhau để tăng độ chính xác khi xác
+	// thực khuôn mặt.
+	ImageLive3 OptMultipartFile `json:"image_live3"`
+	// Kiểm tra các ảnh live image có phải cùng một khuôn mặt hay không.
+	Check3RandomPose OptInt `json:"check_3_random_pose"`
+	// Kiểm tra các ảnh khuôn mặt có fake hay không.
+	Check3StraightPose OptInt `json:"check_3_straight_pose"`
 	// Trả về face feature vector hay không.
-	ReturnFeature OptInt "json:\"return_feature\""
+	ReturnFeature OptInt `json:"return_feature"`
+	// Threshold để kiểm tra xem có đeo khẩu trang hay không.
+	MaskThreshold OptFloat64 `json:"mask_threshold"`
+	// Giá trị dùng để check xem khuôn mặt live có phải fake.
+	FakeThreshold OptFloat64 `json:"fake_threshold"`
 	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
 	// độ tương đồng < sim_threshold_level2 ==> có thể cùng 1 người độ tương đồng
 	// >= sim_threshold_level2 ==> cùng 1 người.
-	SimThresholdLevel1 OptFloat64 "json:\"sim_threshold_level1\""
+	SimThresholdLevel1 OptFloat64 `json:"sim_threshold_level1"`
 	// Độ tương đồng <= sim_threshold_level1 => không cùng 1 người sim_threshold_level1 <
 	// độ tương đồng < sim_threshold_level2 ==> có thể cùng 1 người độ tương đồng
 	// >= sim_threshold_level2 ==> cùng 1 người.
-	SimThresholdLevel2 OptFloat64 "json:\"sim_threshold_level2\""
+	SimThresholdLevel2 OptFloat64 `json:"sim_threshold_level2"`
+}
+
+// GetRequestID returns the value of RequestID.
+func (s FaceIDVerificationInputForm) GetRequestID() string {
+	return s.RequestID
+}
+
+// GetImageCard returns the value of ImageCard.
+func (s FaceIDVerificationInputForm) GetImageCard() ht.MultipartFile {
+	return s.ImageCard
+}
+
+// GetImageLive returns the value of ImageLive.
+func (s FaceIDVerificationInputForm) GetImageLive() ht.MultipartFile {
+	return s.ImageLive
+}
+
+// GetImageLive1 returns the value of ImageLive1.
+func (s FaceIDVerificationInputForm) GetImageLive1() OptMultipartFile {
+	return s.ImageLive1
+}
+
+// GetImageLive2 returns the value of ImageLive2.
+func (s FaceIDVerificationInputForm) GetImageLive2() OptMultipartFile {
+	return s.ImageLive2
+}
+
+// GetImageLive3 returns the value of ImageLive3.
+func (s FaceIDVerificationInputForm) GetImageLive3() OptMultipartFile {
+	return s.ImageLive3
+}
+
+// GetCheck3RandomPose returns the value of Check3RandomPose.
+func (s FaceIDVerificationInputForm) GetCheck3RandomPose() OptInt {
+	return s.Check3RandomPose
+}
+
+// GetCheck3StraightPose returns the value of Check3StraightPose.
+func (s FaceIDVerificationInputForm) GetCheck3StraightPose() OptInt {
+	return s.Check3StraightPose
+}
+
+// GetReturnFeature returns the value of ReturnFeature.
+func (s FaceIDVerificationInputForm) GetReturnFeature() OptInt {
+	return s.ReturnFeature
+}
+
+// GetMaskThreshold returns the value of MaskThreshold.
+func (s FaceIDVerificationInputForm) GetMaskThreshold() OptFloat64 {
+	return s.MaskThreshold
+}
+
+// GetFakeThreshold returns the value of FakeThreshold.
+func (s FaceIDVerificationInputForm) GetFakeThreshold() OptFloat64 {
+	return s.FakeThreshold
+}
+
+// GetSimThresholdLevel1 returns the value of SimThresholdLevel1.
+func (s FaceIDVerificationInputForm) GetSimThresholdLevel1() OptFloat64 {
+	return s.SimThresholdLevel1
+}
+
+// GetSimThresholdLevel2 returns the value of SimThresholdLevel2.
+func (s FaceIDVerificationInputForm) GetSimThresholdLevel2() OptFloat64 {
+	return s.SimThresholdLevel2
+}
+
+// SetRequestID sets the value of RequestID.
+func (s *FaceIDVerificationInputForm) SetRequestID(val string) {
+	s.RequestID = val
+}
+
+// SetImageCard sets the value of ImageCard.
+func (s *FaceIDVerificationInputForm) SetImageCard(val ht.MultipartFile) {
+	s.ImageCard = val
+}
+
+// SetImageLive sets the value of ImageLive.
+func (s *FaceIDVerificationInputForm) SetImageLive(val ht.MultipartFile) {
+	s.ImageLive = val
+}
+
+// SetImageLive1 sets the value of ImageLive1.
+func (s *FaceIDVerificationInputForm) SetImageLive1(val OptMultipartFile) {
+	s.ImageLive1 = val
+}
+
+// SetImageLive2 sets the value of ImageLive2.
+func (s *FaceIDVerificationInputForm) SetImageLive2(val OptMultipartFile) {
+	s.ImageLive2 = val
+}
+
+// SetImageLive3 sets the value of ImageLive3.
+func (s *FaceIDVerificationInputForm) SetImageLive3(val OptMultipartFile) {
+	s.ImageLive3 = val
+}
+
+// SetCheck3RandomPose sets the value of Check3RandomPose.
+func (s *FaceIDVerificationInputForm) SetCheck3RandomPose(val OptInt) {
+	s.Check3RandomPose = val
+}
+
+// SetCheck3StraightPose sets the value of Check3StraightPose.
+func (s *FaceIDVerificationInputForm) SetCheck3StraightPose(val OptInt) {
+	s.Check3StraightPose = val
+}
+
+// SetReturnFeature sets the value of ReturnFeature.
+func (s *FaceIDVerificationInputForm) SetReturnFeature(val OptInt) {
+	s.ReturnFeature = val
+}
+
+// SetMaskThreshold sets the value of MaskThreshold.
+func (s *FaceIDVerificationInputForm) SetMaskThreshold(val OptFloat64) {
+	s.MaskThreshold = val
+}
+
+// SetFakeThreshold sets the value of FakeThreshold.
+func (s *FaceIDVerificationInputForm) SetFakeThreshold(val OptFloat64) {
+	s.FakeThreshold = val
+}
+
+// SetSimThresholdLevel1 sets the value of SimThresholdLevel1.
+func (s *FaceIDVerificationInputForm) SetSimThresholdLevel1(val OptFloat64) {
+	s.SimThresholdLevel1 = val
+}
+
+// SetSimThresholdLevel2 sets the value of SimThresholdLevel2.
+func (s *FaceIDVerificationInputForm) SetSimThresholdLevel2(val OptFloat64) {
+	s.SimThresholdLevel2 = val
 }
 
 func (*FaceIDVerificationInputForm) faceVerificationReq() {}
 
 // Ref: #/components/schemas/FaceIDVerificationResult
 type FaceIDVerificationResult struct {
-	FaceAntiSpoofStatus OptFaceAntiSpoofStatus "json:\"face_anti_spoof_status\""
-	// Góc nghiêng của khuôn mặt ở ảnh card id.
-	FaceCardAngle OptInt "json:\"face_card_angle\""
-	// Góc nghiêng của khuôn mặt ở ảnh chụp chân dung.
-	FaceLiveAngle OptInt "json:\"face_live_angle\""
-	// Vị trí của khuôn mặt detect được trong ảnh card id.
-	FaceLocCard *FaceLocation "json:\"face_loc_card\""
-	// Vị trí của khuôn mặt detect được trong ảnh chụp chân dung.
-	FaceLocLive *FaceLocation "json:\"face_loc_live\""
-	// Feature vector của khuôn mặt ở ảnh thẻ.
-	FeatureVectorFaceCard *FaceFeature "json:\"feature_vector_face_card\""
-	// Feature vector của khuôn mặt ở ảnh chụp chân dung.
-	FeatureVectorFaceLive *FaceFeature "json:\"feature_vector_face_live\""
-	Message               Message      "json:\"message\""
+	Message Message `json:"message"`
 	// Request ID.
-	RequestID string "json:\"request_id\""
-	// Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1].
-	Sim OptFloat64 "json:\"sim\""
-	// Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms).
-	VerificationTime OptFloat64              "json:\"verification_time\""
-	VerifyResult     OptFaceVerifyResultEnum "json:\"verify_result\""
+	RequestID    string                  `json:"request_id"`
+	VerifyResult OptFaceVerifyResultEnum `json:"verify_result"`
 	// Kết quả xác thực dạng text.
-	VerifyResultText OptString         "json:\"verify_result_text\""
-	WearingMask      OptMaskResultEnum "json:\"wearing_mask\""
+	VerifyResultText OptString `json:"verify_result_text"`
+	// Độ tương đồng của ảnh khuôn mặt từ thẻ và ảnh chân dung [0-1].
+	Sim OptFloat64 `json:"sim"`
+	// Vị trí của khuôn mặt detect được trong ảnh card id.
+	FaceLocCard *FaceLocation `json:"face_loc_card"`
+	// Góc nghiêng của khuôn mặt ở ảnh card id.
+	FaceCardAngle OptInt `json:"face_card_angle"`
+	// Vị trí của khuôn mặt detect được trong ảnh chụp chân dung.
+	FaceLocLive *FaceLocation `json:"face_loc_live"`
+	// Góc nghiêng của khuôn mặt ở ảnh chụp chân dung.
+	FaceLiveAngle OptInt `json:"face_live_angle"`
+	// Feature vector của khuôn mặt ở ảnh thẻ.
+	FeatureVectorFaceCard *FaceFeature `json:"feature_vector_face_card"`
+	// Feature vector của khuôn mặt ở ảnh chụp chân dung.
+	FeatureVectorFaceLive *FaceFeature           `json:"feature_vector_face_live"`
+	FaceAntiSpoofStatus   OptFaceAntiSpoofStatus `json:"face_anti_spoof_status"`
+	// Thời gian thực hiện việc xác thực ở phía server (đơn vị mili giây - ms).
+	VerificationTime OptFloat64        `json:"verification_time"`
+	WearingMask      OptMaskResultEnum `json:"wearing_mask"`
 	// Điểm score khi nhận dạng khẩu trang, điểm càng cao thì độ tin tưởng đeo
 	// khẩu trang càng lớn score trong khoảng [0-1].
-	WearingMaskScore OptFloat64 "json:\"wearing_mask_score\""
+	WearingMaskScore OptFloat64 `json:"wearing_mask_score"`
+}
+
+// GetMessage returns the value of Message.
+func (s FaceIDVerificationResult) GetMessage() Message {
+	return s.Message
+}
+
+// GetRequestID returns the value of RequestID.
+func (s FaceIDVerificationResult) GetRequestID() string {
+	return s.RequestID
+}
+
+// GetVerifyResult returns the value of VerifyResult.
+func (s FaceIDVerificationResult) GetVerifyResult() OptFaceVerifyResultEnum {
+	return s.VerifyResult
+}
+
+// GetVerifyResultText returns the value of VerifyResultText.
+func (s FaceIDVerificationResult) GetVerifyResultText() OptString {
+	return s.VerifyResultText
+}
+
+// GetSim returns the value of Sim.
+func (s FaceIDVerificationResult) GetSim() OptFloat64 {
+	return s.Sim
+}
+
+// GetFaceLocCard returns the value of FaceLocCard.
+func (s FaceIDVerificationResult) GetFaceLocCard() *FaceLocation {
+	return s.FaceLocCard
+}
+
+// GetFaceCardAngle returns the value of FaceCardAngle.
+func (s FaceIDVerificationResult) GetFaceCardAngle() OptInt {
+	return s.FaceCardAngle
+}
+
+// GetFaceLocLive returns the value of FaceLocLive.
+func (s FaceIDVerificationResult) GetFaceLocLive() *FaceLocation {
+	return s.FaceLocLive
+}
+
+// GetFaceLiveAngle returns the value of FaceLiveAngle.
+func (s FaceIDVerificationResult) GetFaceLiveAngle() OptInt {
+	return s.FaceLiveAngle
+}
+
+// GetFeatureVectorFaceCard returns the value of FeatureVectorFaceCard.
+func (s FaceIDVerificationResult) GetFeatureVectorFaceCard() *FaceFeature {
+	return s.FeatureVectorFaceCard
+}
+
+// GetFeatureVectorFaceLive returns the value of FeatureVectorFaceLive.
+func (s FaceIDVerificationResult) GetFeatureVectorFaceLive() *FaceFeature {
+	return s.FeatureVectorFaceLive
+}
+
+// GetFaceAntiSpoofStatus returns the value of FaceAntiSpoofStatus.
+func (s FaceIDVerificationResult) GetFaceAntiSpoofStatus() OptFaceAntiSpoofStatus {
+	return s.FaceAntiSpoofStatus
+}
+
+// GetVerificationTime returns the value of VerificationTime.
+func (s FaceIDVerificationResult) GetVerificationTime() OptFloat64 {
+	return s.VerificationTime
+}
+
+// GetWearingMask returns the value of WearingMask.
+func (s FaceIDVerificationResult) GetWearingMask() OptMaskResultEnum {
+	return s.WearingMask
+}
+
+// GetWearingMaskScore returns the value of WearingMaskScore.
+func (s FaceIDVerificationResult) GetWearingMaskScore() OptFloat64 {
+	return s.WearingMaskScore
+}
+
+// SetMessage sets the value of Message.
+func (s *FaceIDVerificationResult) SetMessage(val Message) {
+	s.Message = val
+}
+
+// SetRequestID sets the value of RequestID.
+func (s *FaceIDVerificationResult) SetRequestID(val string) {
+	s.RequestID = val
+}
+
+// SetVerifyResult sets the value of VerifyResult.
+func (s *FaceIDVerificationResult) SetVerifyResult(val OptFaceVerifyResultEnum) {
+	s.VerifyResult = val
+}
+
+// SetVerifyResultText sets the value of VerifyResultText.
+func (s *FaceIDVerificationResult) SetVerifyResultText(val OptString) {
+	s.VerifyResultText = val
+}
+
+// SetSim sets the value of Sim.
+func (s *FaceIDVerificationResult) SetSim(val OptFloat64) {
+	s.Sim = val
+}
+
+// SetFaceLocCard sets the value of FaceLocCard.
+func (s *FaceIDVerificationResult) SetFaceLocCard(val *FaceLocation) {
+	s.FaceLocCard = val
+}
+
+// SetFaceCardAngle sets the value of FaceCardAngle.
+func (s *FaceIDVerificationResult) SetFaceCardAngle(val OptInt) {
+	s.FaceCardAngle = val
+}
+
+// SetFaceLocLive sets the value of FaceLocLive.
+func (s *FaceIDVerificationResult) SetFaceLocLive(val *FaceLocation) {
+	s.FaceLocLive = val
+}
+
+// SetFaceLiveAngle sets the value of FaceLiveAngle.
+func (s *FaceIDVerificationResult) SetFaceLiveAngle(val OptInt) {
+	s.FaceLiveAngle = val
+}
+
+// SetFeatureVectorFaceCard sets the value of FeatureVectorFaceCard.
+func (s *FaceIDVerificationResult) SetFeatureVectorFaceCard(val *FaceFeature) {
+	s.FeatureVectorFaceCard = val
+}
+
+// SetFeatureVectorFaceLive sets the value of FeatureVectorFaceLive.
+func (s *FaceIDVerificationResult) SetFeatureVectorFaceLive(val *FaceFeature) {
+	s.FeatureVectorFaceLive = val
+}
+
+// SetFaceAntiSpoofStatus sets the value of FaceAntiSpoofStatus.
+func (s *FaceIDVerificationResult) SetFaceAntiSpoofStatus(val OptFaceAntiSpoofStatus) {
+	s.FaceAntiSpoofStatus = val
+}
+
+// SetVerificationTime sets the value of VerificationTime.
+func (s *FaceIDVerificationResult) SetVerificationTime(val OptFloat64) {
+	s.VerificationTime = val
+}
+
+// SetWearingMask sets the value of WearingMask.
+func (s *FaceIDVerificationResult) SetWearingMask(val OptMaskResultEnum) {
+	s.WearingMask = val
+}
+
+// SetWearingMaskScore sets the value of WearingMaskScore.
+func (s *FaceIDVerificationResult) SetWearingMaskScore(val OptFloat64) {
+	s.WearingMaskScore = val
 }
 
 func (*FaceIDVerificationResult) faceVerificationRes() {}
@@ -277,15 +1007,55 @@ type FaceLocation []int
 
 // Ref: #/components/schemas/FaceRecognitionResult
 type FaceRecognitionResult struct {
-	FaceLoc FaceLocation "json:\"face_loc\""
+	FaceLoc FaceLocation `json:"face_loc"`
 	// Size of face in pixels.
-	FaceSize int "json:\"face_size\""
+	FaceSize int `json:"face_size"`
 	// List of top-k faces with highest confidence.
-	TopK []FaceIDResult "json:\"top_k\""
+	TopK []FaceIDResult `json:"top_k"`
+}
+
+// GetFaceLoc returns the value of FaceLoc.
+func (s FaceRecognitionResult) GetFaceLoc() FaceLocation {
+	return s.FaceLoc
+}
+
+// GetFaceSize returns the value of FaceSize.
+func (s FaceRecognitionResult) GetFaceSize() int {
+	return s.FaceSize
+}
+
+// GetTopK returns the value of TopK.
+func (s FaceRecognitionResult) GetTopK() []FaceIDResult {
+	return s.TopK
+}
+
+// SetFaceLoc sets the value of FaceLoc.
+func (s *FaceRecognitionResult) SetFaceLoc(val FaceLocation) {
+	s.FaceLoc = val
+}
+
+// SetFaceSize sets the value of FaceSize.
+func (s *FaceRecognitionResult) SetFaceSize(val int) {
+	s.FaceSize = val
+}
+
+// SetTopK sets the value of TopK.
+func (s *FaceRecognitionResult) SetTopK(val []FaceIDResult) {
+	s.TopK = val
 }
 
 type FaceUnregisterOK struct {
-	Message Message "json:\"message\""
+	Message Message `json:"message"`
+}
+
+// GetMessage returns the value of Message.
+func (s FaceUnregisterOK) GetMessage() Message {
+	return s.Message
+}
+
+// SetMessage sets the value of Message.
+func (s *FaceUnregisterOK) SetMessage(val Message) {
+	s.Message = val
 }
 
 func (*FaceUnregisterOK) faceUnregisterRes() {}
@@ -293,11 +1063,31 @@ func (*FaceUnregisterOK) faceUnregisterRes() {}
 // Merged schema.
 type FaceUnregisterReq struct {
 	// Customer is unique name. Used in case many customers have the same real name.
-	UniqueName string "json:\"unique_name\""
+	UniqueName string `json:"unique_name"`
 	// Customer is Face ID, returned in the result when registering a Customer is photo of the face in
 	// the system. If face_id is not provided, all customer photos with unique_name will be removed from
 	// the system.
-	FaceID OptString "json:\"face_id\""
+	FaceID OptString `json:"face_id"`
+}
+
+// GetUniqueName returns the value of UniqueName.
+func (s FaceUnregisterReq) GetUniqueName() string {
+	return s.UniqueName
+}
+
+// GetFaceID returns the value of FaceID.
+func (s FaceUnregisterReq) GetFaceID() OptString {
+	return s.FaceID
+}
+
+// SetUniqueName sets the value of UniqueName.
+func (s *FaceUnregisterReq) SetUniqueName(val string) {
+	s.UniqueName = val
+}
+
+// SetFaceID sets the value of FaceID.
+func (s *FaceUnregisterReq) SetFaceID(val OptString) {
+	s.FaceID = val
 }
 
 // Kết quả xác thực dạng số:
@@ -322,7 +1112,7 @@ const (
 type FakeTypeEnum string
 
 const (
-	FakeTypeEnumNSlashA      FakeTypeEnum = "N/A"
+	FakeTypeEnumNA           FakeTypeEnum = "N/A"
 	FakeTypeEnumSCREEN       FakeTypeEnum = "SCREEN"
 	FakeTypeEnumRANDOMPOSE   FakeTypeEnum = "RANDOM_POSE"
 	FakeTypeEnumSTRAIGHTPOSE FakeTypeEnum = "STRAIGHT_POSE"
@@ -332,7 +1122,17 @@ const (
 // Ref: #/components/schemas/GatewayError
 type GatewayError struct {
 	// Thông điệp lỗi.
-	Message string "json:\"message\""
+	Message string `json:"message"`
+}
+
+// GetMessage returns the value of Message.
+func (s GatewayError) GetMessage() string {
+	return s.Message
+}
+
+// SetMessage sets the value of Message.
+func (s *GatewayError) SetMessage(val string) {
+	s.Message = val
 }
 
 func (*GatewayError) faceRecognitionRes()  {}
@@ -382,91 +1182,167 @@ const (
 // ```{"error_message": "000", "error_code": "OK"}```.
 // Ref: #/components/schemas/Message
 type Message struct {
-	// API version.
-	APIVersion OptString "json:\"api_version\""
-	// Copyright.
-	CopyRight OptString "json:\"copy_right\""
 	// Mã lỗi.
-	ErrorCode string "json:\"error_code\""
+	ErrorCode string `json:"error_code"`
 	// Mô tả lỗi.
-	ErrorMessage string "json:\"error_message\""
+	ErrorMessage string `json:"error_message"`
+	// API version.
+	APIVersion OptString `json:"api_version"`
+	// Copyright.
+	CopyRight OptString `json:"copy_right"`
 	// Information.
-	Info OptString "json:\"info\""
+	Info OptString `json:"info"`
+}
+
+// GetErrorCode returns the value of ErrorCode.
+func (s Message) GetErrorCode() string {
+	return s.ErrorCode
+}
+
+// GetErrorMessage returns the value of ErrorMessage.
+func (s Message) GetErrorMessage() string {
+	return s.ErrorMessage
+}
+
+// GetAPIVersion returns the value of APIVersion.
+func (s Message) GetAPIVersion() OptString {
+	return s.APIVersion
+}
+
+// GetCopyRight returns the value of CopyRight.
+func (s Message) GetCopyRight() OptString {
+	return s.CopyRight
+}
+
+// GetInfo returns the value of Info.
+func (s Message) GetInfo() OptString {
+	return s.Info
+}
+
+// SetErrorCode sets the value of ErrorCode.
+func (s *Message) SetErrorCode(val string) {
+	s.ErrorCode = val
+}
+
+// SetErrorMessage sets the value of ErrorMessage.
+func (s *Message) SetErrorMessage(val string) {
+	s.ErrorMessage = val
+}
+
+// SetAPIVersion sets the value of APIVersion.
+func (s *Message) SetAPIVersion(val OptString) {
+	s.APIVersion = val
+}
+
+// SetCopyRight sets the value of CopyRight.
+func (s *Message) SetCopyRight(val OptString) {
+	s.CopyRight = val
+}
+
+// SetInfo sets the value of Info.
+func (s *Message) SetInfo(val OptString) {
+	s.Info = val
 }
 
 // Ref: #/components/schemas/OCRInput
 type OCRInput struct {
+	RequestID string `json:"request_id"`
+	Image     string `json:"image"`
 	// Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMND..
 	// ) yêu cầu request_id của mặt trước và hay không.
-	IDFullThr OptFloat32 "json:\"id_full_thr\""
-	Image     string     "json:\"image\""
-	RequestID string     "json:\"request_id\""
+	IDFullThr OptFloat32 `json:"id_full_thr"`
+}
+
+// GetRequestID returns the value of RequestID.
+func (s OCRInput) GetRequestID() string {
+	return s.RequestID
+}
+
+// GetImage returns the value of Image.
+func (s OCRInput) GetImage() string {
+	return s.Image
+}
+
+// GetIDFullThr returns the value of IDFullThr.
+func (s OCRInput) GetIDFullThr() OptFloat32 {
+	return s.IDFullThr
+}
+
+// SetRequestID sets the value of RequestID.
+func (s *OCRInput) SetRequestID(val string) {
+	s.RequestID = val
+}
+
+// SetImage sets the value of Image.
+func (s *OCRInput) SetImage(val string) {
+	s.Image = val
+}
+
+// SetIDFullThr sets the value of IDFullThr.
+func (s *OCRInput) SetIDFullThr(val OptFloat32) {
+	s.IDFullThr = val
 }
 
 // Ref: #/components/schemas/OCRInput
 type OCRInputForm struct {
+	RequestID string           `json:"request_id"`
+	Image     ht.MultipartFile `json:"image"`
 	// Giá trị ngưỡng để kiểm tra id_full về mặt đầy đủ thông tin công dân, CMND..
 	// ) yêu cầu request_id của mặt trước và hay không.
-	IDFullThr OptFloat32       "json:\"id_full_thr\""
-	Image     ht.MultipartFile "json:\"image\""
-	RequestID string           "json:\"request_id\""
+	IDFullThr OptFloat32 `json:"id_full_thr"`
+}
+
+// GetRequestID returns the value of RequestID.
+func (s OCRInputForm) GetRequestID() string {
+	return s.RequestID
+}
+
+// GetImage returns the value of Image.
+func (s OCRInputForm) GetImage() ht.MultipartFile {
+	return s.Image
+}
+
+// GetIDFullThr returns the value of IDFullThr.
+func (s OCRInputForm) GetIDFullThr() OptFloat32 {
+	return s.IDFullThr
+}
+
+// SetRequestID sets the value of RequestID.
+func (s *OCRInputForm) SetRequestID(val string) {
+	s.RequestID = val
+}
+
+// SetImage sets the value of Image.
+func (s *OCRInputForm) SetImage(val ht.MultipartFile) {
+	s.Image = val
+}
+
+// SetIDFullThr sets the value of IDFullThr.
+func (s *OCRInputForm) SetIDFullThr(val OptFloat32) {
+	s.IDFullThr = val
 }
 
 // Ref: #/components/schemas/OCRResult
 type OCRResult struct {
-	// Địa chỉ thường trú.
-	Address OptString "json:\"address\""
-	// Độ tin tưởng trường địa chỉ thường trú (là chuỗi string của 1 mảng các
-	// giá trị float từ 0-1).
-	Addressconf OptString "json:\"addressconf\""
-	// Ngày sinh.
-	Birthday OptString "json:\"birthday\""
-	// Độ tin tưởng trường ngày tháng năm sinh (là chuỗi string của 1 mảng các giá
-	// trị float từ 0-1).
-	Birthdayconf OptString "json:\"birthdayconf\""
-	// Đặt điểm.
-	Characteristics OptString "json:\"characteristics\""
-	// Độ tin tưởng của trường đặt điểm (là chuỗi string của 1 mảng các giá
-	// trị float từ 0-1).
-	CharacteristicsConf OptString "json:\"characteristics_conf\""
-	// Loại BLX.
-	Class     OptString "json:\"class\""
-	Copyright OptString "json:\"copyright\""
-	// Quốc gia.
-	Country OptString "json:\"country\""
-	// Quận/Huyện.
-	District OptString       "json:\"district\""
-	Document OptDocumentEnum "json:\"document\""
-	// Dân tộc.
-	Ethnicity OptString "json:\"ethnicity\""
-	// Độ tin tưởng của trường dân tộc (là chuỗi string của 1 mảng các giá trị
-	// float từ 0-1).
-	Ethnicityconf OptString "json:\"ethnicityconf\""
-	// Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn). Chú ý: trường
-	// ngày hết hạn có dạng dd-mm-yyyy hoặc Không thời hạn --> nếu không phù hợp
-	// với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A.
-	Expiry OptString "json:\"expiry\""
-	// Độ tin tưởng của trường hết hạn (là chuỗi string của 1 mảng các giá trị
-	// float từ 0-1).
-	Expiryconf OptString "json:\"expiryconf\""
-	// Nguyên quán.
-	Hometown OptString "json:\"hometown\""
-	// Độ tin tưởng trường nguyên quán (là chuỗi string của 1 mảng các giá trị
-	// float từ 0-1).
-	Hometownconf OptString      "json:\"hometownconf\""
-	ID           OptString      "json:\"id\""
-	IDCheck      OptIDCheckEnum "json:\"id_check\""
+	Document OptDocumentEnum `json:"document"`
+	// Mã kết quả.
+	ResultCode OptOCRResultResultCode `json:"result_code"`
+	// Container id.
+	ServerName OptString `json:"server_name"`
+	// Server version.
+	ServerVer OptString      `json:"server_ver"`
+	IDCheck   OptIDCheckEnum `json:"id_check"`
 	// Check xem giấy tờ có full về mặt THÔNG TIN hay không
 	// * `1` - Full
 	// * `0` - Không full; bị chụp thiếu
 	// Note: trường hợp số ID bị che (dẫn tới score < id_full_thr (mặc định 0.8) -->
 	// not full) Giấy tờ có thể không đầy đủ về mặt hình ảnh(ví dụ không có
 	// hình ảnh khuôn mặt), nhưng nếu vẫn đầy đủ thông tin -- > id_full =1.
-	IDFull OptInt "json:\"id_full\""
+	IDFull OptInt `json:"id_full"`
 	// ID logic:
 	// * `0` - check not OK
 	// * `1` - check OK.
-	IDLogic OptString "json:\"id_logic\""
+	IDLogic OptString `json:"id_logic"`
 	// Nội dung kiểm tra logic:
 	// * `OK` - logic trên giấy tờ đúng theo quy định
 	// * `ID is expired` - giấy tờ đã hết hạn
@@ -478,58 +1354,542 @@ type OCRResult struct {
 	// không có thời hạn)
 	// * `ID can be fake` - trường hợp có thể đang bị giả mạo về chữ "CĂN CƯỚC
 	// CÔNG DÂN/CHỨNG MINH NHÂN DÂN" đối với giấy tờ thẻ cứng.
-	IDLogicMessage OptString     "json:\"id_logic_message\""
-	IDType         OptIDTypeEnum "json:\"id_type\""
+	IDLogicMessage OptString     `json:"id_logic_message"`
+	IDType         OptIDTypeEnum `json:"id_type"`
+	ID             OptString     `json:"id"`
 	// Độ tin tưởng của trường ID (là chuỗi string của 1 mảng các giá trị float
 	// từ 0-1)
 	// *Chú ý*: độ tin tưởng của ký tự bất kì < 0.8 --> cảnh báo đầu vào kém.
-	Idconf OptString "json:\"idconf\""
-	// Nơi cấp.
-	IssueBy OptString "json:\"issue_by\""
-	// Độ tin tưởng của trường nơi cấp (là chuỗi string của 1 mảng các giá trị
-	// float từ 0-1).
-	IssueByConf OptString "json:\"issue_by_conf\""
-	// Ngày cấp *Chú ý*: trường ngày cấp có dạng dd-mm-yyyy --> nếu không phù hợp
-	// với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A.
-	IssueDate OptString "json:\"issue_date\""
-	// Độ tin tưởng của trường ngày cấp (là chuỗi string của 1 mảng các giá trị
-	// float từ 0-1).
-	IssueDateConf OptString "json:\"issue_date_conf\""
+	Idconf OptString `json:"idconf"`
 	// Tên khách hàng trên giấy tờ.
-	Name OptString "json:\"name\""
+	Name OptString `json:"name"`
 	// Độ tin tưởng trường họ tên (là chuỗi string của 1 mảng các giá trị float
 	// từ 0-1).
-	Nameconf OptString "json:\"nameconf\""
-	// Quốc gia.
-	National OptString "json:\"national\""
-	// Chỉ có ý nghĩa với passport. Số CMT của Vietnam.
-	OptinalData  OptString "json:\"optinal_data\""
-	OptionalData OptString "json:\"optional_data\""
-	// Loại Passport (công vụ/thường - PK/P).
-	PassportType OptString "json:\"passport_type\""
-	Precinct     OptString "json:\"precinct\""
-	// Tỉnh/TP.
-	Province OptString "json:\"province\""
-	// Tôn giáo.
-	Religion OptString "json:\"religion\""
-	// Độ tin tưởng của trường tôn giáo (là chuỗi string của 1 mảng các giá trị
-	// float từ 0-1).
-	Religionconf OptString "json:\"religionconf\""
-	// Mã kết quả.
-	ResultCode OptOCRResultResultCode "json:\"result_code\""
-	// Container id.
-	ServerName OptString "json:\"server_name\""
-	// Server version.
-	ServerVer OptString "json:\"server_ver\""
+	Nameconf OptString `json:"nameconf"`
+	// Ngày sinh.
+	Birthday OptString `json:"birthday"`
+	// Độ tin tưởng trường ngày tháng năm sinh (là chuỗi string của 1 mảng các giá
+	// trị float từ 0-1).
+	Birthdayconf OptString `json:"birthdayconf"`
 	// Giới tính.
-	Sex OptString "json:\"sex\""
+	Sex OptString `json:"sex"`
 	// Độ tin tưởng trường giới tính (là chuỗi string của 1 mảng các giá trị float
 	// từ 0-1).
-	Sexconf OptString "json:\"sexconf\""
+	Sexconf OptString `json:"sexconf"`
+	// Nguyên quán.
+	Hometown OptString `json:"hometown"`
+	// Độ tin tưởng trường nguyên quán (là chuỗi string của 1 mảng các giá trị
+	// float từ 0-1).
+	Hometownconf OptString `json:"hometownconf"`
+	// Địa chỉ thường trú.
+	Address OptString `json:"address"`
+	// Độ tin tưởng trường địa chỉ thường trú (là chuỗi string của 1 mảng các
+	// giá trị float từ 0-1).
+	Addressconf OptString `json:"addressconf"`
+	// Thời hạn giấy tờ (Với BLX có trường hợp không thời hạn). Chú ý: trường
+	// ngày hết hạn có dạng dd-mm-yyyy hoặc Không thời hạn --> nếu không phù hợp
+	// với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A.
+	Expiry OptString `json:"expiry"`
+	// Độ tin tưởng của trường hết hạn (là chuỗi string của 1 mảng các giá trị
+	// float từ 0-1).
+	Expiryconf OptString `json:"expiryconf"`
+	// Tôn giáo.
+	Religion OptString `json:"religion"`
+	// Độ tin tưởng của trường tôn giáo (là chuỗi string của 1 mảng các giá trị
+	// float từ 0-1).
+	Religionconf OptString `json:"religionconf"`
+	// Ngày cấp *Chú ý*: trường ngày cấp có dạng dd-mm-yyyy --> nếu không phù hợp
+	// với các dạng này(bị che, tẩy xóa) --> giá trị nhận dạng là N/A.
+	IssueDate OptString `json:"issue_date"`
+	// Độ tin tưởng của trường ngày cấp (là chuỗi string của 1 mảng các giá trị
+	// float từ 0-1).
+	IssueDateConf OptString `json:"issue_date_conf"`
+	// Nơi cấp.
+	IssueBy OptString `json:"issue_by"`
+	// Độ tin tưởng của trường nơi cấp (là chuỗi string của 1 mảng các giá trị
+	// float từ 0-1).
+	IssueByConf OptString `json:"issue_by_conf"`
+	// Dân tộc.
+	Ethnicity OptString `json:"ethnicity"`
+	// Độ tin tưởng của trường dân tộc (là chuỗi string của 1 mảng các giá trị
+	// float từ 0-1).
+	Ethnicityconf OptString `json:"ethnicityconf"`
+	// Đặt điểm.
+	Characteristics OptString `json:"characteristics"`
+	// Độ tin tưởng của trường đặt điểm (là chuỗi string của 1 mảng các giá
+	// trị float từ 0-1).
+	CharacteristicsConf OptString `json:"characteristics_conf"`
 	// Đường phố.
-	Street OptString "json:\"street\""
+	Street OptString `json:"street"`
 	// Tên đường.
-	StreetName OptString "json:\"street_name\""
+	StreetName OptString `json:"street_name"`
+	// Quốc gia.
+	Country OptString `json:"country"`
+	// Quốc gia.
+	National OptString `json:"national"`
+	// Loại BLX.
+	Class OptString `json:"class"`
+	// Chỉ có ý nghĩa với passport. Số CMT của Vietnam.
+	OptinalData OptString `json:"optinal_data"`
+	// Loại Passport (công vụ/thường - PK/P).
+	PassportType OptString `json:"passport_type"`
+	// Tỉnh/TP.
+	Province OptString `json:"province"`
+	// Quận/Huyện.
+	District     OptString `json:"district"`
+	Precinct     OptString `json:"precinct"`
+	OptionalData OptString `json:"optional_data"`
+	Copyright    OptString `json:"copyright"`
+}
+
+// GetDocument returns the value of Document.
+func (s OCRResult) GetDocument() OptDocumentEnum {
+	return s.Document
+}
+
+// GetResultCode returns the value of ResultCode.
+func (s OCRResult) GetResultCode() OptOCRResultResultCode {
+	return s.ResultCode
+}
+
+// GetServerName returns the value of ServerName.
+func (s OCRResult) GetServerName() OptString {
+	return s.ServerName
+}
+
+// GetServerVer returns the value of ServerVer.
+func (s OCRResult) GetServerVer() OptString {
+	return s.ServerVer
+}
+
+// GetIDCheck returns the value of IDCheck.
+func (s OCRResult) GetIDCheck() OptIDCheckEnum {
+	return s.IDCheck
+}
+
+// GetIDFull returns the value of IDFull.
+func (s OCRResult) GetIDFull() OptInt {
+	return s.IDFull
+}
+
+// GetIDLogic returns the value of IDLogic.
+func (s OCRResult) GetIDLogic() OptString {
+	return s.IDLogic
+}
+
+// GetIDLogicMessage returns the value of IDLogicMessage.
+func (s OCRResult) GetIDLogicMessage() OptString {
+	return s.IDLogicMessage
+}
+
+// GetIDType returns the value of IDType.
+func (s OCRResult) GetIDType() OptIDTypeEnum {
+	return s.IDType
+}
+
+// GetID returns the value of ID.
+func (s OCRResult) GetID() OptString {
+	return s.ID
+}
+
+// GetIdconf returns the value of Idconf.
+func (s OCRResult) GetIdconf() OptString {
+	return s.Idconf
+}
+
+// GetName returns the value of Name.
+func (s OCRResult) GetName() OptString {
+	return s.Name
+}
+
+// GetNameconf returns the value of Nameconf.
+func (s OCRResult) GetNameconf() OptString {
+	return s.Nameconf
+}
+
+// GetBirthday returns the value of Birthday.
+func (s OCRResult) GetBirthday() OptString {
+	return s.Birthday
+}
+
+// GetBirthdayconf returns the value of Birthdayconf.
+func (s OCRResult) GetBirthdayconf() OptString {
+	return s.Birthdayconf
+}
+
+// GetSex returns the value of Sex.
+func (s OCRResult) GetSex() OptString {
+	return s.Sex
+}
+
+// GetSexconf returns the value of Sexconf.
+func (s OCRResult) GetSexconf() OptString {
+	return s.Sexconf
+}
+
+// GetHometown returns the value of Hometown.
+func (s OCRResult) GetHometown() OptString {
+	return s.Hometown
+}
+
+// GetHometownconf returns the value of Hometownconf.
+func (s OCRResult) GetHometownconf() OptString {
+	return s.Hometownconf
+}
+
+// GetAddress returns the value of Address.
+func (s OCRResult) GetAddress() OptString {
+	return s.Address
+}
+
+// GetAddressconf returns the value of Addressconf.
+func (s OCRResult) GetAddressconf() OptString {
+	return s.Addressconf
+}
+
+// GetExpiry returns the value of Expiry.
+func (s OCRResult) GetExpiry() OptString {
+	return s.Expiry
+}
+
+// GetExpiryconf returns the value of Expiryconf.
+func (s OCRResult) GetExpiryconf() OptString {
+	return s.Expiryconf
+}
+
+// GetReligion returns the value of Religion.
+func (s OCRResult) GetReligion() OptString {
+	return s.Religion
+}
+
+// GetReligionconf returns the value of Religionconf.
+func (s OCRResult) GetReligionconf() OptString {
+	return s.Religionconf
+}
+
+// GetIssueDate returns the value of IssueDate.
+func (s OCRResult) GetIssueDate() OptString {
+	return s.IssueDate
+}
+
+// GetIssueDateConf returns the value of IssueDateConf.
+func (s OCRResult) GetIssueDateConf() OptString {
+	return s.IssueDateConf
+}
+
+// GetIssueBy returns the value of IssueBy.
+func (s OCRResult) GetIssueBy() OptString {
+	return s.IssueBy
+}
+
+// GetIssueByConf returns the value of IssueByConf.
+func (s OCRResult) GetIssueByConf() OptString {
+	return s.IssueByConf
+}
+
+// GetEthnicity returns the value of Ethnicity.
+func (s OCRResult) GetEthnicity() OptString {
+	return s.Ethnicity
+}
+
+// GetEthnicityconf returns the value of Ethnicityconf.
+func (s OCRResult) GetEthnicityconf() OptString {
+	return s.Ethnicityconf
+}
+
+// GetCharacteristics returns the value of Characteristics.
+func (s OCRResult) GetCharacteristics() OptString {
+	return s.Characteristics
+}
+
+// GetCharacteristicsConf returns the value of CharacteristicsConf.
+func (s OCRResult) GetCharacteristicsConf() OptString {
+	return s.CharacteristicsConf
+}
+
+// GetStreet returns the value of Street.
+func (s OCRResult) GetStreet() OptString {
+	return s.Street
+}
+
+// GetStreetName returns the value of StreetName.
+func (s OCRResult) GetStreetName() OptString {
+	return s.StreetName
+}
+
+// GetCountry returns the value of Country.
+func (s OCRResult) GetCountry() OptString {
+	return s.Country
+}
+
+// GetNational returns the value of National.
+func (s OCRResult) GetNational() OptString {
+	return s.National
+}
+
+// GetClass returns the value of Class.
+func (s OCRResult) GetClass() OptString {
+	return s.Class
+}
+
+// GetOptinalData returns the value of OptinalData.
+func (s OCRResult) GetOptinalData() OptString {
+	return s.OptinalData
+}
+
+// GetPassportType returns the value of PassportType.
+func (s OCRResult) GetPassportType() OptString {
+	return s.PassportType
+}
+
+// GetProvince returns the value of Province.
+func (s OCRResult) GetProvince() OptString {
+	return s.Province
+}
+
+// GetDistrict returns the value of District.
+func (s OCRResult) GetDistrict() OptString {
+	return s.District
+}
+
+// GetPrecinct returns the value of Precinct.
+func (s OCRResult) GetPrecinct() OptString {
+	return s.Precinct
+}
+
+// GetOptionalData returns the value of OptionalData.
+func (s OCRResult) GetOptionalData() OptString {
+	return s.OptionalData
+}
+
+// GetCopyright returns the value of Copyright.
+func (s OCRResult) GetCopyright() OptString {
+	return s.Copyright
+}
+
+// SetDocument sets the value of Document.
+func (s *OCRResult) SetDocument(val OptDocumentEnum) {
+	s.Document = val
+}
+
+// SetResultCode sets the value of ResultCode.
+func (s *OCRResult) SetResultCode(val OptOCRResultResultCode) {
+	s.ResultCode = val
+}
+
+// SetServerName sets the value of ServerName.
+func (s *OCRResult) SetServerName(val OptString) {
+	s.ServerName = val
+}
+
+// SetServerVer sets the value of ServerVer.
+func (s *OCRResult) SetServerVer(val OptString) {
+	s.ServerVer = val
+}
+
+// SetIDCheck sets the value of IDCheck.
+func (s *OCRResult) SetIDCheck(val OptIDCheckEnum) {
+	s.IDCheck = val
+}
+
+// SetIDFull sets the value of IDFull.
+func (s *OCRResult) SetIDFull(val OptInt) {
+	s.IDFull = val
+}
+
+// SetIDLogic sets the value of IDLogic.
+func (s *OCRResult) SetIDLogic(val OptString) {
+	s.IDLogic = val
+}
+
+// SetIDLogicMessage sets the value of IDLogicMessage.
+func (s *OCRResult) SetIDLogicMessage(val OptString) {
+	s.IDLogicMessage = val
+}
+
+// SetIDType sets the value of IDType.
+func (s *OCRResult) SetIDType(val OptIDTypeEnum) {
+	s.IDType = val
+}
+
+// SetID sets the value of ID.
+func (s *OCRResult) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetIdconf sets the value of Idconf.
+func (s *OCRResult) SetIdconf(val OptString) {
+	s.Idconf = val
+}
+
+// SetName sets the value of Name.
+func (s *OCRResult) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetNameconf sets the value of Nameconf.
+func (s *OCRResult) SetNameconf(val OptString) {
+	s.Nameconf = val
+}
+
+// SetBirthday sets the value of Birthday.
+func (s *OCRResult) SetBirthday(val OptString) {
+	s.Birthday = val
+}
+
+// SetBirthdayconf sets the value of Birthdayconf.
+func (s *OCRResult) SetBirthdayconf(val OptString) {
+	s.Birthdayconf = val
+}
+
+// SetSex sets the value of Sex.
+func (s *OCRResult) SetSex(val OptString) {
+	s.Sex = val
+}
+
+// SetSexconf sets the value of Sexconf.
+func (s *OCRResult) SetSexconf(val OptString) {
+	s.Sexconf = val
+}
+
+// SetHometown sets the value of Hometown.
+func (s *OCRResult) SetHometown(val OptString) {
+	s.Hometown = val
+}
+
+// SetHometownconf sets the value of Hometownconf.
+func (s *OCRResult) SetHometownconf(val OptString) {
+	s.Hometownconf = val
+}
+
+// SetAddress sets the value of Address.
+func (s *OCRResult) SetAddress(val OptString) {
+	s.Address = val
+}
+
+// SetAddressconf sets the value of Addressconf.
+func (s *OCRResult) SetAddressconf(val OptString) {
+	s.Addressconf = val
+}
+
+// SetExpiry sets the value of Expiry.
+func (s *OCRResult) SetExpiry(val OptString) {
+	s.Expiry = val
+}
+
+// SetExpiryconf sets the value of Expiryconf.
+func (s *OCRResult) SetExpiryconf(val OptString) {
+	s.Expiryconf = val
+}
+
+// SetReligion sets the value of Religion.
+func (s *OCRResult) SetReligion(val OptString) {
+	s.Religion = val
+}
+
+// SetReligionconf sets the value of Religionconf.
+func (s *OCRResult) SetReligionconf(val OptString) {
+	s.Religionconf = val
+}
+
+// SetIssueDate sets the value of IssueDate.
+func (s *OCRResult) SetIssueDate(val OptString) {
+	s.IssueDate = val
+}
+
+// SetIssueDateConf sets the value of IssueDateConf.
+func (s *OCRResult) SetIssueDateConf(val OptString) {
+	s.IssueDateConf = val
+}
+
+// SetIssueBy sets the value of IssueBy.
+func (s *OCRResult) SetIssueBy(val OptString) {
+	s.IssueBy = val
+}
+
+// SetIssueByConf sets the value of IssueByConf.
+func (s *OCRResult) SetIssueByConf(val OptString) {
+	s.IssueByConf = val
+}
+
+// SetEthnicity sets the value of Ethnicity.
+func (s *OCRResult) SetEthnicity(val OptString) {
+	s.Ethnicity = val
+}
+
+// SetEthnicityconf sets the value of Ethnicityconf.
+func (s *OCRResult) SetEthnicityconf(val OptString) {
+	s.Ethnicityconf = val
+}
+
+// SetCharacteristics sets the value of Characteristics.
+func (s *OCRResult) SetCharacteristics(val OptString) {
+	s.Characteristics = val
+}
+
+// SetCharacteristicsConf sets the value of CharacteristicsConf.
+func (s *OCRResult) SetCharacteristicsConf(val OptString) {
+	s.CharacteristicsConf = val
+}
+
+// SetStreet sets the value of Street.
+func (s *OCRResult) SetStreet(val OptString) {
+	s.Street = val
+}
+
+// SetStreetName sets the value of StreetName.
+func (s *OCRResult) SetStreetName(val OptString) {
+	s.StreetName = val
+}
+
+// SetCountry sets the value of Country.
+func (s *OCRResult) SetCountry(val OptString) {
+	s.Country = val
+}
+
+// SetNational sets the value of National.
+func (s *OCRResult) SetNational(val OptString) {
+	s.National = val
+}
+
+// SetClass sets the value of Class.
+func (s *OCRResult) SetClass(val OptString) {
+	s.Class = val
+}
+
+// SetOptinalData sets the value of OptinalData.
+func (s *OCRResult) SetOptinalData(val OptString) {
+	s.OptinalData = val
+}
+
+// SetPassportType sets the value of PassportType.
+func (s *OCRResult) SetPassportType(val OptString) {
+	s.PassportType = val
+}
+
+// SetProvince sets the value of Province.
+func (s *OCRResult) SetProvince(val OptString) {
+	s.Province = val
+}
+
+// SetDistrict sets the value of District.
+func (s *OCRResult) SetDistrict(val OptString) {
+	s.District = val
+}
+
+// SetPrecinct sets the value of Precinct.
+func (s *OCRResult) SetPrecinct(val OptString) {
+	s.Precinct = val
+}
+
+// SetOptionalData sets the value of OptionalData.
+func (s *OCRResult) SetOptionalData(val OptString) {
+	s.OptionalData = val
+}
+
+// SetCopyright sets the value of Copyright.
+func (s *OCRResult) SetCopyright(val OptString) {
+	s.Copyright = val
 }
 
 func (*OCRResult) oCRecognitionRes() {}

@@ -76,6 +76,12 @@ func (s FaceAntiSpoofStatus) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s FaceAntiSpoofStatus) encodeFields(e *jx.Encoder) {
 	{
+		if s.Status.Set {
+			e.FieldStart("status")
+			s.Status.Encode(e)
+		}
+	}
+	{
 		if s.FakeCode.Set {
 			e.FieldStart("fake_code")
 			s.FakeCode.Encode(e)
@@ -99,20 +105,14 @@ func (s FaceAntiSpoofStatus) encodeFields(e *jx.Encoder) {
 			s.LivenessCompareScores.Encode(e)
 		}
 	}
-	{
-		if s.Status.Set {
-			e.FieldStart("status")
-			s.Status.Encode(e)
-		}
-	}
 }
 
 var jsonFieldsNameOfFaceAntiSpoofStatus = [5]string{
-	0: "fake_code",
-	1: "fake_score",
-	2: "fake_type",
-	3: "liveness_compare_scores",
-	4: "status",
+	0: "status",
+	1: "fake_code",
+	2: "fake_score",
+	3: "fake_type",
+	4: "liveness_compare_scores",
 }
 
 // Decode decodes FaceAntiSpoofStatus from json.
@@ -123,6 +123,16 @@ func (s *FaceAntiSpoofStatus) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "status":
+			if err := func() error {
+				s.Status.Reset()
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"status\"")
+			}
 		case "fake_code":
 			if err := func() error {
 				s.FakeCode.Reset()
@@ -162,16 +172,6 @@ func (s *FaceAntiSpoofStatus) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"liveness_compare_scores\"")
-			}
-		case "status":
-			if err := func() error {
-				s.Status.Reset()
-				if err := s.Status.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"status\"")
 			}
 		default:
 			return d.Skip()
@@ -260,19 +260,19 @@ func (s FaceIDRecognitionInput) Encode(e *jx.Encoder) {
 func (s FaceIDRecognitionInput) encodeFields(e *jx.Encoder) {
 	{
 
-		e.FieldStart("image")
-		e.Str(s.Image)
+		e.FieldStart("request_id")
+		e.Str(s.RequestID)
 	}
 	{
 
-		e.FieldStart("request_id")
-		e.Str(s.RequestID)
+		e.FieldStart("image")
+		e.Str(s.Image)
 	}
 }
 
 var jsonFieldsNameOfFaceIDRecognitionInput = [2]string{
-	0: "image",
-	1: "request_id",
+	0: "request_id",
+	1: "image",
 }
 
 // Decode decodes FaceIDRecognitionInput from json.
@@ -284,20 +284,8 @@ func (s *FaceIDRecognitionInput) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "image":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Image = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"image\"")
-			}
 		case "request_id":
-			requiredBitSet[0] |= 1 << 1
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
 				s.RequestID = string(v)
@@ -307,6 +295,18 @@ func (s *FaceIDRecognitionInput) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"request_id\"")
+			}
+		case "image":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Image = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"image\"")
 			}
 		default:
 			return d.Skip()
@@ -519,12 +519,6 @@ func (s FaceIDRegisterInput) encodeFields(e *jx.Encoder) {
 		e.Str(s.UniqueName)
 	}
 	{
-		if s.Force.Set {
-			e.FieldStart("force")
-			s.Force.Encode(e)
-		}
-	}
-	{
 
 		e.FieldStart("image")
 		e.Str(s.Image)
@@ -535,13 +529,19 @@ func (s FaceIDRegisterInput) encodeFields(e *jx.Encoder) {
 			s.PersonName.Encode(e)
 		}
 	}
+	{
+		if s.Force.Set {
+			e.FieldStart("force")
+			s.Force.Encode(e)
+		}
+	}
 }
 
 var jsonFieldsNameOfFaceIDRegisterInput = [4]string{
 	0: "unique_name",
-	1: "force",
-	2: "image",
-	3: "person_name",
+	1: "image",
+	2: "person_name",
+	3: "force",
 }
 
 // Decode decodes FaceIDRegisterInput from json.
@@ -566,18 +566,8 @@ func (s *FaceIDRegisterInput) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"unique_name\"")
 			}
-		case "force":
-			if err := func() error {
-				s.Force.Reset()
-				if err := s.Force.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"force\"")
-			}
 		case "image":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Str()
 				s.Image = string(v)
@@ -598,6 +588,16 @@ func (s *FaceIDRegisterInput) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"person_name\"")
 			}
+		case "force":
+			if err := func() error {
+				s.Force.Reset()
+				if err := s.Force.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"force\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -608,7 +608,7 @@ func (s *FaceIDRegisterInput) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000101,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -670,12 +670,6 @@ func (s FaceIDRegisterResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.FaceID.Set {
-			e.FieldStart("face_id")
-			s.FaceID.Encode(e)
-		}
-	}
-	{
 
 		e.FieldStart("face_loc")
 		e.ArrStart()
@@ -685,21 +679,9 @@ func (s FaceIDRegisterResult) encodeFields(e *jx.Encoder) {
 		e.ArrEnd()
 	}
 	{
-		if s.MatchedScore.Set {
-			e.FieldStart("matched_score")
-			s.MatchedScore.Encode(e)
-		}
-	}
-	{
 
 		e.FieldStart("message")
 		s.Message.Encode(e)
-	}
-	{
-		if s.SamePersonThr.Set {
-			e.FieldStart("same_person_thr")
-			s.SamePersonThr.Encode(e)
-		}
 	}
 	{
 		if s.UniqueName.Set {
@@ -707,16 +689,34 @@ func (s FaceIDRegisterResult) encodeFields(e *jx.Encoder) {
 			s.UniqueName.Encode(e)
 		}
 	}
+	{
+		if s.FaceID.Set {
+			e.FieldStart("face_id")
+			s.FaceID.Encode(e)
+		}
+	}
+	{
+		if s.MatchedScore.Set {
+			e.FieldStart("matched_score")
+			s.MatchedScore.Encode(e)
+		}
+	}
+	{
+		if s.SamePersonThr.Set {
+			e.FieldStart("same_person_thr")
+			s.SamePersonThr.Encode(e)
+		}
+	}
 }
 
 var jsonFieldsNameOfFaceIDRegisterResult = [7]string{
 	0: "face_card_angle",
-	1: "face_id",
-	2: "face_loc",
-	3: "matched_score",
-	4: "message",
-	5: "same_person_thr",
-	6: "unique_name",
+	1: "face_loc",
+	2: "message",
+	3: "unique_name",
+	4: "face_id",
+	5: "matched_score",
+	6: "same_person_thr",
 }
 
 // Decode decodes FaceIDRegisterResult from json.
@@ -738,18 +738,8 @@ func (s *FaceIDRegisterResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"face_card_angle\"")
 			}
-		case "face_id":
-			if err := func() error {
-				s.FaceID.Reset()
-				if err := s.FaceID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_id\"")
-			}
 		case "face_loc":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				s.FaceLoc = make([]int, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -768,18 +758,8 @@ func (s *FaceIDRegisterResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"face_loc\"")
 			}
-		case "matched_score":
-			if err := func() error {
-				s.MatchedScore.Reset()
-				if err := s.MatchedScore.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"matched_score\"")
-			}
 		case "message":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				if err := s.Message.Decode(d); err != nil {
 					return err
@@ -787,16 +767,6 @@ func (s *FaceIDRegisterResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"message\"")
-			}
-		case "same_person_thr":
-			if err := func() error {
-				s.SamePersonThr.Reset()
-				if err := s.SamePersonThr.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"same_person_thr\"")
 			}
 		case "unique_name":
 			if err := func() error {
@@ -808,6 +778,36 @@ func (s *FaceIDRegisterResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"unique_name\"")
 			}
+		case "face_id":
+			if err := func() error {
+				s.FaceID.Reset()
+				if err := s.FaceID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_id\"")
+			}
+		case "matched_score":
+			if err := func() error {
+				s.MatchedScore.Reset()
+				if err := s.MatchedScore.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"matched_score\"")
+			}
+		case "same_person_thr":
+			if err := func() error {
+				s.SamePersonThr.Reset()
+				if err := s.SamePersonThr.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"same_person_thr\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -818,7 +818,7 @@ func (s *FaceIDRegisterResult) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00010100,
+		0b00000110,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -1078,22 +1078,9 @@ func (s FaceIDVerificationInput) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s FaceIDVerificationInput) encodeFields(e *jx.Encoder) {
 	{
-		if s.Check3RandomPose.Set {
-			e.FieldStart("check_3_random_pose")
-			s.Check3RandomPose.Encode(e)
-		}
-	}
-	{
-		if s.Check3StraightPose.Set {
-			e.FieldStart("check_3_straight_pose")
-			s.Check3StraightPose.Encode(e)
-		}
-	}
-	{
-		if s.FakeThreshold.Set {
-			e.FieldStart("fake_threshold")
-			s.FakeThreshold.Encode(e)
-		}
+
+		e.FieldStart("request_id")
+		e.Str(s.RequestID)
 	}
 	{
 
@@ -1124,20 +1111,33 @@ func (s FaceIDVerificationInput) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Check3RandomPose.Set {
+			e.FieldStart("check_3_random_pose")
+			s.Check3RandomPose.Encode(e)
+		}
+	}
+	{
+		if s.Check3StraightPose.Set {
+			e.FieldStart("check_3_straight_pose")
+			s.Check3StraightPose.Encode(e)
+		}
+	}
+	{
+		if s.ReturnFeature.Set {
+			e.FieldStart("return_feature")
+			s.ReturnFeature.Encode(e)
+		}
+	}
+	{
 		if s.MaskThreshold.Set {
 			e.FieldStart("mask_threshold")
 			s.MaskThreshold.Encode(e)
 		}
 	}
 	{
-
-		e.FieldStart("request_id")
-		e.Str(s.RequestID)
-	}
-	{
-		if s.ReturnFeature.Set {
-			e.FieldStart("return_feature")
-			s.ReturnFeature.Encode(e)
+		if s.FakeThreshold.Set {
+			e.FieldStart("fake_threshold")
+			s.FakeThreshold.Encode(e)
 		}
 	}
 	{
@@ -1155,17 +1155,17 @@ func (s FaceIDVerificationInput) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfFaceIDVerificationInput = [13]string{
-	0:  "check_3_random_pose",
-	1:  "check_3_straight_pose",
-	2:  "fake_threshold",
-	3:  "image_card",
-	4:  "image_live",
-	5:  "image_live1",
-	6:  "image_live2",
-	7:  "image_live3",
-	8:  "mask_threshold",
-	9:  "request_id",
-	10: "return_feature",
+	0:  "request_id",
+	1:  "image_card",
+	2:  "image_live",
+	3:  "image_live1",
+	4:  "image_live2",
+	5:  "image_live3",
+	6:  "check_3_random_pose",
+	7:  "check_3_straight_pose",
+	8:  "return_feature",
+	9:  "mask_threshold",
+	10: "fake_threshold",
 	11: "sim_threshold_level1",
 	12: "sim_threshold_level2",
 }
@@ -1180,38 +1180,20 @@ func (s *FaceIDVerificationInput) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "check_3_random_pose":
+		case "request_id":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Check3RandomPose.Reset()
-				if err := s.Check3RandomPose.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RequestID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"check_3_random_pose\"")
-			}
-		case "check_3_straight_pose":
-			if err := func() error {
-				s.Check3StraightPose.Reset()
-				if err := s.Check3StraightPose.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"check_3_straight_pose\"")
-			}
-		case "fake_threshold":
-			if err := func() error {
-				s.FakeThreshold.Reset()
-				if err := s.FakeThreshold.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"fake_threshold\"")
+				return errors.Wrap(err, "decode field \"request_id\"")
 			}
 		case "image_card":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Str()
 				s.ImageCard = string(v)
@@ -1223,7 +1205,7 @@ func (s *FaceIDVerificationInput) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"image_card\"")
 			}
 		case "image_live":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
 				s.ImageLive = string(v)
@@ -1264,27 +1246,25 @@ func (s *FaceIDVerificationInput) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"image_live3\"")
 			}
-		case "mask_threshold":
+		case "check_3_random_pose":
 			if err := func() error {
-				s.MaskThreshold.Reset()
-				if err := s.MaskThreshold.Decode(d); err != nil {
+				s.Check3RandomPose.Reset()
+				if err := s.Check3RandomPose.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"mask_threshold\"")
+				return errors.Wrap(err, "decode field \"check_3_random_pose\"")
 			}
-		case "request_id":
-			requiredBitSet[1] |= 1 << 1
+		case "check_3_straight_pose":
 			if err := func() error {
-				v, err := d.Str()
-				s.RequestID = string(v)
-				if err != nil {
+				s.Check3StraightPose.Reset()
+				if err := s.Check3StraightPose.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"request_id\"")
+				return errors.Wrap(err, "decode field \"check_3_straight_pose\"")
 			}
 		case "return_feature":
 			if err := func() error {
@@ -1295,6 +1275,26 @@ func (s *FaceIDVerificationInput) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"return_feature\"")
+			}
+		case "mask_threshold":
+			if err := func() error {
+				s.MaskThreshold.Reset()
+				if err := s.MaskThreshold.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mask_threshold\"")
+			}
+		case "fake_threshold":
+			if err := func() error {
+				s.FakeThreshold.Reset()
+				if err := s.FakeThreshold.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"fake_threshold\"")
 			}
 		case "sim_threshold_level1":
 			if err := func() error {
@@ -1326,8 +1326,8 @@ func (s *FaceIDVerificationInput) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b00011000,
-		0b00000010,
+		0b00000111,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -1383,21 +1383,31 @@ func (s FaceIDVerificationResult) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s FaceIDVerificationResult) encodeFields(e *jx.Encoder) {
 	{
-		if s.FaceAntiSpoofStatus.Set {
-			e.FieldStart("face_anti_spoof_status")
-			s.FaceAntiSpoofStatus.Encode(e)
+
+		e.FieldStart("message")
+		s.Message.Encode(e)
+	}
+	{
+
+		e.FieldStart("request_id")
+		e.Str(s.RequestID)
+	}
+	{
+		if s.VerifyResult.Set {
+			e.FieldStart("verify_result")
+			s.VerifyResult.Encode(e)
 		}
 	}
 	{
-		if s.FaceCardAngle.Set {
-			e.FieldStart("face_card_angle")
-			s.FaceCardAngle.Encode(e)
+		if s.VerifyResultText.Set {
+			e.FieldStart("verify_result_text")
+			s.VerifyResultText.Encode(e)
 		}
 	}
 	{
-		if s.FaceLiveAngle.Set {
-			e.FieldStart("face_live_angle")
-			s.FaceLiveAngle.Encode(e)
+		if s.Sim.Set {
+			e.FieldStart("sim")
+			s.Sim.Encode(e)
 		}
 	}
 	{
@@ -1407,9 +1417,21 @@ func (s FaceIDVerificationResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.FaceCardAngle.Set {
+			e.FieldStart("face_card_angle")
+			s.FaceCardAngle.Encode(e)
+		}
+	}
+	{
 		if s.FaceLocLive != nil {
 			e.FieldStart("face_loc_live")
 			s.FaceLocLive.Encode(e)
+		}
+	}
+	{
+		if s.FaceLiveAngle.Set {
+			e.FieldStart("face_live_angle")
+			s.FaceLiveAngle.Encode(e)
 		}
 	}
 	{
@@ -1425,37 +1447,15 @@ func (s FaceIDVerificationResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-
-		e.FieldStart("message")
-		s.Message.Encode(e)
-	}
-	{
-
-		e.FieldStart("request_id")
-		e.Str(s.RequestID)
-	}
-	{
-		if s.Sim.Set {
-			e.FieldStart("sim")
-			s.Sim.Encode(e)
+		if s.FaceAntiSpoofStatus.Set {
+			e.FieldStart("face_anti_spoof_status")
+			s.FaceAntiSpoofStatus.Encode(e)
 		}
 	}
 	{
 		if s.VerificationTime.Set {
 			e.FieldStart("verification_time")
 			s.VerificationTime.Encode(e)
-		}
-	}
-	{
-		if s.VerifyResult.Set {
-			e.FieldStart("verify_result")
-			s.VerifyResult.Encode(e)
-		}
-	}
-	{
-		if s.VerifyResultText.Set {
-			e.FieldStart("verify_result_text")
-			s.VerifyResultText.Encode(e)
 		}
 	}
 	{
@@ -1473,19 +1473,19 @@ func (s FaceIDVerificationResult) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfFaceIDVerificationResult = [15]string{
-	0:  "face_anti_spoof_status",
-	1:  "face_card_angle",
-	2:  "face_live_angle",
-	3:  "face_loc_card",
-	4:  "face_loc_live",
-	5:  "feature_vector_face_card",
-	6:  "feature_vector_face_live",
-	7:  "message",
-	8:  "request_id",
-	9:  "sim",
-	10: "verification_time",
-	11: "verify_result",
-	12: "verify_result_text",
+	0:  "message",
+	1:  "request_id",
+	2:  "verify_result",
+	3:  "verify_result_text",
+	4:  "sim",
+	5:  "face_loc_card",
+	6:  "face_card_angle",
+	7:  "face_loc_live",
+	8:  "face_live_angle",
+	9:  "feature_vector_face_card",
+	10: "feature_vector_face_live",
+	11: "face_anti_spoof_status",
+	12: "verification_time",
 	13: "wearing_mask",
 	14: "wearing_mask_score",
 }
@@ -1499,35 +1499,57 @@ func (s *FaceIDVerificationResult) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "face_anti_spoof_status":
+		case "message":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.FaceAntiSpoofStatus.Reset()
-				if err := s.FaceAntiSpoofStatus.Decode(d); err != nil {
+				if err := s.Message.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_anti_spoof_status\"")
+				return errors.Wrap(err, "decode field \"message\"")
 			}
-		case "face_card_angle":
+		case "request_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.FaceCardAngle.Reset()
-				if err := s.FaceCardAngle.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RequestID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_card_angle\"")
+				return errors.Wrap(err, "decode field \"request_id\"")
 			}
-		case "face_live_angle":
+		case "verify_result":
 			if err := func() error {
-				s.FaceLiveAngle.Reset()
-				if err := s.FaceLiveAngle.Decode(d); err != nil {
+				s.VerifyResult.Reset()
+				if err := s.VerifyResult.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"face_live_angle\"")
+				return errors.Wrap(err, "decode field \"verify_result\"")
+			}
+		case "verify_result_text":
+			if err := func() error {
+				s.VerifyResultText.Reset()
+				if err := s.VerifyResultText.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"verify_result_text\"")
+			}
+		case "sim":
+			if err := func() error {
+				s.Sim.Reset()
+				if err := s.Sim.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sim\"")
 			}
 		case "face_loc_card":
 			if err := func() error {
@@ -1541,6 +1563,16 @@ func (s *FaceIDVerificationResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"face_loc_card\"")
 			}
+		case "face_card_angle":
+			if err := func() error {
+				s.FaceCardAngle.Reset()
+				if err := s.FaceCardAngle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_card_angle\"")
+			}
 		case "face_loc_live":
 			if err := func() error {
 				s.FaceLocLive = nil
@@ -1552,6 +1584,16 @@ func (s *FaceIDVerificationResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"face_loc_live\"")
+			}
+		case "face_live_angle":
+			if err := func() error {
+				s.FaceLiveAngle.Reset()
+				if err := s.FaceLiveAngle.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"face_live_angle\"")
 			}
 		case "feature_vector_face_card":
 			if err := func() error {
@@ -1577,37 +1619,15 @@ func (s *FaceIDVerificationResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"feature_vector_face_live\"")
 			}
-		case "message":
-			requiredBitSet[0] |= 1 << 7
+		case "face_anti_spoof_status":
 			if err := func() error {
-				if err := s.Message.Decode(d); err != nil {
+				s.FaceAntiSpoofStatus.Reset()
+				if err := s.FaceAntiSpoofStatus.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"message\"")
-			}
-		case "request_id":
-			requiredBitSet[1] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.RequestID = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"request_id\"")
-			}
-		case "sim":
-			if err := func() error {
-				s.Sim.Reset()
-				if err := s.Sim.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"sim\"")
+				return errors.Wrap(err, "decode field \"face_anti_spoof_status\"")
 			}
 		case "verification_time":
 			if err := func() error {
@@ -1618,26 +1638,6 @@ func (s *FaceIDVerificationResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"verification_time\"")
-			}
-		case "verify_result":
-			if err := func() error {
-				s.VerifyResult.Reset()
-				if err := s.VerifyResult.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"verify_result\"")
-			}
-		case "verify_result_text":
-			if err := func() error {
-				s.VerifyResultText.Reset()
-				if err := s.VerifyResultText.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"verify_result_text\"")
 			}
 		case "wearing_mask":
 			if err := func() error {
@@ -1669,8 +1669,8 @@ func (s *FaceIDVerificationResult) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b10000000,
-		0b00000001,
+		0b00000011,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -2166,8 +2166,8 @@ func (s *FakeTypeEnum) Decode(d *jx.Decoder) error {
 	}
 	// Try to use constant string.
 	switch FakeTypeEnum(v) {
-	case FakeTypeEnumNSlashA:
-		*s = FakeTypeEnumNSlashA
+	case FakeTypeEnumNA:
+		*s = FakeTypeEnumNA
 	case FakeTypeEnumSCREEN:
 		*s = FakeTypeEnumSCREEN
 	case FakeTypeEnumRANDOMPOSE:
@@ -2427,6 +2427,16 @@ func (s Message) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s Message) encodeFields(e *jx.Encoder) {
 	{
+
+		e.FieldStart("error_code")
+		e.Str(s.ErrorCode)
+	}
+	{
+
+		e.FieldStart("error_message")
+		e.Str(s.ErrorMessage)
+	}
+	{
 		if s.APIVersion.Set {
 			e.FieldStart("api_version")
 			s.APIVersion.Encode(e)
@@ -2439,16 +2449,6 @@ func (s Message) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-
-		e.FieldStart("error_code")
-		e.Str(s.ErrorCode)
-	}
-	{
-
-		e.FieldStart("error_message")
-		e.Str(s.ErrorMessage)
-	}
-	{
 		if s.Info.Set {
 			e.FieldStart("info")
 			s.Info.Encode(e)
@@ -2457,10 +2457,10 @@ func (s Message) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfMessage = [5]string{
-	0: "api_version",
-	1: "copy_right",
-	2: "error_code",
-	3: "error_message",
+	0: "error_code",
+	1: "error_message",
+	2: "api_version",
+	3: "copy_right",
 	4: "info",
 }
 
@@ -2473,6 +2473,30 @@ func (s *Message) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "error_code":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.ErrorCode = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"error_code\"")
+			}
+		case "error_message":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.ErrorMessage = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"error_message\"")
+			}
 		case "api_version":
 			if err := func() error {
 				s.APIVersion.Reset()
@@ -2492,30 +2516,6 @@ func (s *Message) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"copy_right\"")
-			}
-		case "error_code":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Str()
-				s.ErrorCode = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error_code\"")
-			}
-		case "error_message":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := d.Str()
-				s.ErrorMessage = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error_message\"")
 			}
 		case "info":
 			if err := func() error {
@@ -2537,7 +2537,7 @@ func (s *Message) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00001100,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -2593,111 +2593,27 @@ func (s OCRResult) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s OCRResult) encodeFields(e *jx.Encoder) {
 	{
-		if s.Address.Set {
-			e.FieldStart("address")
-			s.Address.Encode(e)
-		}
-	}
-	{
-		if s.Addressconf.Set {
-			e.FieldStart("addressconf")
-			s.Addressconf.Encode(e)
-		}
-	}
-	{
-		if s.Birthday.Set {
-			e.FieldStart("birthday")
-			s.Birthday.Encode(e)
-		}
-	}
-	{
-		if s.Birthdayconf.Set {
-			e.FieldStart("birthdayconf")
-			s.Birthdayconf.Encode(e)
-		}
-	}
-	{
-		if s.Characteristics.Set {
-			e.FieldStart("characteristics")
-			s.Characteristics.Encode(e)
-		}
-	}
-	{
-		if s.CharacteristicsConf.Set {
-			e.FieldStart("characteristics_conf")
-			s.CharacteristicsConf.Encode(e)
-		}
-	}
-	{
-		if s.Class.Set {
-			e.FieldStart("class")
-			s.Class.Encode(e)
-		}
-	}
-	{
-		if s.Copyright.Set {
-			e.FieldStart("copyright")
-			s.Copyright.Encode(e)
-		}
-	}
-	{
-		if s.Country.Set {
-			e.FieldStart("country")
-			s.Country.Encode(e)
-		}
-	}
-	{
-		if s.District.Set {
-			e.FieldStart("district")
-			s.District.Encode(e)
-		}
-	}
-	{
 		if s.Document.Set {
 			e.FieldStart("document")
 			s.Document.Encode(e)
 		}
 	}
 	{
-		if s.Ethnicity.Set {
-			e.FieldStart("ethnicity")
-			s.Ethnicity.Encode(e)
+		if s.ResultCode.Set {
+			e.FieldStart("result_code")
+			s.ResultCode.Encode(e)
 		}
 	}
 	{
-		if s.Ethnicityconf.Set {
-			e.FieldStart("ethnicityconf")
-			s.Ethnicityconf.Encode(e)
+		if s.ServerName.Set {
+			e.FieldStart("server_name")
+			s.ServerName.Encode(e)
 		}
 	}
 	{
-		if s.Expiry.Set {
-			e.FieldStart("expiry")
-			s.Expiry.Encode(e)
-		}
-	}
-	{
-		if s.Expiryconf.Set {
-			e.FieldStart("expiryconf")
-			s.Expiryconf.Encode(e)
-		}
-	}
-	{
-		if s.Hometown.Set {
-			e.FieldStart("hometown")
-			s.Hometown.Encode(e)
-		}
-	}
-	{
-		if s.Hometownconf.Set {
-			e.FieldStart("hometownconf")
-			s.Hometownconf.Encode(e)
-		}
-	}
-	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
+		if s.ServerVer.Set {
+			e.FieldStart("server_ver")
+			s.ServerVer.Encode(e)
 		}
 	}
 	{
@@ -2731,33 +2647,15 @@ func (s OCRResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.ID.Set {
+			e.FieldStart("id")
+			s.ID.Encode(e)
+		}
+	}
+	{
 		if s.Idconf.Set {
 			e.FieldStart("idconf")
 			s.Idconf.Encode(e)
-		}
-	}
-	{
-		if s.IssueBy.Set {
-			e.FieldStart("issue_by")
-			s.IssueBy.Encode(e)
-		}
-	}
-	{
-		if s.IssueByConf.Set {
-			e.FieldStart("issue_by_conf")
-			s.IssueByConf.Encode(e)
-		}
-	}
-	{
-		if s.IssueDate.Set {
-			e.FieldStart("issue_date")
-			s.IssueDate.Encode(e)
-		}
-	}
-	{
-		if s.IssueDateConf.Set {
-			e.FieldStart("issue_date_conf")
-			s.IssueDateConf.Encode(e)
 		}
 	}
 	{
@@ -2773,69 +2671,15 @@ func (s OCRResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.National.Set {
-			e.FieldStart("national")
-			s.National.Encode(e)
+		if s.Birthday.Set {
+			e.FieldStart("birthday")
+			s.Birthday.Encode(e)
 		}
 	}
 	{
-		if s.OptinalData.Set {
-			e.FieldStart("optinal_data")
-			s.OptinalData.Encode(e)
-		}
-	}
-	{
-		if s.OptionalData.Set {
-			e.FieldStart("optional_data")
-			s.OptionalData.Encode(e)
-		}
-	}
-	{
-		if s.PassportType.Set {
-			e.FieldStart("passport_type")
-			s.PassportType.Encode(e)
-		}
-	}
-	{
-		if s.Precinct.Set {
-			e.FieldStart("precinct")
-			s.Precinct.Encode(e)
-		}
-	}
-	{
-		if s.Province.Set {
-			e.FieldStart("province")
-			s.Province.Encode(e)
-		}
-	}
-	{
-		if s.Religion.Set {
-			e.FieldStart("religion")
-			s.Religion.Encode(e)
-		}
-	}
-	{
-		if s.Religionconf.Set {
-			e.FieldStart("religionconf")
-			s.Religionconf.Encode(e)
-		}
-	}
-	{
-		if s.ResultCode.Set {
-			e.FieldStart("result_code")
-			s.ResultCode.Encode(e)
-		}
-	}
-	{
-		if s.ServerName.Set {
-			e.FieldStart("server_name")
-			s.ServerName.Encode(e)
-		}
-	}
-	{
-		if s.ServerVer.Set {
-			e.FieldStart("server_ver")
-			s.ServerVer.Encode(e)
+		if s.Birthdayconf.Set {
+			e.FieldStart("birthdayconf")
+			s.Birthdayconf.Encode(e)
 		}
 	}
 	{
@@ -2851,6 +2695,102 @@ func (s OCRResult) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Hometown.Set {
+			e.FieldStart("hometown")
+			s.Hometown.Encode(e)
+		}
+	}
+	{
+		if s.Hometownconf.Set {
+			e.FieldStart("hometownconf")
+			s.Hometownconf.Encode(e)
+		}
+	}
+	{
+		if s.Address.Set {
+			e.FieldStart("address")
+			s.Address.Encode(e)
+		}
+	}
+	{
+		if s.Addressconf.Set {
+			e.FieldStart("addressconf")
+			s.Addressconf.Encode(e)
+		}
+	}
+	{
+		if s.Expiry.Set {
+			e.FieldStart("expiry")
+			s.Expiry.Encode(e)
+		}
+	}
+	{
+		if s.Expiryconf.Set {
+			e.FieldStart("expiryconf")
+			s.Expiryconf.Encode(e)
+		}
+	}
+	{
+		if s.Religion.Set {
+			e.FieldStart("religion")
+			s.Religion.Encode(e)
+		}
+	}
+	{
+		if s.Religionconf.Set {
+			e.FieldStart("religionconf")
+			s.Religionconf.Encode(e)
+		}
+	}
+	{
+		if s.IssueDate.Set {
+			e.FieldStart("issue_date")
+			s.IssueDate.Encode(e)
+		}
+	}
+	{
+		if s.IssueDateConf.Set {
+			e.FieldStart("issue_date_conf")
+			s.IssueDateConf.Encode(e)
+		}
+	}
+	{
+		if s.IssueBy.Set {
+			e.FieldStart("issue_by")
+			s.IssueBy.Encode(e)
+		}
+	}
+	{
+		if s.IssueByConf.Set {
+			e.FieldStart("issue_by_conf")
+			s.IssueByConf.Encode(e)
+		}
+	}
+	{
+		if s.Ethnicity.Set {
+			e.FieldStart("ethnicity")
+			s.Ethnicity.Encode(e)
+		}
+	}
+	{
+		if s.Ethnicityconf.Set {
+			e.FieldStart("ethnicityconf")
+			s.Ethnicityconf.Encode(e)
+		}
+	}
+	{
+		if s.Characteristics.Set {
+			e.FieldStart("characteristics")
+			s.Characteristics.Encode(e)
+		}
+	}
+	{
+		if s.CharacteristicsConf.Set {
+			e.FieldStart("characteristics_conf")
+			s.CharacteristicsConf.Encode(e)
+		}
+	}
+	{
 		if s.Street.Set {
 			e.FieldStart("street")
 			s.Street.Encode(e)
@@ -2862,54 +2802,114 @@ func (s OCRResult) encodeFields(e *jx.Encoder) {
 			s.StreetName.Encode(e)
 		}
 	}
+	{
+		if s.Country.Set {
+			e.FieldStart("country")
+			s.Country.Encode(e)
+		}
+	}
+	{
+		if s.National.Set {
+			e.FieldStart("national")
+			s.National.Encode(e)
+		}
+	}
+	{
+		if s.Class.Set {
+			e.FieldStart("class")
+			s.Class.Encode(e)
+		}
+	}
+	{
+		if s.OptinalData.Set {
+			e.FieldStart("optinal_data")
+			s.OptinalData.Encode(e)
+		}
+	}
+	{
+		if s.PassportType.Set {
+			e.FieldStart("passport_type")
+			s.PassportType.Encode(e)
+		}
+	}
+	{
+		if s.Province.Set {
+			e.FieldStart("province")
+			s.Province.Encode(e)
+		}
+	}
+	{
+		if s.District.Set {
+			e.FieldStart("district")
+			s.District.Encode(e)
+		}
+	}
+	{
+		if s.Precinct.Set {
+			e.FieldStart("precinct")
+			s.Precinct.Encode(e)
+		}
+	}
+	{
+		if s.OptionalData.Set {
+			e.FieldStart("optional_data")
+			s.OptionalData.Encode(e)
+		}
+	}
+	{
+		if s.Copyright.Set {
+			e.FieldStart("copyright")
+			s.Copyright.Encode(e)
+		}
+	}
 }
 
 var jsonFieldsNameOfOCRResult = [45]string{
-	0:  "address",
-	1:  "addressconf",
-	2:  "birthday",
-	3:  "birthdayconf",
-	4:  "characteristics",
-	5:  "characteristics_conf",
-	6:  "class",
-	7:  "copyright",
-	8:  "country",
-	9:  "district",
-	10: "document",
-	11: "ethnicity",
-	12: "ethnicityconf",
-	13: "expiry",
-	14: "expiryconf",
-	15: "hometown",
-	16: "hometownconf",
-	17: "id",
-	18: "id_check",
-	19: "id_full",
-	20: "id_logic",
-	21: "id_logic_message",
-	22: "id_type",
-	23: "idconf",
-	24: "issue_by",
-	25: "issue_by_conf",
-	26: "issue_date",
-	27: "issue_date_conf",
-	28: "name",
-	29: "nameconf",
-	30: "national",
-	31: "optinal_data",
-	32: "optional_data",
-	33: "passport_type",
-	34: "precinct",
-	35: "province",
-	36: "religion",
-	37: "religionconf",
-	38: "result_code",
-	39: "server_name",
-	40: "server_ver",
-	41: "sex",
-	42: "sexconf",
-	43: "street",
-	44: "street_name",
+	0:  "document",
+	1:  "result_code",
+	2:  "server_name",
+	3:  "server_ver",
+	4:  "id_check",
+	5:  "id_full",
+	6:  "id_logic",
+	7:  "id_logic_message",
+	8:  "id_type",
+	9:  "id",
+	10: "idconf",
+	11: "name",
+	12: "nameconf",
+	13: "birthday",
+	14: "birthdayconf",
+	15: "sex",
+	16: "sexconf",
+	17: "hometown",
+	18: "hometownconf",
+	19: "address",
+	20: "addressconf",
+	21: "expiry",
+	22: "expiryconf",
+	23: "religion",
+	24: "religionconf",
+	25: "issue_date",
+	26: "issue_date_conf",
+	27: "issue_by",
+	28: "issue_by_conf",
+	29: "ethnicity",
+	30: "ethnicityconf",
+	31: "characteristics",
+	32: "characteristics_conf",
+	33: "street",
+	34: "street_name",
+	35: "country",
+	36: "national",
+	37: "class",
+	38: "optinal_data",
+	39: "passport_type",
+	40: "province",
+	41: "district",
+	42: "precinct",
+	43: "optional_data",
+	44: "copyright",
 }
 
 // Decode decodes OCRResult from json.
@@ -2920,106 +2920,6 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "address":
-			if err := func() error {
-				s.Address.Reset()
-				if err := s.Address.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"address\"")
-			}
-		case "addressconf":
-			if err := func() error {
-				s.Addressconf.Reset()
-				if err := s.Addressconf.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"addressconf\"")
-			}
-		case "birthday":
-			if err := func() error {
-				s.Birthday.Reset()
-				if err := s.Birthday.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"birthday\"")
-			}
-		case "birthdayconf":
-			if err := func() error {
-				s.Birthdayconf.Reset()
-				if err := s.Birthdayconf.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"birthdayconf\"")
-			}
-		case "characteristics":
-			if err := func() error {
-				s.Characteristics.Reset()
-				if err := s.Characteristics.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"characteristics\"")
-			}
-		case "characteristics_conf":
-			if err := func() error {
-				s.CharacteristicsConf.Reset()
-				if err := s.CharacteristicsConf.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"characteristics_conf\"")
-			}
-		case "class":
-			if err := func() error {
-				s.Class.Reset()
-				if err := s.Class.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"class\"")
-			}
-		case "copyright":
-			if err := func() error {
-				s.Copyright.Reset()
-				if err := s.Copyright.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"copyright\"")
-			}
-		case "country":
-			if err := func() error {
-				s.Country.Reset()
-				if err := s.Country.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"country\"")
-			}
-		case "district":
-			if err := func() error {
-				s.District.Reset()
-				if err := s.District.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"district\"")
-			}
 		case "document":
 			if err := func() error {
 				s.Document.Reset()
@@ -3030,75 +2930,35 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"document\"")
 			}
-		case "ethnicity":
+		case "result_code":
 			if err := func() error {
-				s.Ethnicity.Reset()
-				if err := s.Ethnicity.Decode(d); err != nil {
+				s.ResultCode.Reset()
+				if err := s.ResultCode.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ethnicity\"")
+				return errors.Wrap(err, "decode field \"result_code\"")
 			}
-		case "ethnicityconf":
+		case "server_name":
 			if err := func() error {
-				s.Ethnicityconf.Reset()
-				if err := s.Ethnicityconf.Decode(d); err != nil {
+				s.ServerName.Reset()
+				if err := s.ServerName.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ethnicityconf\"")
+				return errors.Wrap(err, "decode field \"server_name\"")
 			}
-		case "expiry":
+		case "server_ver":
 			if err := func() error {
-				s.Expiry.Reset()
-				if err := s.Expiry.Decode(d); err != nil {
+				s.ServerVer.Reset()
+				if err := s.ServerVer.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"expiry\"")
-			}
-		case "expiryconf":
-			if err := func() error {
-				s.Expiryconf.Reset()
-				if err := s.Expiryconf.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"expiryconf\"")
-			}
-		case "hometown":
-			if err := func() error {
-				s.Hometown.Reset()
-				if err := s.Hometown.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hometown\"")
-			}
-		case "hometownconf":
-			if err := func() error {
-				s.Hometownconf.Reset()
-				if err := s.Hometownconf.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hometownconf\"")
-			}
-		case "id":
-			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"id\"")
+				return errors.Wrap(err, "decode field \"server_ver\"")
 			}
 		case "id_check":
 			if err := func() error {
@@ -3150,6 +3010,16 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"id_type\"")
 			}
+		case "id":
+			if err := func() error {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
 		case "idconf":
 			if err := func() error {
 				s.Idconf.Reset()
@@ -3159,46 +3029,6 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"idconf\"")
-			}
-		case "issue_by":
-			if err := func() error {
-				s.IssueBy.Reset()
-				if err := s.IssueBy.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"issue_by\"")
-			}
-		case "issue_by_conf":
-			if err := func() error {
-				s.IssueByConf.Reset()
-				if err := s.IssueByConf.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"issue_by_conf\"")
-			}
-		case "issue_date":
-			if err := func() error {
-				s.IssueDate.Reset()
-				if err := s.IssueDate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"issue_date\"")
-			}
-		case "issue_date_conf":
-			if err := func() error {
-				s.IssueDateConf.Reset()
-				if err := s.IssueDateConf.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"issue_date_conf\"")
 			}
 		case "name":
 			if err := func() error {
@@ -3220,115 +3050,25 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"nameconf\"")
 			}
-		case "national":
+		case "birthday":
 			if err := func() error {
-				s.National.Reset()
-				if err := s.National.Decode(d); err != nil {
+				s.Birthday.Reset()
+				if err := s.Birthday.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"national\"")
+				return errors.Wrap(err, "decode field \"birthday\"")
 			}
-		case "optinal_data":
+		case "birthdayconf":
 			if err := func() error {
-				s.OptinalData.Reset()
-				if err := s.OptinalData.Decode(d); err != nil {
+				s.Birthdayconf.Reset()
+				if err := s.Birthdayconf.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"optinal_data\"")
-			}
-		case "optional_data":
-			if err := func() error {
-				s.OptionalData.Reset()
-				if err := s.OptionalData.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"optional_data\"")
-			}
-		case "passport_type":
-			if err := func() error {
-				s.PassportType.Reset()
-				if err := s.PassportType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"passport_type\"")
-			}
-		case "precinct":
-			if err := func() error {
-				s.Precinct.Reset()
-				if err := s.Precinct.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"precinct\"")
-			}
-		case "province":
-			if err := func() error {
-				s.Province.Reset()
-				if err := s.Province.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"province\"")
-			}
-		case "religion":
-			if err := func() error {
-				s.Religion.Reset()
-				if err := s.Religion.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"religion\"")
-			}
-		case "religionconf":
-			if err := func() error {
-				s.Religionconf.Reset()
-				if err := s.Religionconf.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"religionconf\"")
-			}
-		case "result_code":
-			if err := func() error {
-				s.ResultCode.Reset()
-				if err := s.ResultCode.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"result_code\"")
-			}
-		case "server_name":
-			if err := func() error {
-				s.ServerName.Reset()
-				if err := s.ServerName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"server_name\"")
-			}
-		case "server_ver":
-			if err := func() error {
-				s.ServerVer.Reset()
-				if err := s.ServerVer.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"server_ver\"")
+				return errors.Wrap(err, "decode field \"birthdayconf\"")
 			}
 		case "sex":
 			if err := func() error {
@@ -3350,6 +3090,166 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"sexconf\"")
 			}
+		case "hometown":
+			if err := func() error {
+				s.Hometown.Reset()
+				if err := s.Hometown.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hometown\"")
+			}
+		case "hometownconf":
+			if err := func() error {
+				s.Hometownconf.Reset()
+				if err := s.Hometownconf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hometownconf\"")
+			}
+		case "address":
+			if err := func() error {
+				s.Address.Reset()
+				if err := s.Address.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"address\"")
+			}
+		case "addressconf":
+			if err := func() error {
+				s.Addressconf.Reset()
+				if err := s.Addressconf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"addressconf\"")
+			}
+		case "expiry":
+			if err := func() error {
+				s.Expiry.Reset()
+				if err := s.Expiry.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expiry\"")
+			}
+		case "expiryconf":
+			if err := func() error {
+				s.Expiryconf.Reset()
+				if err := s.Expiryconf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"expiryconf\"")
+			}
+		case "religion":
+			if err := func() error {
+				s.Religion.Reset()
+				if err := s.Religion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"religion\"")
+			}
+		case "religionconf":
+			if err := func() error {
+				s.Religionconf.Reset()
+				if err := s.Religionconf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"religionconf\"")
+			}
+		case "issue_date":
+			if err := func() error {
+				s.IssueDate.Reset()
+				if err := s.IssueDate.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"issue_date\"")
+			}
+		case "issue_date_conf":
+			if err := func() error {
+				s.IssueDateConf.Reset()
+				if err := s.IssueDateConf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"issue_date_conf\"")
+			}
+		case "issue_by":
+			if err := func() error {
+				s.IssueBy.Reset()
+				if err := s.IssueBy.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"issue_by\"")
+			}
+		case "issue_by_conf":
+			if err := func() error {
+				s.IssueByConf.Reset()
+				if err := s.IssueByConf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"issue_by_conf\"")
+			}
+		case "ethnicity":
+			if err := func() error {
+				s.Ethnicity.Reset()
+				if err := s.Ethnicity.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ethnicity\"")
+			}
+		case "ethnicityconf":
+			if err := func() error {
+				s.Ethnicityconf.Reset()
+				if err := s.Ethnicityconf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ethnicityconf\"")
+			}
+		case "characteristics":
+			if err := func() error {
+				s.Characteristics.Reset()
+				if err := s.Characteristics.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"characteristics\"")
+			}
+		case "characteristics_conf":
+			if err := func() error {
+				s.CharacteristicsConf.Reset()
+				if err := s.CharacteristicsConf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"characteristics_conf\"")
+			}
 		case "street":
 			if err := func() error {
 				s.Street.Reset()
@@ -3369,6 +3269,106 @@ func (s *OCRResult) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"street_name\"")
+			}
+		case "country":
+			if err := func() error {
+				s.Country.Reset()
+				if err := s.Country.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"country\"")
+			}
+		case "national":
+			if err := func() error {
+				s.National.Reset()
+				if err := s.National.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"national\"")
+			}
+		case "class":
+			if err := func() error {
+				s.Class.Reset()
+				if err := s.Class.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"class\"")
+			}
+		case "optinal_data":
+			if err := func() error {
+				s.OptinalData.Reset()
+				if err := s.OptinalData.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"optinal_data\"")
+			}
+		case "passport_type":
+			if err := func() error {
+				s.PassportType.Reset()
+				if err := s.PassportType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"passport_type\"")
+			}
+		case "province":
+			if err := func() error {
+				s.Province.Reset()
+				if err := s.Province.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"province\"")
+			}
+		case "district":
+			if err := func() error {
+				s.District.Reset()
+				if err := s.District.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"district\"")
+			}
+		case "precinct":
+			if err := func() error {
+				s.Precinct.Reset()
+				if err := s.Precinct.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"precinct\"")
+			}
+		case "optional_data":
+			if err := func() error {
+				s.OptionalData.Reset()
+				if err := s.OptionalData.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"optional_data\"")
+			}
+		case "copyright":
+			if err := func() error {
+				s.Copyright.Reset()
+				if err := s.Copyright.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"copyright\"")
 			}
 		default:
 			return d.Skip()

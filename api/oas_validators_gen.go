@@ -37,6 +37,24 @@ func (s DocumentEnum) Validate() error {
 func (s FaceAntiSpoofStatus) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
+		if s.Status.Set {
+			if err := func() error {
+				if err := s.Status.Value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "status",
+			Error: err,
+		})
+	}
+	if err := func() error {
 		if s.FakeCode.Set {
 			if err := func() error {
 				if err := s.FakeCode.Value.Validate(); err != nil {
@@ -96,24 +114,6 @@ func (s FaceAntiSpoofStatus) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "fake_type",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.Status.Set {
-			if err := func() error {
-				if err := s.Status.Value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "status",
 			Error: err,
 		})
 	}
@@ -304,33 +304,6 @@ func (s FaceIDResult) Validate() error {
 func (s FaceIDVerificationInput) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.FakeThreshold.Set {
-			if err := func() error {
-				if err := (validate.Float{
-					MinSet:        true,
-					Min:           0,
-					MaxSet:        true,
-					Max:           1,
-					MinExclusive:  false,
-					MaxExclusive:  false,
-					MultipleOfSet: false,
-					MultipleOf:    nil,
-				}).Validate(float64(s.FakeThreshold.Value)); err != nil {
-					return errors.Wrap(err, "float")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "fake_threshold",
-			Error: err,
-		})
-	}
-	if err := func() error {
 		if s.MaskThreshold.Set {
 			if err := func() error {
 				if err := (validate.Float{
@@ -354,6 +327,33 @@ func (s FaceIDVerificationInput) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "mask_threshold",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.FakeThreshold.Set {
+			if err := func() error {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.FakeThreshold.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "fake_threshold",
 			Error: err,
 		})
 	}
@@ -419,33 +419,6 @@ func (s FaceIDVerificationInput) Validate() error {
 func (s FaceIDVerificationInputForm) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.FakeThreshold.Set {
-			if err := func() error {
-				if err := (validate.Float{
-					MinSet:        true,
-					Min:           0,
-					MaxSet:        true,
-					Max:           1,
-					MinExclusive:  false,
-					MaxExclusive:  false,
-					MultipleOfSet: false,
-					MultipleOf:    nil,
-				}).Validate(float64(s.FakeThreshold.Value)); err != nil {
-					return errors.Wrap(err, "float")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "fake_threshold",
-			Error: err,
-		})
-	}
-	if err := func() error {
 		if s.MaskThreshold.Set {
 			if err := func() error {
 				if err := (validate.Float{
@@ -469,6 +442,33 @@ func (s FaceIDVerificationInputForm) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "mask_threshold",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.FakeThreshold.Set {
+			if err := func() error {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.FakeThreshold.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "fake_threshold",
 			Error: err,
 		})
 	}
@@ -534,9 +534,9 @@ func (s FaceIDVerificationInputForm) Validate() error {
 func (s FaceIDVerificationResult) Validate() error {
 	var failures []validate.FieldError
 	if err := func() error {
-		if s.FaceAntiSpoofStatus.Set {
+		if s.VerifyResult.Set {
 			if err := func() error {
-				if err := s.FaceAntiSpoofStatus.Value.Validate(); err != nil {
+				if err := s.VerifyResult.Value.Validate(); err != nil {
 					return err
 				}
 				return nil
@@ -547,7 +547,34 @@ func (s FaceIDVerificationResult) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "face_anti_spoof_status",
+			Name:  "verify_result",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if s.Sim.Set {
+			if err := func() error {
+				if err := (validate.Float{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        true,
+					Max:           1,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    nil,
+				}).Validate(float64(s.Sim.Value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "sim",
 			Error: err,
 		})
 	}
@@ -628,19 +655,10 @@ func (s FaceIDVerificationResult) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.Sim.Set {
+		if s.FaceAntiSpoofStatus.Set {
 			if err := func() error {
-				if err := (validate.Float{
-					MinSet:        true,
-					Min:           0,
-					MaxSet:        true,
-					Max:           1,
-					MinExclusive:  false,
-					MaxExclusive:  false,
-					MultipleOfSet: false,
-					MultipleOf:    nil,
-				}).Validate(float64(s.Sim.Value)); err != nil {
-					return errors.Wrap(err, "float")
+				if err := s.FaceAntiSpoofStatus.Value.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -650,7 +668,7 @@ func (s FaceIDVerificationResult) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "sim",
+			Name:  "face_anti_spoof_status",
 			Error: err,
 		})
 	}
@@ -669,24 +687,6 @@ func (s FaceIDVerificationResult) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "verification_time",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.VerifyResult.Set {
-			if err := func() error {
-				if err := s.VerifyResult.Value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "verify_result",
 			Error: err,
 		})
 	}
@@ -951,6 +951,24 @@ func (s OCRResult) Validate() error {
 		})
 	}
 	if err := func() error {
+		if s.ResultCode.Set {
+			if err := func() error {
+				if err := s.ResultCode.Value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "result_code",
+			Error: err,
+		})
+	}
+	if err := func() error {
 		if s.IDCheck.Set {
 			if err := func() error {
 				if err := s.IDCheck.Value.Validate(); err != nil {
@@ -983,24 +1001,6 @@ func (s OCRResult) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "id_type",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if s.ResultCode.Set {
-			if err := func() error {
-				if err := s.ResultCode.Value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "result_code",
 			Error: err,
 		})
 	}

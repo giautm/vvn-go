@@ -9,14 +9,14 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
-	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeFaceRecognitionResponse(resp *http.Response, span trace.Span) (res FaceRecognitionRes, err error) {
+func decodeFaceRecognitionResponse(resp *http.Response) (res FaceRecognitionRes, err error) {
 	switch resp.StatusCode {
 	case 200:
+		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -36,13 +36,17 @@ func decodeFaceRecognitionResponse(resp *http.Response, span trace.Span) (res Fa
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
 	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -62,19 +66,23 @@ func decodeFaceRecognitionResponse(resp *http.Response, span trace.Span) (res Fa
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	default:
-		return res, validate.UnexpectedStatusCode(resp.StatusCode)
 	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
-func decodeFaceRegisterResponse(resp *http.Response, span trace.Span) (res FaceRegisterRes, err error) {
+
+func decodeFaceRegisterResponse(resp *http.Response) (res FaceRegisterRes, err error) {
 	switch resp.StatusCode {
 	case 200:
+		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -94,13 +102,17 @@ func decodeFaceRegisterResponse(resp *http.Response, span trace.Span) (res FaceR
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
 	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -120,19 +132,23 @@ func decodeFaceRegisterResponse(resp *http.Response, span trace.Span) (res FaceR
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	default:
-		return res, validate.UnexpectedStatusCode(resp.StatusCode)
 	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
-func decodeFaceUnregisterResponse(resp *http.Response, span trace.Span) (res FaceUnregisterRes, err error) {
+
+func decodeFaceUnregisterResponse(resp *http.Response) (res FaceUnregisterRes, err error) {
 	switch resp.StatusCode {
 	case 200:
+		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -152,13 +168,17 @@ func decodeFaceUnregisterResponse(resp *http.Response, span trace.Span) (res Fac
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
 	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -178,19 +198,23 @@ func decodeFaceUnregisterResponse(resp *http.Response, span trace.Span) (res Fac
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	default:
-		return res, validate.UnexpectedStatusCode(resp.StatusCode)
 	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
-func decodeFaceVerificationResponse(resp *http.Response, span trace.Span) (res FaceVerificationRes, err error) {
+
+func decodeFaceVerificationResponse(resp *http.Response) (res FaceVerificationRes, err error) {
 	switch resp.StatusCode {
 	case 200:
+		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -210,13 +234,17 @@ func decodeFaceVerificationResponse(resp *http.Response, span trace.Span) (res F
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
 	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -236,19 +264,23 @@ func decodeFaceVerificationResponse(resp *http.Response, span trace.Span) (res F
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	default:
-		return res, validate.UnexpectedStatusCode(resp.StatusCode)
 	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
-func decodeOCRecognitionResponse(resp *http.Response, span trace.Span) (res OCRecognitionRes, err error) {
+
+func decodeOCRecognitionResponse(resp *http.Response) (res OCRecognitionRes, err error) {
 	switch resp.StatusCode {
 	case 200:
+		// Code 200.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -268,13 +300,17 @@ func decodeOCRecognitionResponse(resp *http.Response, span trace.Span) (res OCRe
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
 	case 401:
+		// Code 401.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -294,13 +330,15 @@ func decodeOCRecognitionResponse(resp *http.Response, span trace.Span) (res OCRe
 				}
 				return nil
 			}(); err != nil {
-				return res, err
+				return res, errors.Wrap(err, "decode \"application/json\"")
+			}
+			if err := d.Skip(); err != io.EOF {
+				return res, errors.New("unexpected trailing data")
 			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	default:
-		return res, validate.UnexpectedStatusCode(resp.StatusCode)
 	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }

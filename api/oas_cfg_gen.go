@@ -7,11 +7,16 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/nonrecording"
+	"go.opentelemetry.io/otel/metric/instrument/syncint64"
 	"go.opentelemetry.io/otel/trace"
 
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/otelogen"
+)
+
+var (
+	// Allocate option closure once.
+	clientSpanKind = trace.WithSpanKind(trace.SpanKindClient)
 )
 
 type config struct {
@@ -25,7 +30,7 @@ type config struct {
 func newConfig(opts ...Option) config {
 	cfg := config{
 		TracerProvider: otel.GetTracerProvider(),
-		MeterProvider:  nonrecording.NewNoopMeterProvider(),
+		MeterProvider:  metric.NewNoopMeterProvider(),
 		Client:         http.DefaultClient,
 	}
 	for _, opt := range opts {
@@ -38,6 +43,28 @@ func newConfig(opts ...Option) config {
 	return cfg
 }
 
+type baseClient struct {
+	cfg      config
+	requests syncint64.Counter
+	errors   syncint64.Counter
+	duration syncint64.Histogram
+}
+
+func (cfg config) baseClient() (c baseClient, err error) {
+	c = baseClient{cfg: cfg}
+	if c.requests, err = c.cfg.Meter.SyncInt64().Counter(otelogen.ClientRequestCount); err != nil {
+		return c, err
+	}
+	if c.errors, err = c.cfg.Meter.SyncInt64().Counter(otelogen.ClientErrorsCount); err != nil {
+		return c, err
+	}
+	if c.duration, err = c.cfg.Meter.SyncInt64().Histogram(otelogen.ClientDuration); err != nil {
+		return c, err
+	}
+	return c, nil
+}
+
+// Option is config option.
 type Option interface {
 	apply(*config)
 }
